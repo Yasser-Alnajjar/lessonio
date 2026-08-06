@@ -30,5 +30,21 @@
     "forgotPassword": "Forgot password?",
     "email": "Email",
     "password": "Password"
+  },
+  "theme": {
+    "toggleLabel": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "themePreview": {
+    "heading": "Every study session, one continuous line.",
+    "subheading": "Study Line turns lessons, homework, and study time into a single trend you can watch move.",
+    "colorsHeading": "Palette",
+    "typographyHeading": "Type",
+    "typographyBody": "Fraunces carries hero moments. Geist Sans runs the interface. Geist Mono aligns every number.",
+    "glassHeading": "Floating surfaces",
+    "glassBody": "Reserved for overlays — the command palette, popovers, the mobile action menu. Standard cards stay solid.",
+    "note": "Theme preview — Phase 3. The real dashboard lands in Phase 7."
   }
 }

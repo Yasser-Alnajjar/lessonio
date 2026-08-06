@@ -1,0 +1,13 @@
+export * as Auth from "./auth";
+export * as Dashboard from "./dashboard";
+export * as Subjects from "./subjects";
+export * as Lessons from "./lessons";
+export * as Homework from "./homework";
+export * as Exams from "./exams";
+export * as StudySessions from "./study-sessions";
+export * as Calendar from "./calendar";
+export * as Search from "./search";
+export * as Statistics from "./statistics";
+export * as Notifications from "./notifications";
+export * as Gamification from "./gamification";
+export * as Settings from "./settings";

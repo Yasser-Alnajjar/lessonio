@@ -1,4 +1,8 @@
 {
+  "Index": {
+    "name": "Study Line",
+    "tagline": "Your study, on track."
+  },
   "app": {
     "name": "Study Line",
     "tagline": "Your study, on track."
@@ -120,5 +124,53 @@
     "glassHeading": "Floating surfaces",
     "glassBody": "Reserved for overlays — the command palette, popovers, the mobile action menu. Standard cards stay solid.",
     "note": "Theme preview — Phase 3. The real dashboard lands in Phase 7."
+  },
+  "dashboard": {
+    "greeting": {
+      "morning": "Good morning, {name}",
+      "afternoon": "Good afternoon, {name}",
+      "evening": "Good evening, {name}",
+      "subtitle": "Here's where your study line stands today."
+    },
+    "streak": {
+      "label": "Day streak",
+      "longest": "Longest: {days} days",
+      "empty": "Start a study session to begin your streak."
+    },
+    "progress": {
+      "title": "Weekly goal",
+      "level": "Level {level}",
+      "xpToNext": "{xp}/{xpToNext} XP to next level"
+    },
+    "todayLessons": {
+      "title": "Today's lessons",
+      "empty": "No lessons scheduled for today."
+    },
+    "upcomingLessons": {
+      "title": "Upcoming lessons",
+      "empty": "Nothing coming up yet."
+    },
+    "recentActivity": {
+      "title": "Recent activity",
+      "empty": "Your recent activity will show up here.",
+      "kinds": {
+        "lesson_completed": "Completed",
+        "note_added": "Added a note to",
+        "homework_done": "Finished homework",
+        "exam_scored": "Scored an exam"
+      }
+    },
+    "weeklySummary": {
+      "title": "This week",
+      "subtitle": "{minutes} of {target} min studied",
+      "noGoal": "{minutes} min studied — set a weekly goal to track progress here."
+    },
+    "quickActions": {
+      "title": "Quick actions",
+      "addLesson": "Add lesson",
+      "startSession": "Start studying",
+      "logHomework": "Log homework",
+      "viewCalendar": "View calendar"
+    }
   }
 }

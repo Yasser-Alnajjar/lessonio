@@ -1,18 +1,76 @@
 "use client";
 
-import { FeaturePlaceholder } from "@/components/shared/feature-placeholder";
 import type { DashboardOverviewData } from "@/lib/types/dashboard";
+import { GreetingCard } from "./greeting-card";
+import { StreakCard } from "./streak-card";
+import { ProgressCard } from "./progress-card";
+import { LessonListCard } from "./lesson-list-card";
+import { RecentActivityCard } from "./recent-activity-card";
+import { WeeklySummaryCard } from "./weekly-summary-card";
+import { QuickActionsCard } from "./quick-actions-card";
+import useTranslate from "@/hooks/useTranslate";
 
 interface DashboardOverviewViewProps {
   data: DashboardOverviewData | null;
 }
 
 export const DashboardOverviewView = ({ data }: DashboardOverviewViewProps) => {
+  const t = useTranslate("dashboard");
+
+  const greetingName = data?.greetingName ?? "there";
+  const progress = data?.progress ?? {
+    xp: 0,
+    level: 1,
+    xpToNextLevel: 100,
+    currentStreakDays: 0,
+    longestStreakDays: 0,
+  };
+  const overallProgressPercent = data?.overallProgressPercent ?? 0;
+  const todayLessons = data?.todayLessons ?? [];
+  const upcomingLessons = data?.upcomingLessons ?? [];
+  const recentActivity = data?.recentActivity ?? [];
+  const weeklySummary = data?.weeklySummary ?? {
+    totalMinutes: 0,
+    targetMinutes: 0,
+    dayBreakdown: [],
+  };
+
   return (
-    <FeaturePlaceholder
-      title="Dashboard"
-      description="This view will be built in Phase 7 (Dashboard Layout)."
-      itemCount={data ? 1 : 0}
-    />
+    <div className="flex flex-col gap-6 p-4">
+      <GreetingCard name={greetingName} />
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <StreakCard
+          currentStreakDays={progress.currentStreakDays}
+          longestStreakDays={progress.longestStreakDays}
+        />
+        <ProgressCard
+          percent={overallProgressPercent}
+          level={progress.level}
+          xp={progress.xp}
+          xpToNextLevel={progress.xpToNextLevel}
+        />
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <LessonListCard
+          title={t("todayLessons.title")}
+          lessons={todayLessons}
+          emptyMessage={t("todayLessons.empty")}
+        />
+        <LessonListCard
+          title={t("upcomingLessons.title")}
+          lessons={upcomingLessons}
+          emptyMessage={t("upcomingLessons.empty")}
+        />
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <WeeklySummaryCard summary={weeklySummary} />
+        <RecentActivityCard items={recentActivity} />
+      </div>
+
+      <QuickActionsCard />
+    </div>
   );
 };

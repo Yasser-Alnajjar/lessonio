@@ -1,6 +1,6 @@
 -- Objects are stored at "{user_id}/{lesson_id}/{filename}" so ownership can
 -- be checked from the path alone via storage.foldername(name), matching the
--- pattern src/actions/... will use when it uploads (Phase 10).
+-- pattern src/actions/attachments.mutations.ts uses when it uploads (Phase 9).
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values (
   'attachments',
@@ -16,10 +16,11 @@ values (
 )
 on conflict (id) do nothing;
 
--- Explicit rather than assumed: real Supabase projects enable RLS on
--- storage.objects by default, but stating it here makes this migration
--- correct on its own regardless of platform defaults. Idempotent if already on.
-alter table storage.objects enable row level security;
+-- No `alter table storage.objects enable row level security` here: hosted
+-- Supabase projects already have it on and own the table as
+-- `supabase_storage_admin`, so the migration role can't ALTER it (only
+-- CREATE POLICY, which is what actually grants access). Local Docker stacks
+-- also ship with it enabled by default, so nothing is lost by omitting it.
 
 create policy "Anyone can view attachment files"
   on storage.objects for select

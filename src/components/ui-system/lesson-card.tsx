@@ -11,6 +11,7 @@ import type { Lesson, LessonWithRelations } from "@/lib/types/lesson";
 export interface LessonCardProps extends React.ComponentProps<"div"> {
   lesson: Lesson | LessonWithRelations;
   href?: string;
+  actions?: React.ReactNode;
 }
 
 function hasRelations(
@@ -19,7 +20,7 @@ function hasRelations(
   return "subjectName" in lesson;
 }
 
-export function LessonCard({ lesson, href, className, ...props }: LessonCardProps) {
+export function LessonCard({ lesson, href, actions, className, ...props }: LessonCardProps) {
   const relations = hasRelations(lesson) ? lesson : null;
 
   const content = (
@@ -28,6 +29,7 @@ export function LessonCard({ lesson, href, className, ...props }: LessonCardProp
       className={cn(
         "h-full gap-3 transition-shadow",
         href && "cursor-pointer hover:shadow-md",
+        lesson.isArchived && "opacity-60",
         className,
       )}
       {...props}
@@ -50,7 +52,10 @@ export function LessonCard({ lesson, href, className, ...props }: LessonCardProp
             {lesson.title}
           </h3>
         </div>
-        <StatusBadge kind="study" status={lesson.studyStatus} className="shrink-0" />
+        <div className="flex shrink-0 items-center gap-2">
+          <StatusBadge kind="study" status={lesson.studyStatus} />
+          {actions && <div className="w-8 shrink-0" aria-hidden />}
+        </div>
       </CardHeader>
       <CardContent className="flex flex-col gap-1.5 text-xs text-muted-foreground">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
@@ -89,15 +94,24 @@ export function LessonCard({ lesson, href, className, ...props }: LessonCardProp
     </Card>
   );
 
-  if (href) {
-    return (
-      <Link href={href} className="block h-full">
-        {content}
-      </Link>
-    );
+  const linked = href ? (
+    <Link href={href} className="block h-full">
+      {content}
+    </Link>
+  ) : (
+    content
+  );
+
+  if (!actions) {
+    return linked;
   }
 
-  return content;
+  return (
+    <div className="relative h-full">
+      {linked}
+      <div className="absolute end-4 top-4">{actions}</div>
+    </div>
+  );
 }
 
 export function LessonCardSkeleton({

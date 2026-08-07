@@ -236,5 +236,128 @@
       "totalStudyMinutes": "وقت المذاكرة",
       "minutesSuffix": "د"
     }
+  },
+  "lessons": {
+    "list": {
+      "title": "الدروس",
+      "subtitle": "كل حصة، متتبَّعة من الجدول إلى المراجعة.",
+      "newLesson": "درس جديد",
+      "noSubjectsHint": "أنشئ مادة أولاً — يحتاج كل درس إلى مادة ينتمي إليها.",
+      "searchPlaceholder": "البحث في الدروس...",
+      "filterStatus": "حالة المذاكرة",
+      "filterSubject": "المادة",
+      "filterDateRange": "النطاق الزمني",
+      "showArchived": "إظهار المؤرشفة",
+      "hideArchived": "إخفاء المؤرشفة",
+      "emptyTitle": "لا توجد دروس بعد",
+      "emptyDescription": "أضف درسك الأول لتبدأ بتتبع الحضور وتقدّم المذاكرة والمزيد.",
+      "emptyAction": "درس جديد",
+      "noResultsTitle": "لا توجد دروس مطابقة",
+      "noResultsDescription": "جرّب كلمة بحث مختلفة أو امسح عوامل التصفية."
+    },
+    "card": {
+      "actionsLabel": "إجراءات الدرس",
+      "edit": "تعديل",
+      "duplicate": "نسخ",
+      "archive": "أرشفة",
+      "unarchive": "إلغاء الأرشفة",
+      "delete": "حذف"
+    },
+    "form": {
+      "createTitle": "درس جديد",
+      "editTitle": "تعديل الدرس",
+      "createDescription": "حدّد موعد درس وأضف له وسومًا لتسهيل التصفية لاحقًا.",
+      "editDescription": "حدّث الجدول أو التفاصيل أو الوسوم لهذا الدرس.",
+      "subjectLabel": "المادة",
+      "subjectPlaceholder": "اختر مادة",
+      "titleLabel": "العنوان",
+      "titlePlaceholder": "مثال: الفصل 4: التكاملات",
+      "teacherLabel": "المعلّم",
+      "teacherPlaceholder": "مثال: د. سميث",
+      "locationLabel": "المكان",
+      "locationPlaceholder": "مثال: قاعة 204",
+      "dateLabel": "التاريخ",
+      "timeLabel": "الوقت",
+      "durationLabel": "المدة (دقيقة)",
+      "tagsLabel": "الوسوم",
+      "tagsTrigger": "الوسوم",
+      "newTagPlaceholder": "اسم وسم جديد",
+      "noTags": "لا توجد وسوم بعد — أنشئ واحدًا أدناه.",
+      "cancel": "إلغاء",
+      "submitting": "جارٍ الحفظ...",
+      "submitCreate": "إنشاء الدرس",
+      "submitEdit": "حفظ التغييرات",
+      "errors": {
+        "subjectRequired": "اختر مادة",
+        "titleRequired": "العنوان مطلوب",
+        "titleMax": "يجب ألا يتجاوز العنوان 160 حرفًا",
+        "teacherMax": "يجب ألا يتجاوز اسم المعلّم 120 حرفًا",
+        "locationMax": "يجب ألا يتجاوز المكان 120 حرفًا",
+        "dateRequired": "التاريخ مطلوب",
+        "timeRequired": "الوقت مطلوب",
+        "durationInvalid": "يجب أن تكون المدة رقمًا موجبًا"
+      }
+    },
+    "delete": {
+      "title": "حذف الدرس؟",
+      "description": "سيؤدي هذا إلى حذف \"{title}\" نهائيًا مع ملاحظاته ومرفقاته. لا يمكن التراجع عن هذا.",
+      "confirm": "حذف الدرس",
+      "cancel": "إلغاء",
+      "genericError": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
+    },
+    "detail": {
+      "backToList": "العودة إلى الدروس",
+      "notFoundTitle": "الدرس غير موجود",
+      "notFoundDescription": "ربما تم حذف هذا الدرس.",
+      "archivedNote": "مؤرشف",
+      "edit": "تعديل",
+      "duplicate": "نسخ",
+      "archive": "أرشفة",
+      "unarchive": "إلغاء الأرشفة",
+      "delete": "حذف",
+      "minutesSuffix": "د",
+      "statusTitle": "الحالة",
+      "notesTab": "الملاحظات",
+      "attachmentsTab": "المرفقات"
+    },
+    "status": {
+      "attendance": "الحضور",
+      "study": "المذاكرة",
+      "review": "المراجعة",
+      "homework": "الواجب",
+      "exam": "الاختبار"
+    },
+    "notes": {
+      "untitled": "ملاحظة بلا عنوان",
+      "searchPlaceholder": "البحث في الملاحظات...",
+      "newNote": "ملاحظة جديدة",
+      "noSearchResults": "لا توجد ملاحظات مطابقة لبحثك.",
+      "selectPrompt": "اختر ملاحظة لبدء التعديل.",
+      "emptyTitle": "لا توجد ملاحظات بعد",
+      "emptyDescription": "أضف ملاحظتك الأولى لتدوين ما حدث في هذا الدرس.",
+      "titlePlaceholder": "عنوان الملاحظة",
+      "saving": "جارٍ الحفظ...",
+      "saved": "تم الحفظ",
+      "delete": "حذف الملاحظة",
+      "write": "كتابة",
+      "preview": "معاينة",
+      "contentPlaceholder": "اكتب بصيغة Markdown...",
+      "nothingToPreview": "لا يوجد شيء لمعاينته بعد."
+    },
+    "attachments": {
+      "hint": "صور وملفات PDF وفيديو وصوت حتى 50 ميغابايت.",
+      "upload": "رفع",
+      "unsupportedType": "نوع الملف غير مدعوم.",
+      "tooLarge": "حجم الملف يتجاوز الحد الأقصى البالغ 50 ميغابايت.",
+      "preview": "معاينة",
+      "download": "تنزيل",
+      "delete": "حذف",
+      "emptyTitle": "لا توجد مرفقات بعد",
+      "emptyDescription": "ارفع صورًا أو ملفات PDF أو فيديو أو صوت لهذا الدرس.",
+      "deleteTitle": "حذف المرفق؟",
+      "deleteDescription": "سيؤدي هذا إلى حذف \"{name}\" نهائيًا. لا يمكن التراجع عن هذا.",
+      "deleteConfirm": "حذف",
+      "deleteCancel": "إلغاء"
+    }
   }
 }

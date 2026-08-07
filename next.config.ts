@@ -26,6 +26,12 @@ const nextConfig: NextConfig = {
       "@tanstack/react-table",
       "date-fns",
     ],
+    // Attachment uploads (Actions.Attachments.upload) send the file straight
+    // through a Server Action; the "attachments" Storage bucket allows up to
+    // 50 MB, so the request body limit must clear that plus multipart overhead.
+    serverActions: {
+      bodySizeLimit: "55mb",
+    },
   },
 };
 

@@ -7,7 +7,24 @@ interface LessonsDetailProps {
 
 export const LessonsDetail = async ({ params }: LessonsDetailProps) => {
   const { lessonId } = await params;
-  const { data } = await Actions.Lessons.getById(lessonId);
 
-  return <LessonsDetailView data={data} lessonId={lessonId} />;
+  const [{ data: lesson }, { data: subjects }, { data: tags }, { data: notes }, { data: attachments }] =
+    await Promise.all([
+      Actions.Lessons.getById(lessonId),
+      Actions.Subjects.getAll(),
+      Actions.Tags.getAll(),
+      Actions.Notes.getAllForLesson(lessonId),
+      Actions.Attachments.getAllForLesson(lessonId),
+    ]);
+
+  return (
+    <LessonsDetailView
+      data={lesson}
+      lessonId={lessonId}
+      subjects={subjects ?? []}
+      tags={tags ?? []}
+      notes={notes ?? []}
+      attachments={attachments ?? []}
+    />
+  );
 };

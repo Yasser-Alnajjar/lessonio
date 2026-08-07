@@ -6,3 +6,8 @@ export interface Tag extends AuditFields {
   name: string;
   color: string;
 }
+
+export interface CreateTagInput {
+  name: string;
+  color: string;
+}

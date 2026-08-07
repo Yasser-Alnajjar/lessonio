@@ -236,5 +236,128 @@
       "totalStudyMinutes": "Study time",
       "minutesSuffix": "min"
     }
+  },
+  "lessons": {
+    "list": {
+      "title": "Lessons",
+      "subtitle": "Every class, tracked from schedule to review.",
+      "newLesson": "New lesson",
+      "noSubjectsHint": "Create a subject first — lessons need one to belong to.",
+      "searchPlaceholder": "Search lessons...",
+      "filterStatus": "Study status",
+      "filterSubject": "Subject",
+      "filterDateRange": "Date range",
+      "showArchived": "Show archived",
+      "hideArchived": "Hide archived",
+      "emptyTitle": "No lessons yet",
+      "emptyDescription": "Add your first lesson to start tracking attendance, study progress, and more.",
+      "emptyAction": "New lesson",
+      "noResultsTitle": "No matching lessons",
+      "noResultsDescription": "Try a different search term or clear your filters."
+    },
+    "card": {
+      "actionsLabel": "Lesson actions",
+      "edit": "Edit",
+      "duplicate": "Duplicate",
+      "archive": "Archive",
+      "unarchive": "Unarchive",
+      "delete": "Delete"
+    },
+    "form": {
+      "createTitle": "New lesson",
+      "editTitle": "Edit lesson",
+      "createDescription": "Schedule a lesson and tag it for easy filtering later.",
+      "editDescription": "Update the schedule, details, or tags for this lesson.",
+      "subjectLabel": "Subject",
+      "subjectPlaceholder": "Choose a subject",
+      "titleLabel": "Title",
+      "titlePlaceholder": "e.g. Chapter 4: Integrals",
+      "teacherLabel": "Teacher",
+      "teacherPlaceholder": "e.g. Dr. Smith",
+      "locationLabel": "Location",
+      "locationPlaceholder": "e.g. Room 204",
+      "dateLabel": "Date",
+      "timeLabel": "Time",
+      "durationLabel": "Duration (min)",
+      "tagsLabel": "Tags",
+      "tagsTrigger": "Tags",
+      "newTagPlaceholder": "New tag name",
+      "noTags": "No tags yet — create one below.",
+      "cancel": "Cancel",
+      "submitting": "Saving...",
+      "submitCreate": "Create lesson",
+      "submitEdit": "Save changes",
+      "errors": {
+        "subjectRequired": "Choose a subject",
+        "titleRequired": "Title is required",
+        "titleMax": "Title must be 160 characters or fewer",
+        "teacherMax": "Teacher must be 120 characters or fewer",
+        "locationMax": "Location must be 120 characters or fewer",
+        "dateRequired": "Date is required",
+        "timeRequired": "Time is required",
+        "durationInvalid": "Duration must be a positive number"
+      }
+    },
+    "delete": {
+      "title": "Delete lesson?",
+      "description": "This permanently deletes \"{title}\" along with its notes and attachments. This cannot be undone.",
+      "confirm": "Delete lesson",
+      "cancel": "Cancel",
+      "genericError": "Something went wrong. Please try again."
+    },
+    "detail": {
+      "backToList": "Back to lessons",
+      "notFoundTitle": "Lesson not found",
+      "notFoundDescription": "This lesson may have been deleted.",
+      "archivedNote": "Archived",
+      "edit": "Edit",
+      "duplicate": "Duplicate",
+      "archive": "Archive",
+      "unarchive": "Unarchive",
+      "delete": "Delete",
+      "minutesSuffix": "min",
+      "statusTitle": "Status",
+      "notesTab": "Notes",
+      "attachmentsTab": "Attachments"
+    },
+    "status": {
+      "attendance": "Attendance",
+      "study": "Study",
+      "review": "Review",
+      "homework": "Homework",
+      "exam": "Exam"
+    },
+    "notes": {
+      "untitled": "Untitled note",
+      "searchPlaceholder": "Search notes...",
+      "newNote": "New note",
+      "noSearchResults": "No notes match your search.",
+      "selectPrompt": "Select a note to start editing.",
+      "emptyTitle": "No notes yet",
+      "emptyDescription": "Add your first note to capture what happened in this lesson.",
+      "titlePlaceholder": "Note title",
+      "saving": "Saving...",
+      "saved": "Saved",
+      "delete": "Delete note",
+      "write": "Write",
+      "preview": "Preview",
+      "contentPlaceholder": "Write in Markdown...",
+      "nothingToPreview": "Nothing to preview yet."
+    },
+    "attachments": {
+      "hint": "Images, PDFs, video, and audio up to 50 MB.",
+      "upload": "Upload",
+      "unsupportedType": "Unsupported file type.",
+      "tooLarge": "File is larger than the 50 MB limit.",
+      "preview": "Preview",
+      "download": "Download",
+      "delete": "Delete",
+      "emptyTitle": "No attachments yet",
+      "emptyDescription": "Upload images, PDFs, video, or audio for this lesson.",
+      "deleteTitle": "Delete attachment?",
+      "deleteDescription": "This permanently deletes \"{name}\". This cannot be undone.",
+      "deleteConfirm": "Delete",
+      "deleteCancel": "Cancel"
+    }
   }
 }

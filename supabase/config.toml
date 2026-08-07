@@ -2,7 +2,6 @@ project_id = "study-line"
 
 [db]
 port = 54322
-major_version = 16
 
 [api]
 enabled = true

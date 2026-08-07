@@ -1,3 +1,4 @@
+import { attachmentsActions } from "./attachments";
 import { authActions } from "./auth";
 import { calendarActions } from "./calendar";
 import { dashboardActions } from "./dashboard";
@@ -5,12 +6,14 @@ import { examsActions } from "./exams";
 import { gamificationActions } from "./gamification";
 import { homeworkActions } from "./homework";
 import { lessonsActions } from "./lessons";
+import { notesActions } from "./lesson-notes";
 import { notificationsActions } from "./notifications";
 import { searchActions } from "./search";
 import { settingsActions } from "./settings";
 import { statisticsActions } from "./statistics";
 import { studySessionsActions } from "./study-sessions";
 import { subjectsActions } from "./subjects";
+import { tagsActions } from "./tags";
 
 /**
  * Single entry point for all data access, per the mandatory architecture:
@@ -21,6 +24,9 @@ export const Actions = {
   Dashboard: dashboardActions,
   Subjects: subjectsActions,
   Lessons: lessonsActions,
+  Notes: notesActions,
+  Attachments: attachmentsActions,
+  Tags: tagsActions,
   Homework: homeworkActions,
   Exams: examsActions,
   StudySessions: studySessionsActions,

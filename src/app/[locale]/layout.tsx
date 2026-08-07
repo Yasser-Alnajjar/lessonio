@@ -51,7 +51,12 @@ export default async function LocaleLayout({
   const direction = localeDirections[locale as AppLocale];
 
   return (
-    <html lang={locale} dir={direction} suppressHydrationWarning>
+    <html
+      lang={locale}
+      dir={direction}
+      suppressHydrationWarning
+      data-scroll-behavior="smooth"
+    >
       <body
         className={`${GeistSans.variable} ${GeistMono.variable} bg-background text-foreground font-sans antialiased`}
       >

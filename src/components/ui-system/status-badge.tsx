@@ -1,4 +1,6 @@
-import { Badge, type badgeVariants } from "@/components/ui/badge";
+"use client";
+
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import type {
   AttendanceStatus,
@@ -8,8 +10,9 @@ import type {
   StudyStatus,
 } from "@/lib/types/lesson";
 import type { VariantProps } from "class-variance-authority";
+import useTranslate from "@/hooks/useTranslate";
 
-type BadgeVariant = VariantProps<typeof badgeVariants>["variant"];
+type BadgeVariant = VariantProps<typeof Badge>["variant"];
 
 interface StatusMeta {
   label: string;
@@ -17,40 +20,40 @@ interface StatusMeta {
 }
 
 /**
- * Single source of truth for how each lesson-related status renders, so
- * Lesson Card, Data Table, and Filter Sidebar never diverge in wording or color.
+ * Single source of truth for how each lesson-related status renders.
+ * Labels are resolved through next-intl.
  */
 export const ATTENDANCE_STATUS_META: Record<AttendanceStatus, StatusMeta> = {
-  attended: { label: "Attended", variant: "default" },
-  absent: { label: "Absent", variant: "destructive" },
-  late: { label: "Late", variant: "outline" },
-  cancelled: { label: "Cancelled", variant: "secondary" },
+  attended: { label: "attended", variant: "default" },
+  absent: { label: "absent", variant: "destructive" },
+  late: { label: "late", variant: "outline" },
+  cancelled: { label: "cancelled", variant: "secondary" },
 };
 
 export const STUDY_STATUS_META: Record<StudyStatus, StatusMeta> = {
-  not_started: { label: "Not started", variant: "secondary" },
-  studying: { label: "Studying", variant: "outline" },
-  completed: { label: "Completed", variant: "default" },
-  reviewed: { label: "Reviewed", variant: "default" },
+  not_started: { label: "not_started", variant: "secondary" },
+  studying: { label: "studying", variant: "outline" },
+  completed: { label: "completed", variant: "default" },
+  reviewed: { label: "reviewed", variant: "default" },
 };
 
 export const REVIEW_STATUS_META: Record<ReviewStatus, StatusMeta> = {
-  not_reviewed: { label: "Not reviewed", variant: "secondary" },
-  needs_review: { label: "Needs review", variant: "outline" },
-  reviewed: { label: "Reviewed", variant: "default" },
+  not_reviewed: { label: "not_reviewed", variant: "secondary" },
+  needs_review: { label: "needs_review", variant: "outline" },
+  reviewed: { label: "reviewed", variant: "default" },
 };
 
 export const HOMEWORK_STATUS_META: Record<LessonHomeworkStatus, StatusMeta> = {
-  none: { label: "No homework", variant: "secondary" },
-  pending: { label: "Pending", variant: "outline" },
-  in_progress: { label: "In progress", variant: "outline" },
-  completed: { label: "Completed", variant: "default" },
+  none: { label: "none", variant: "secondary" },
+  pending: { label: "pending", variant: "outline" },
+  in_progress: { label: "in_progress", variant: "outline" },
+  completed: { label: "completed", variant: "default" },
 };
 
 export const EXAM_STATUS_META: Record<LessonExamStatus, StatusMeta> = {
-  none: { label: "No exam", variant: "secondary" },
-  upcoming: { label: "Upcoming", variant: "outline" },
-  completed: { label: "Completed", variant: "default" },
+  none: { label: "none", variant: "secondary" },
+  upcoming: { label: "upcoming", variant: "outline" },
+  completed: { label: "completed", variant: "default" },
 };
 
 type StatusBadgeProps = React.ComponentProps<typeof Badge> &
@@ -66,19 +69,26 @@ function getStatusMeta(props: StatusBadgeProps): StatusMeta {
   switch (props.kind) {
     case "attendance":
       return ATTENDANCE_STATUS_META[props.status];
+
     case "study":
       return STUDY_STATUS_META[props.status];
+
     case "review":
       return REVIEW_STATUS_META[props.status];
+
     case "homework":
       return HOMEWORK_STATUS_META[props.status];
+
     case "exam":
       return EXAM_STATUS_META[props.status];
   }
 }
 
 export function StatusBadge(props: StatusBadgeProps) {
-  const { className, kind: _kind, status: _status, ...rest } = props;
+  const t = useTranslate("lessons.status");
+
+  const { className, kind, variant: _variant, ...rest } = props;
+
   const meta = getStatusMeta(props);
 
   return (
@@ -87,7 +97,7 @@ export function StatusBadge(props: StatusBadgeProps) {
       className={cn("capitalize", className)}
       {...rest}
     >
-      {meta.label}
+      {t(`${kind}.${meta.label}`)}
     </Badge>
   );
 }

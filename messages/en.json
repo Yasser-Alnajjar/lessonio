@@ -261,7 +261,46 @@
       "duplicate": "Duplicate",
       "archive": "Archive",
       "unarchive": "Unarchive",
-      "delete": "Delete"
+      "delete": "Delete",
+      "not_started": "Not Started",
+      "studying": "Studying",
+      "completed": "Completed",
+      "reviewed": "Reviewed"
+    },
+    "status": {
+      "attendance": {
+        "label": "attendance",
+        "attended": "Attended",
+        "absent": "Absent",
+        "late": "Late",
+        "cancelled": "Cancelled"
+      },
+      "study": {
+        "label": "study",
+        "not_started": "Not started",
+        "studying": "Studying",
+        "completed": "Completed",
+        "reviewed": "Reviewed"
+      },
+      "review": {
+        "label": "review",
+        "not_reviewed": "Not reviewed",
+        "needs_review": "Needs review",
+        "reviewed": "Reviewed"
+      },
+      "homework": {
+        "label": "homework",
+        "none": "No homework",
+        "pending": "Pending",
+        "in_progress": "In progress",
+        "completed": "Completed"
+      },
+      "exam": {
+        "label": "exam",
+        "none": "No exam",
+        "upcoming": "Upcoming",
+        "completed": "Completed"
+      }
     },
     "form": {
       "createTitle": "New lesson",
@@ -319,13 +358,6 @@
       "statusTitle": "Status",
       "notesTab": "Notes",
       "attachmentsTab": "Attachments"
-    },
-    "status": {
-      "attendance": "Attendance",
-      "study": "Study",
-      "review": "Review",
-      "homework": "Homework",
-      "exam": "Exam"
     },
     "notes": {
       "untitled": "Untitled note",

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { format, parseISO } from "date-fns";
 import {
   Archive,
@@ -17,7 +17,10 @@ import {
   User,
 } from "lucide-react";
 
-import { duplicateLesson, toggleArchiveLesson } from "@/actions/lessons.mutations";
+import {
+  duplicateLesson,
+  toggleArchiveLesson,
+} from "@/actions/lessons.mutations";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -52,6 +55,8 @@ export const LessonsDetailView = ({
   attachments,
 }: LessonsDetailViewProps) => {
   const t = useTranslations("lessons.detail");
+  const locale = useLocale();
+  const isArabic = locale === "ar";
   const router = useRouter();
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -63,7 +68,10 @@ export const LessonsDetailView = ({
         <EmptyState
           title={t("notFoundTitle")}
           description={t("notFoundDescription")}
-          action={{ label: t("backToList"), onClick: () => router.push("/lessons/list") }}
+          action={{
+            label: t("backToList"),
+            onClick: () => router.push("/lessons/list"),
+          }}
         />
       </div>
     );
@@ -95,12 +103,19 @@ export const LessonsDetailView = ({
             className="mb-1 inline-flex items-center gap-1.5 text-xs font-medium"
             style={{ color: data.subjectColor }}
           >
-            <span className="size-1.5 rounded-full" style={{ backgroundColor: data.subjectColor }} />
+            <span
+              className="size-1.5 rounded-full"
+              style={{ backgroundColor: data.subjectColor }}
+            />
             {data.subjectName}
           </span>
-          <h1 className="text-xl font-semibold text-foreground">{data.title}</h1>
+          <h1 className="text-xl font-semibold text-foreground">
+            {data.title}
+          </h1>
           {data.isArchived && (
-            <span className="text-xs text-muted-foreground">{t("archivedNote")}</span>
+            <span className="text-xs text-muted-foreground">
+              {t("archivedNote")}
+            </span>
           )}
         </div>
 
@@ -109,15 +124,27 @@ export const LessonsDetailView = ({
             <Pencil />
             {t("edit")}
           </Button>
-          <Button variant="outline" size="sm" onClick={() => void handleDuplicate()}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => void handleDuplicate()}
+          >
             <Copy />
             {t("duplicate")}
           </Button>
-          <Button variant="outline" size="sm" onClick={() => void handleToggleArchive()}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => void handleToggleArchive()}
+          >
             {data.isArchived ? <ArchiveRestore /> : <Archive />}
             {data.isArchived ? t("unarchive") : t("archive")}
           </Button>
-          <Button variant="destructive" size="sm" onClick={() => setDeleteOpen(true)}>
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={() => setDeleteOpen(true)}
+          >
             <Trash2 />
             {t("delete")}
           </Button>
@@ -160,17 +187,23 @@ export const LessonsDetailView = ({
       </Card>
 
       <div className="flex flex-col gap-2">
-        <h2 className="text-sm font-medium text-foreground">{t("statusTitle")}</h2>
-        <LessonStatusControls lesson={data} onUpdated={() => router.refresh()} />
+        <h2 className="text-sm font-medium text-foreground">
+          {t("statusTitle")}
+        </h2>
+        <LessonStatusControls
+          lesson={data}
+          onUpdated={() => router.refresh()}
+        />
       </div>
 
-      <Tabs defaultValue="notes">
+      <Tabs defaultValue="notes" dir={isArabic ? "rtl" : "ltr"}>
         <TabsList>
           <TabsTrigger value="notes">
             {t("notesTab")} {notes.length > 0 && `(${notes.length})`}
           </TabsTrigger>
           <TabsTrigger value="attachments">
-            {t("attachmentsTab")} {attachments.length > 0 && `(${attachments.length})`}
+            {t("attachmentsTab")}{" "}
+            {attachments.length > 0 && `(${attachments.length})`}
           </TabsTrigger>
         </TabsList>
         <TabsContent value="notes">

@@ -3,7 +3,10 @@
 import { useMemo, useState } from "react";
 import { Plus } from "lucide-react";
 
-import { toggleArchiveLesson, duplicateLesson } from "@/actions/lessons.mutations";
+import {
+  toggleArchiveLesson,
+  duplicateLesson,
+} from "@/actions/lessons.mutations";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui-system/empty-state";
 import {
@@ -35,7 +38,11 @@ interface FormState {
   lesson: LessonWithRelations | null;
 }
 
-export const LessonsListView = ({ data, subjects, tags: initialTags }: LessonsListViewProps) => {
+export const LessonsListView = ({
+  data,
+  subjects,
+  tags: initialTags,
+}: LessonsListViewProps) => {
   const t = useTranslate("lessons");
   const router = useRouter();
 
@@ -43,8 +50,13 @@ export const LessonsListView = ({ data, subjects, tags: initialTags }: LessonsLi
   const [filter, setFilter] = useState<FilterSidebarValue>(EMPTY_FILTER_VALUE);
   const [showArchived, setShowArchived] = useState(false);
   const [tags, setTags] = useState(initialTags);
-  const [formState, setFormState] = useState<FormState>({ open: false, lesson: null });
-  const [deleteTarget, setDeleteTarget] = useState<LessonWithRelations | null>(null);
+  const [formState, setFormState] = useState<FormState>({
+    open: false,
+    lesson: null,
+  });
+  const [deleteTarget, setDeleteTarget] = useState<LessonWithRelations | null>(
+    null,
+  );
 
   const statusOptions = STUDY_STATUSES.map((status) => ({
     value: status,
@@ -67,10 +79,16 @@ export const LessonsListView = ({ data, subjects, tags: initialTags }: LessonsLi
       ) {
         return false;
       }
-      if (filter.statuses.length > 0 && !filter.statuses.includes(lesson.studyStatus)) {
+      if (
+        filter.statuses.length > 0 &&
+        !filter.statuses.includes(lesson.studyStatus)
+      ) {
         return false;
       }
-      if (filter.subjectIds.length > 0 && !filter.subjectIds.includes(lesson.subjectId)) {
+      if (
+        filter.subjectIds.length > 0 &&
+        !filter.subjectIds.includes(lesson.subjectId)
+      ) {
         return false;
       }
       if (filter.dateFrom && lesson.date < filter.dateFrom) return false;
@@ -97,9 +115,13 @@ export const LessonsListView = ({ data, subjects, tags: initialTags }: LessonsLi
       return (
         <EmptyState
           variant={data.length === 0 ? "no-data" : "no-results"}
-          title={data.length === 0 ? t("list.emptyTitle") : t("list.noResultsTitle")}
+          title={
+            data.length === 0 ? t("list.emptyTitle") : t("list.noResultsTitle")
+          }
           description={
-            data.length === 0 ? t("list.emptyDescription") : t("list.noResultsDescription")
+            data.length === 0
+              ? t("list.emptyDescription")
+              : t("list.noResultsDescription")
           }
           action={
             data.length === 0 && subjects.length > 0
@@ -139,7 +161,9 @@ export const LessonsListView = ({ data, subjects, tags: initialTags }: LessonsLi
     <div className="flex flex-col gap-6 p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold text-foreground">{t("list.title")}</h1>
+          <h1 className="text-xl font-semibold text-foreground">
+            {t("list.title")}
+          </h1>
           <p className="text-sm text-muted-foreground">{t("list.subtitle")}</p>
         </div>
         <Button
@@ -152,7 +176,9 @@ export const LessonsListView = ({ data, subjects, tags: initialTags }: LessonsLi
       </div>
 
       {subjects.length === 0 && (
-        <p className="text-sm text-muted-foreground">{t("list.noSubjectsHint")}</p>
+        <p className="text-sm text-muted-foreground">
+          {t("list.noSubjectsHint")}
+        </p>
       )}
 
       <div className="flex flex-wrap items-center gap-3">

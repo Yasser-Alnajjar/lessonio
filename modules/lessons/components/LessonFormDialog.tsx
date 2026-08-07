@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Loader2 } from "lucide-react";
 
 import { createLesson, updateLesson } from "@/actions/lessons.mutations";
@@ -34,7 +34,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { createLessonSchema } from "@/lib/validations/lesson";
-import type { CreateLessonInput, LessonWithRelations } from "@/lib/types/lesson";
+import type {
+  CreateLessonInput,
+  LessonWithRelations,
+} from "@/lib/types/lesson";
 import type { Subject } from "@/lib/types/subject";
 import type { Tag } from "@/lib/types/tag";
 import { TagPicker } from "./TagPicker";
@@ -72,6 +75,8 @@ export function LessonFormDialog({
   onSaved,
 }: LessonFormDialogProps) {
   const t = useTranslations("lessons.form");
+  const locale = useLocale();
+  const isArabic = locale === "ar";
   const isEdit = Boolean(lesson);
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -124,10 +129,15 @@ export function LessonFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
+      <DialogContent
+        className="max-h-[90vh] overflow-y-auto sm:max-w-lg"
+        dir={isArabic ? "rtl" : "ltr"}
+      >
         <DialogHeader>
-          <DialogTitle>{isEdit ? t("editTitle") : t("createTitle")}</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="w-fit">
+            {isEdit ? t("editTitle") : t("createTitle")}
+          </DialogTitle>
+          <DialogDescription className="w-fit">
             {isEdit ? t("editDescription") : t("createDescription")}
           </DialogDescription>
         </DialogHeader>
@@ -140,7 +150,11 @@ export function LessonFormDialog({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t("subjectLabel")}</FormLabel>
-                  <Select value={field.value} onValueChange={field.onChange}>
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    dir={isArabic ? "rtl" : "ltr"}
+                  >
                     <FormControl>
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder={t("subjectPlaceholder")} />
@@ -170,7 +184,11 @@ export function LessonFormDialog({
                 <FormItem>
                   <FormLabel>{t("titleLabel")}</FormLabel>
                   <FormControl>
-                    <Input placeholder={t("titlePlaceholder")} autoFocus {...field} />
+                    <Input
+                      placeholder={t("titlePlaceholder")}
+                      autoFocus
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -198,7 +216,10 @@ export function LessonFormDialog({
                   <FormItem>
                     <FormLabel>{t("locationLabel")}</FormLabel>
                     <FormControl>
-                      <Input placeholder={t("locationPlaceholder")} {...field} />
+                      <Input
+                        placeholder={t("locationPlaceholder")}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -244,7 +265,9 @@ export function LessonFormDialog({
                         type="number"
                         min={1}
                         value={field.value}
-                        onChange={(event) => field.onChange(event.target.valueAsNumber)}
+                        onChange={(event) =>
+                          field.onChange(event.target.valueAsNumber)
+                        }
                       />
                     </FormControl>
                     <FormMessage />
@@ -282,10 +305,17 @@ export function LessonFormDialog({
             )}
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
                 {t("cancel")}
               </Button>
-              <Button type="submit" disabled={mutation.isPending || subjects.length === 0}>
+              <Button
+                type="submit"
+                disabled={mutation.isPending || subjects.length === 0}
+              >
                 {mutation.isPending && <Loader2 className="animate-spin" />}
                 {mutation.isPending
                   ? t("submitting")

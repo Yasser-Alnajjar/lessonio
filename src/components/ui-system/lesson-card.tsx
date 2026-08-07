@@ -20,7 +20,13 @@ function hasRelations(
   return "subjectName" in lesson;
 }
 
-export function LessonCard({ lesson, href, actions, className, ...props }: LessonCardProps) {
+export function LessonCard({
+  lesson,
+  href,
+  actions,
+  className,
+  ...props
+}: LessonCardProps) {
   const relations = hasRelations(lesson) ? lesson : null;
 
   const content = (
@@ -119,7 +125,11 @@ export function LessonCardSkeleton({
   ...props
 }: React.ComponentProps<"div">) {
   return (
-    <Card data-slot="lesson-card-skeleton" className={cn("h-full gap-3", className)} {...props}>
+    <Card
+      data-slot="lesson-card-skeleton"
+      className={cn("h-full gap-3", className)}
+      {...props}
+    >
       <CardHeader className="flex-row items-start justify-between gap-3 space-y-0">
         <div className="flex min-w-0 flex-1 flex-col gap-2">
           <Skeleton className="h-3 w-1/4" />

@@ -39,7 +39,10 @@ export interface LessonStatusControlsProps {
   onUpdated?: () => void;
 }
 
-export function LessonStatusControls({ lesson, onUpdated }: LessonStatusControlsProps) {
+export function LessonStatusControls({
+  lesson,
+  onUpdated,
+}: LessonStatusControlsProps) {
   const t = useTranslations("lessons.status");
   const [isPending, startTransition] = useTransition();
 
@@ -47,27 +50,35 @@ export function LessonStatusControls({ lesson, onUpdated }: LessonStatusControls
     key: string;
     label: string;
     value: string;
-    options: readonly string[];
+    options: { label: string; value: string }[];
     meta: Record<string, { label: string }>;
     onChange: (value: string) => void;
   }> = [
     {
       key: "attendance",
-      label: t("attendance"),
+      label: t("attendance.label"),
       value: lesson.attendanceStatus,
-      options: ATTENDANCE_STATUSES,
+      options: ATTENDANCE_STATUSES.map((a) => ({
+        label: t(`attendance.${a}`),
+        value: a,
+      })),
       meta: ATTENDANCE_STATUS_META,
       onChange: (value) =>
         startTransition(async () => {
-          await updateLesson(lesson.id, { attendanceStatus: value as AttendanceStatus });
+          await updateLesson(lesson.id, {
+            attendanceStatus: value as AttendanceStatus,
+          });
           onUpdated?.();
         }),
     },
     {
       key: "study",
-      label: t("study"),
+      label: t("study.label"),
       value: lesson.studyStatus,
-      options: STUDY_STATUSES,
+      options: STUDY_STATUSES.map((s) => ({
+        label: t(`study.${s}`),
+        value: s,
+      })),
       meta: STUDY_STATUS_META,
       onChange: (value) =>
         startTransition(async () => {
@@ -77,37 +88,52 @@ export function LessonStatusControls({ lesson, onUpdated }: LessonStatusControls
     },
     {
       key: "review",
-      label: t("review"),
+      label: t("review.label"),
       value: lesson.reviewStatus,
-      options: REVIEW_STATUSES,
+      options: REVIEW_STATUSES.map((r) => ({
+        label: t(`review.${r}`),
+        value: r,
+      })),
       meta: REVIEW_STATUS_META,
       onChange: (value) =>
         startTransition(async () => {
-          await updateLesson(lesson.id, { reviewStatus: value as ReviewStatus });
+          await updateLesson(lesson.id, {
+            reviewStatus: value as ReviewStatus,
+          });
           onUpdated?.();
         }),
     },
     {
       key: "homework",
-      label: t("homework"),
+      label: t("homework.label"),
       value: lesson.homeworkStatus,
-      options: LESSON_HOMEWORK_STATUSES,
+      options: LESSON_HOMEWORK_STATUSES.map((h) => ({
+        label: t(`homework.${h}`),
+        value: h,
+      })),
       meta: HOMEWORK_STATUS_META,
       onChange: (value) =>
         startTransition(async () => {
-          await updateLesson(lesson.id, { homeworkStatus: value as LessonHomeworkStatus });
+          await updateLesson(lesson.id, {
+            homeworkStatus: value as LessonHomeworkStatus,
+          });
           onUpdated?.();
         }),
     },
     {
       key: "exam",
-      label: t("exam"),
+      label: t("exam.label"),
       value: lesson.examStatus,
-      options: LESSON_EXAM_STATUSES,
+      options: LESSON_EXAM_STATUSES.map((e) => ({
+        label: t(`exam.${e}`),
+        value: e,
+      })),
       meta: EXAM_STATUS_META,
       onChange: (value) =>
         startTransition(async () => {
-          await updateLesson(lesson.id, { examStatus: value as LessonExamStatus });
+          await updateLesson(lesson.id, {
+            examStatus: value as LessonExamStatus,
+          });
           onUpdated?.();
         }),
     },
@@ -117,15 +143,21 @@ export function LessonStatusControls({ lesson, onUpdated }: LessonStatusControls
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
       {fields.map((field) => (
         <div key={field.key} className="flex flex-col gap-1.5">
-          <label className="text-xs font-medium text-muted-foreground">{field.label}</label>
-          <Select value={field.value} onValueChange={field.onChange} disabled={isPending}>
+          <label className="text-xs font-medium text-muted-foreground">
+            {field.label}
+          </label>
+          <Select
+            value={field.value}
+            onValueChange={field.onChange}
+            disabled={isPending}
+          >
             <SelectTrigger className="w-full">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               {field.options.map((option) => (
-                <SelectItem key={option} value={option}>
-                  {field.meta[option]?.label ?? option}
+                <SelectItem key={option.label} value={option.value}>
+                  {option.label}
                 </SelectItem>
               ))}
             </SelectContent>

@@ -23,7 +23,9 @@ export function NotesPanel({ lessonId, notes: initialNotes }: NotesPanelProps) {
   const t = useTranslations("lessons.notes");
   const [notes, setNotes] = useState(initialNotes);
   const [search, setSearch] = useState("");
-  const [selectedId, setSelectedId] = useState<string | null>(initialNotes[0]?.id ?? null);
+  const [selectedId, setSelectedId] = useState<string | null>(
+    initialNotes[0]?.id ?? null,
+  );
   const [creating, setCreating] = useState(false);
 
   const filtered = useMemo(() => {
@@ -90,7 +92,9 @@ export function NotesPanel({ lessonId, notes: initialNotes }: NotesPanelProps) {
 
         <div className="flex flex-col gap-1.5">
           {filtered.length === 0 && (
-            <p className="px-1 text-xs text-muted-foreground">{t("noSearchResults")}</p>
+            <p className="px-1 text-xs text-muted-foreground">
+              {t("noSearchResults")}
+            </p>
           )}
           {filtered.map((note) => (
             <button
@@ -116,7 +120,12 @@ export function NotesPanel({ lessonId, notes: initialNotes }: NotesPanelProps) {
 
       <Card className="p-4">
         {selected ? (
-          <NoteEditor key={selected.id} note={selected} onDeleted={handleDeleted} />
+          <NoteEditor
+            key={selected.id}
+            setNotes={setNotes}
+            note={selected}
+            onDeleted={handleDeleted}
+          />
         ) : (
           <p className="text-sm text-muted-foreground">{t("selectPrompt")}</p>
         )}

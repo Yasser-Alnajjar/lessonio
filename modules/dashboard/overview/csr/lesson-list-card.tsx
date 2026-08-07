@@ -11,7 +11,11 @@ interface LessonListCardProps {
   emptyMessage: string;
 }
 
-export function LessonListCard({ title, lessons, emptyMessage }: LessonListCardProps) {
+export function LessonListCard({
+  title,
+  lessons,
+  emptyMessage,
+}: LessonListCardProps) {
   return (
     <Card data-slot="lesson-list-card" className="gap-4">
       <CardHeader>
@@ -19,7 +23,11 @@ export function LessonListCard({ title, lessons, emptyMessage }: LessonListCardP
       </CardHeader>
       <CardContent>
         {lessons.length === 0 ? (
-          <EmptyState variant="no-data" title={emptyMessage} className="min-h-[10rem] p-6" />
+          <EmptyState
+            variant="no-data"
+            title={emptyMessage}
+            className="min-h-40 p-6"
+          />
         ) : (
           <div className="flex flex-col gap-3">
             {lessons.map((lesson) => (

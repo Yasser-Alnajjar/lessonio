@@ -261,7 +261,11 @@
       "duplicate": "نسخ",
       "archive": "أرشفة",
       "unarchive": "إلغاء الأرشفة",
-      "delete": "حذف"
+      "delete": "حذف",
+      "not_started": "لم يبدأ",
+      "studying": "قيد الدراسة",
+      "completed": "مكتمل",
+      "reviewed": "تمت المراجعة"
     },
     "form": {
       "createTitle": "درس جديد",
@@ -321,11 +325,39 @@
       "attachmentsTab": "المرفقات"
     },
     "status": {
-      "attendance": "الحضور",
-      "study": "المذاكرة",
-      "review": "المراجعة",
-      "homework": "الواجب",
-      "exam": "الاختبار"
+      "attendance": {
+        "label": "الحضور",
+        "attended": "حضر",
+        "absent": "غائب",
+        "late": "متأخر",
+        "cancelled": "ملغى"
+      },
+      "study": {
+        "label": "الدراسة",
+        "not_started": "لم يبدأ",
+        "studying": "قيد الدراسة",
+        "completed": "مكتمل",
+        "reviewed": "تمت المراجعة"
+      },
+      "review": {
+        "label": "المراجعة",
+        "not_reviewed": "لم تتم المراجعة",
+        "needs_review": "يحتاج إلى مراجعة",
+        "reviewed": "تمت المراجعة"
+      },
+      "homework": {
+        "label": "الواجب",
+        "none": "لا يوجد واجب",
+        "pending": "قيد الانتظار",
+        "in_progress": "قيد التنفيذ",
+        "completed": "مكتمل"
+      },
+      "exam": {
+        "label": "الاختبار",
+        "none": "لا يوجد اختبار",
+        "upcoming": "قادم",
+        "completed": "مكتمل"
+      }
     },
     "notes": {
       "untitled": "ملاحظة بلا عنوان",

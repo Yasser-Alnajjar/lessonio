@@ -39,7 +39,7 @@ export function EmptyState({
       data-slot="empty-state"
       data-variant={variant}
       className={cn(
-        "flex min-h-[16rem] w-full flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-muted-foreground/20 p-10 text-center",
+        "flex min-h-64 w-full flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-muted-foreground/20 p-10 text-center",
         className,
       )}
       {...props}

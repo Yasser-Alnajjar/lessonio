@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 
 import { StudyLineMark } from "@/components/shared/study-line-mark";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
+import { LanguageSwitch } from "@/components/shared/language-switch";
 
 interface AuthShellProps {
   children: React.ReactNode;
@@ -17,7 +18,7 @@ export async function AuthShell({ children }: AuthShellProps) {
 
   return (
     <div className="bg-background grid min-h-svh lg:grid-cols-2">
-      <section className="from-primary/10 via-background to-highlighter/10 relative hidden flex-col justify-between overflow-hidden bg-gradient-to-br p-10 lg:flex">
+      <section className="from-primary/10 via-background to-highlighter/10 relative hidden flex-col justify-between overflow-hidden bg-linear-to-br p-10 lg:flex">
         <div className="flex items-center gap-2">
           <StudyLineMark className="h-8 w-auto" />
           <span className="font-display text-lg">{t("brand")}</span>
@@ -39,12 +40,13 @@ export async function AuthShell({ children }: AuthShellProps) {
       </section>
 
       <section className="flex flex-col gap-6 p-6 sm:p-10">
-        <div className="flex items-center justify-between lg:justify-end">
+        <div className="flex items-center justify-between lg:justify-end gap-2">
           <div className="flex items-center gap-2 lg:hidden">
             <StudyLineMark className="h-7 w-auto" />
             <span className="font-display text-base">{t("brand")}</span>
           </div>
           <ThemeToggle />
+          <LanguageSwitch />
         </div>
 
         <div className="flex flex-1 items-center justify-center">

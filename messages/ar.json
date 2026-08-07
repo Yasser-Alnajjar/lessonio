@@ -172,5 +172,69 @@
       "logHomework": "تسجيل واجب",
       "viewCalendar": "عرض التقويم"
     }
+  },
+  "subjects": {
+    "list": {
+      "title": "المواد",
+      "subtitle": "نظّم موادك الدراسية وتابع تقدّمك بنظرة واحدة.",
+      "newSubject": "مادة جديدة",
+      "emptyTitle": "لا توجد مواد بعد",
+      "emptyDescription": "أنشئ مادتك الأولى لتبدأ بتنظيم الدروس والواجبات والاختبارات.",
+      "emptyAction": "إنشاء مادة",
+      "showArchived": "إظهار المؤرشفة",
+      "hideArchived": "إخفاء المؤرشفة"
+    },
+    "card": {
+      "progressLabel": "معدّل المذاكرة",
+      "archivedBadge": "مؤرشفة",
+      "actionsLabel": "إجراءات المادة",
+      "edit": "تعديل",
+      "archive": "أرشفة",
+      "unarchive": "إلغاء الأرشفة",
+      "delete": "حذف"
+    },
+    "form": {
+      "createTitle": "مادة جديدة",
+      "editTitle": "تعديل المادة",
+      "createDescription": "أضف مادة لتبدأ بمتابعة الدروس والتقدّم.",
+      "editDescription": "حدّث الاسم أو اللون أو الأيقونة لهذه المادة.",
+      "nameLabel": "الاسم",
+      "namePlaceholder": "مثال: التفاضل والتكامل ٢",
+      "colorLabel": "اللون",
+      "iconLabel": "الأيقونة",
+      "cancel": "إلغاء",
+      "submitting": "جارٍ الحفظ...",
+      "submitCreate": "إنشاء المادة",
+      "submitEdit": "حفظ التغييرات",
+      "errors": {
+        "nameRequired": "الاسم مطلوب",
+        "nameMax": "يجب ألا يتجاوز الاسم 80 حرفاً",
+        "colorInvalid": "اختر لوناً",
+        "iconRequired": "اختر أيقونة"
+      }
+    },
+    "delete": {
+      "title": "حذف المادة؟",
+      "description": "سيؤدي هذا إلى حذف \"{name}\" نهائياً مع جميع دروسها وواجباتها واختباراتها. لا يمكن التراجع عن هذا الإجراء.",
+      "confirm": "حذف المادة",
+      "cancel": "إلغاء",
+      "genericError": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
+    },
+    "detail": {
+      "backToList": "العودة إلى المواد",
+      "notFoundTitle": "المادة غير موجودة",
+      "notFoundDescription": "ربما تم حذف هذه المادة.",
+      "archivedNote": "مؤرشفة",
+      "edit": "تعديل",
+      "archive": "أرشفة",
+      "unarchive": "إلغاء الأرشفة",
+      "delete": "حذف",
+      "totalLessons": "إجمالي الدروس",
+      "attendanceRate": "معدّل الحضور",
+      "studyRate": "معدّل المذاكرة",
+      "homeworkProgress": "تقدّم الواجبات",
+      "totalStudyMinutes": "وقت المذاكرة",
+      "minutesSuffix": "د"
+    }
   }
 }

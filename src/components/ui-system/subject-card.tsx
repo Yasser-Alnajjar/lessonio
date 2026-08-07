@@ -1,40 +1,18 @@
-import {
-  BookOpen,
-  Calculator,
-  Code,
-  Dumbbell,
-  FlaskConical,
-  Globe,
-  Landmark,
-  Languages,
-  Music,
-  Palette,
-} from "lucide-react";
-
 import { Link } from "@/i18n/navigation";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
+import { SUBJECT_ICON_COMPONENTS } from "@/lib/constants/subjects";
 import { cn } from "@/lib/utils";
-import type { Subject, SubjectIcon, SubjectWithStats } from "@/lib/types/subject";
-
-const SUBJECT_ICONS: Record<SubjectIcon, React.ComponentType<{ className?: string }>> = {
-  "book-open": BookOpen,
-  calculator: Calculator,
-  "flask-conical": FlaskConical,
-  globe: Globe,
-  landmark: Landmark,
-  palette: Palette,
-  code: Code,
-  music: Music,
-  dumbbell: Dumbbell,
-  languages: Languages,
-};
+import type { Subject, SubjectWithStats } from "@/lib/types/subject";
 
 export interface SubjectCardProps extends React.ComponentProps<"div"> {
   subject: Subject | SubjectWithStats;
   href?: string;
   progressLabel?: string;
+  archivedLabel?: string;
+  actions?: React.ReactNode;
 }
 
 function hasStats(
@@ -47,10 +25,12 @@ export function SubjectCard({
   subject,
   href,
   progressLabel = "Progress",
+  archivedLabel,
+  actions,
   className,
   ...props
 }: SubjectCardProps) {
-  const Icon = SUBJECT_ICONS[subject.icon];
+  const Icon = SUBJECT_ICON_COMPONENTS[subject.icon];
   const progress = hasStats(subject)
     ? Math.min(100, Math.max(0, subject.stats.studyRate))
     : null;
@@ -61,6 +41,7 @@ export function SubjectCard({
       className={cn(
         "h-full gap-4 transition-shadow",
         href && "cursor-pointer hover:shadow-md",
+        subject.isArchived && "opacity-60",
         className,
       )}
       {...props}
@@ -76,9 +57,16 @@ export function SubjectCard({
           <Icon className="size-5" />
         </span>
         <div className="min-w-0 flex-1">
-          <h3 className="truncate text-sm font-medium text-foreground">
-            {subject.name}
-          </h3>
+          <div className="flex items-center gap-2">
+            <h3 className="truncate text-sm font-medium text-foreground">
+              {subject.name}
+            </h3>
+            {subject.isArchived && archivedLabel && (
+              <Badge variant="secondary" className="shrink-0 text-[10px]">
+                {archivedLabel}
+              </Badge>
+            )}
+          </div>
           {hasStats(subject) && (
             <p className="truncate text-xs text-muted-foreground">
               {subject.stats.totalLessons} lesson
@@ -86,6 +74,7 @@ export function SubjectCard({
             </p>
           )}
         </div>
+        {actions && <div className="w-8 shrink-0" aria-hidden />}
       </CardHeader>
       {progress !== null && (
         <CardContent className="flex flex-col gap-1.5">
@@ -99,15 +88,24 @@ export function SubjectCard({
     </Card>
   );
 
-  if (href) {
-    return (
-      <Link href={href} className="block h-full">
-        {content}
-      </Link>
-    );
+  const linked = href ? (
+    <Link href={href} className="block h-full">
+      {content}
+    </Link>
+  ) : (
+    content
+  );
+
+  if (!actions) {
+    return linked;
   }
 
-  return content;
+  return (
+    <div className="relative h-full">
+      {linked}
+      <div className="absolute end-4 top-4">{actions}</div>
+    </div>
+  );
 }
 
 export function SubjectCardSkeleton({

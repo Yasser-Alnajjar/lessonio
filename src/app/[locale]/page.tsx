@@ -1,6 +1,8 @@
 import { getTranslations } from "next-intl/server";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { StudyLineMark } from "@/components/shared/study-line-mark";
+import { LogoutButton } from "@/components/shared/logout-button";
+import { LanguageSwitch } from "@/components/shared/language-switch";
 
 const SWATCHES = [
   { className: "bg-background", label: "Background" },
@@ -26,7 +28,11 @@ export default async function HomePage() {
           <span className="text-muted-foreground text-sm font-medium tracking-wide uppercase">
             {t("name")}
           </span>
-          <ThemeToggle />
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <LanguageSwitch />
+            <LogoutButton />
+          </div>
         </div>
 
         <StudyLineMark className="h-16 w-auto" />

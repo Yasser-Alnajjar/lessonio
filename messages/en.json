@@ -172,5 +172,69 @@
       "logHomework": "Log homework",
       "viewCalendar": "View calendar"
     }
+  },
+  "subjects": {
+    "list": {
+      "title": "Subjects",
+      "subtitle": "Organize your courses and track progress at a glance.",
+      "newSubject": "New subject",
+      "emptyTitle": "No subjects yet",
+      "emptyDescription": "Create your first subject to start organizing lessons, homework, and exams.",
+      "emptyAction": "Create subject",
+      "showArchived": "Show archived",
+      "hideArchived": "Hide archived"
+    },
+    "card": {
+      "progressLabel": "Study rate",
+      "archivedBadge": "Archived",
+      "actionsLabel": "Subject actions",
+      "edit": "Edit",
+      "archive": "Archive",
+      "unarchive": "Unarchive",
+      "delete": "Delete"
+    },
+    "form": {
+      "createTitle": "New subject",
+      "editTitle": "Edit subject",
+      "createDescription": "Add a subject to start tracking lessons and progress.",
+      "editDescription": "Update the name, color, or icon for this subject.",
+      "nameLabel": "Name",
+      "namePlaceholder": "e.g. Calculus II",
+      "colorLabel": "Color",
+      "iconLabel": "Icon",
+      "cancel": "Cancel",
+      "submitting": "Saving...",
+      "submitCreate": "Create subject",
+      "submitEdit": "Save changes",
+      "errors": {
+        "nameRequired": "Name is required",
+        "nameMax": "Name must be 80 characters or fewer",
+        "colorInvalid": "Choose a color",
+        "iconRequired": "Choose an icon"
+      }
+    },
+    "delete": {
+      "title": "Delete subject?",
+      "description": "This permanently deletes \"{name}\" along with all of its lessons, homework, and exams. This cannot be undone.",
+      "confirm": "Delete subject",
+      "cancel": "Cancel",
+      "genericError": "Something went wrong. Please try again."
+    },
+    "detail": {
+      "backToList": "Back to subjects",
+      "notFoundTitle": "Subject not found",
+      "notFoundDescription": "This subject may have been deleted.",
+      "archivedNote": "Archived",
+      "edit": "Edit",
+      "archive": "Archive",
+      "unarchive": "Unarchive",
+      "delete": "Delete",
+      "totalLessons": "Total lessons",
+      "attendanceRate": "Attendance rate",
+      "studyRate": "Study rate",
+      "homeworkProgress": "Homework progress",
+      "totalStudyMinutes": "Study time",
+      "minutesSuffix": "min"
+    }
   }
 }

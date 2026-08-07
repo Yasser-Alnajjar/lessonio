@@ -1,38 +1,53 @@
 import "server-only";
 
-import type { ActionResult, MutationResult } from "@/lib/types/common";
+import type { User as SupabaseUser } from "@supabase/supabase-js";
+
+import { createClient } from "@/lib/supabase/server";
+import type { ActionResult } from "@/lib/types/common";
 import type { User } from "@/lib/types/user";
+import * as authMutations from "./auth.mutations";
+
+function mapUser(user: SupabaseUser): User {
+  const metadata = user.user_metadata;
+  const fullName =
+    typeof metadata.full_name === "string" ? metadata.full_name : null;
+  const avatarUrl =
+    typeof metadata.avatar_url === "string" ? metadata.avatar_url : null;
+  const timezone =
+    typeof metadata.timezone === "string" ? metadata.timezone : null;
+
+  return {
+    id: user.id,
+    email: user.email ?? "",
+    fullName,
+    avatarUrl,
+    timezone,
+    createdAt: user.created_at,
+    updatedAt: user.updated_at ?? user.created_at,
+  };
+}
 
 /**
- * TODO(Phase 4 — Authentication): replace every stub below with real
- * Supabase Auth calls (`createServerClient` from `@supabase/ssr`).
+ * SSR-facing surface for `Actions.Auth.*`. `getSession` is a plain
+ * SSR-only read; the mutations are re-exported references to the real
+ * Server Actions defined in `auth.mutations.ts` (imported directly by
+ * Client Components — see that file's header comment for why).
  */
 export const authActions = {
   async getSession(): Promise<ActionResult<User>> {
-    return { data: null, error: null };
+    const supabase = await createClient();
+    const { data, error } = await supabase.auth.getUser();
+
+    if (error || !data.user) {
+      return { data: null, error: null };
+    }
+
+    return { data: mapUser(data.user), error: null };
   },
 
-  async login(_email: string, _password: string): Promise<MutationResult> {
-    return { success: false, error: "Not implemented until Phase 4." };
-  },
-
-  async register(
-    _email: string,
-    _password: string,
-    _fullName: string,
-  ): Promise<MutationResult> {
-    return { success: false, error: "Not implemented until Phase 4." };
-  },
-
-  async requestPasswordReset(_email: string): Promise<MutationResult> {
-    return { success: false, error: "Not implemented until Phase 4." };
-  },
-
-  async resetPassword(_token: string, _newPassword: string): Promise<MutationResult> {
-    return { success: false, error: "Not implemented until Phase 4." };
-  },
-
-  async logout(): Promise<MutationResult> {
-    return { success: false, error: "Not implemented until Phase 4." };
-  },
+  login: authMutations.login,
+  register: authMutations.register,
+  requestPasswordReset: authMutations.requestPasswordReset,
+  resetPassword: authMutations.resetPassword,
+  logout: authMutations.logout,
 };

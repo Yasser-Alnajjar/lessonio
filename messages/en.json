@@ -24,12 +24,86 @@
     "settings": "Settings"
   },
   "auth": {
-    "login": "Log in",
-    "register": "Create account",
+    "shell": {
+      "brand": "Study Line",
+      "eyebrow": "Study Line",
+      "headline": "Pick up your line exactly where you left it.",
+      "body": "Every lesson, every study session, every streak — tracked in one continuous line you can watch move forward.",
+      "footnote": "Your data stays yours. Export it anytime from Settings."
+    },
+    "login": {
+      "title": "Welcome back",
+      "subtitle": "Log in to pick up your study line where you left off.",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "submit": "Log in",
+      "submitting": "Logging in…",
+      "forgotPassword": "Forgot password?",
+      "noAccount": "Don't have an account?",
+      "registerLink": "Create one",
+      "errors": {
+        "emailInvalid": "Enter a valid email address.",
+        "passwordRequired": "Enter your password."
+      }
+    },
+    "register": {
+      "title": "Create your account",
+      "subtitle": "Start tracking every subject, lesson, and study hour in one place.",
+      "fullNameLabel": "Full name",
+      "fullNamePlaceholder": "Ada Lovelace",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "At least 8 characters",
+      "confirmPasswordLabel": "Confirm password",
+      "confirmPasswordPlaceholder": "Re-enter your password",
+      "submit": "Create account",
+      "submitting": "Creating account…",
+      "haveAccount": "Already have an account?",
+      "loginLink": "Log in",
+      "success": "Account created. Check your email to confirm, then log in.",
+      "errors": {
+        "fullNameMin": "Enter your full name.",
+        "fullNameMax": "Full name is too long.",
+        "emailInvalid": "Enter a valid email address.",
+        "passwordMin": "Password must be at least 8 characters.",
+        "confirmPasswordMin": "Confirm your password.",
+        "passwordMismatch": "Passwords do not match."
+      }
+    },
+    "forgotPassword": {
+      "title": "Reset your password",
+      "subtitle": "Enter your email and we'll send you a reset link.",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "submit": "Send reset link",
+      "submitting": "Sending…",
+      "success": "If an account exists for that email, a reset link is on its way.",
+      "backToLogin": "Back to log in",
+      "errors": {
+        "emailInvalid": "Enter a valid email address."
+      }
+    },
+    "resetPassword": {
+      "title": "Set a new password",
+      "subtitle": "Choose a new password for your account.",
+      "passwordLabel": "New password",
+      "passwordPlaceholder": "At least 8 characters",
+      "confirmPasswordLabel": "Confirm new password",
+      "confirmPasswordPlaceholder": "Re-enter your new password",
+      "submit": "Update password",
+      "submitting": "Updating…",
+      "success": "Password updated. Redirecting to log in…",
+      "errors": {
+        "passwordMin": "Password must be at least 8 characters.",
+        "confirmPasswordMin": "Confirm your password.",
+        "passwordMismatch": "Passwords do not match."
+      }
+    },
     "logout": "Log out",
-    "forgotPassword": "Forgot password?",
-    "email": "Email",
-    "password": "Password"
+    "loggingOut": "Logging out…"
   },
   "theme": {
     "toggleLabel": "Theme",

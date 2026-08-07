@@ -4,10 +4,11 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
-// import "@fontsource-variable/fraunces/full.css";
+import "@fontsource-variable/fraunces/full.css";
 
 import { routing, localeDirections, type AppLocale } from "@/i18n/routing";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { QueryProvider } from "@/components/providers/query-provider";
 import "../globals.css";
 
 interface LocaleLayoutProps {
@@ -55,7 +56,9 @@ export default async function LocaleLayout({
         className={`${GeistSans.variable} ${GeistMono.variable} bg-background text-foreground font-sans antialiased`}
       >
         <NextIntlClientProvider>
-          <ThemeProvider>{children}</ThemeProvider>
+          <QueryProvider>
+            <ThemeProvider>{children}</ThemeProvider>
+          </QueryProvider>
         </NextIntlClientProvider>
       </body>
     </html>

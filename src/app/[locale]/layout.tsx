@@ -16,10 +16,6 @@ interface LocaleLayoutProps {
   params: Promise<{ locale: string }>;
 }
 
-export function generateStaticParams(): Array<{ locale: AppLocale }> {
-  return routing.locales.map((locale) => ({ locale }));
-}
-
 export async function generateMetadata({
   params,
 }: Pick<LocaleLayoutProps, "params">): Promise<Metadata> {
@@ -41,14 +37,26 @@ export default async function LocaleLayout({
 }: LocaleLayoutProps) {
   const { locale } = await params;
 
+  let messages;
+  try {
+    messages = (await import(`../../../messages/${locale}.json`)).default;
+  } catch (error) {
+    console.error(error);
+  }
   if (!hasLocale(routing.locales, locale)) {
     notFound();
   }
+  if (!messages) notFound();
 
   const direction = localeDirections[locale as AppLocale];
 
   return (
-    <html lang={locale} dir={direction} suppressHydrationWarning>
+    <html
+      lang={locale}
+      dir={direction}
+      suppressHydrationWarning
+      data-scroll-behavior="smooth"
+    >
       <body
         className={`${GeistSans.variable} ${GeistMono.variable} bg-background text-foreground font-sans antialiased`}
       >

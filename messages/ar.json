@@ -1,4 +1,8 @@
 {
+  "Index": {
+    "name": "ستَدي لاين",
+    "tagline": "دراستك، تحت السيطرة."
+  },
   "app": {
     "name": "ستَدي لاين",
     "tagline": "دراستك، تحت السيطرة."
@@ -120,5 +124,117 @@
     "glassHeading": "السطوح العائمة",
     "glassBody": "تُستخدم فقط للطبقات العلوية — لوحة الأوامر، القوائم المنبثقة، قائمة الجوال. البطاقات العادية تبقى صلبة.",
     "note": "معاينة المظهر — المرحلة 3. لوحة التحكم الفعلية تصل في المرحلة 7."
+  },
+  "dashboard": {
+    "greeting": {
+      "morning": "صباح الخير، {name}",
+      "afternoon": "مساء الخير، {name}",
+      "evening": "مساء الخير، {name}",
+      "subtitle": "إليك وضع خط دراستك اليوم."
+    },
+    "streak": {
+      "label": "تتابع الأيام",
+      "longest": "أطول تتابع: {days} يوم",
+      "empty": "ابدأ جلسة مذاكرة لتبدأ تتابعك."
+    },
+    "progress": {
+      "title": "الهدف الأسبوعي",
+      "level": "المستوى {level}",
+      "xpToNext": "{xp}/{xpToNext} نقطة للمستوى التالي"
+    },
+    "todayLessons": {
+      "title": "دروس اليوم",
+      "empty": "لا توجد دروس مجدولة اليوم."
+    },
+    "upcomingLessons": {
+      "title": "الدروس القادمة",
+      "empty": "لا يوجد شيء قادم بعد."
+    },
+    "recentActivity": {
+      "title": "النشاط الأخير",
+      "empty": "سيظهر نشاطك الأخير هنا.",
+      "kinds": {
+        "lesson_completed": "أكملت",
+        "note_added": "أضفت ملاحظة إلى",
+        "homework_done": "أنهيت واجب",
+        "exam_scored": "سجّلت درجة اختبار"
+      }
+    },
+    "weeklySummary": {
+      "title": "هذا الأسبوع",
+      "subtitle": "{minutes} من {target} دقيقة مذاكرة",
+      "noGoal": "{minutes} دقيقة مذاكرة — عيّن هدفاً أسبوعياً لمتابعة تقدّمك هنا."
+    },
+    "quickActions": {
+      "title": "إجراءات سريعة",
+      "addLesson": "إضافة درس",
+      "startSession": "ابدأ المذاكرة",
+      "logHomework": "تسجيل واجب",
+      "viewCalendar": "عرض التقويم"
+    }
+  },
+  "subjects": {
+    "list": {
+      "title": "المواد",
+      "subtitle": "نظّم موادك الدراسية وتابع تقدّمك بنظرة واحدة.",
+      "newSubject": "مادة جديدة",
+      "emptyTitle": "لا توجد مواد بعد",
+      "emptyDescription": "أنشئ مادتك الأولى لتبدأ بتنظيم الدروس والواجبات والاختبارات.",
+      "emptyAction": "إنشاء مادة",
+      "showArchived": "إظهار المؤرشفة",
+      "hideArchived": "إخفاء المؤرشفة"
+    },
+    "card": {
+      "progressLabel": "معدّل المذاكرة",
+      "archivedBadge": "مؤرشفة",
+      "actionsLabel": "إجراءات المادة",
+      "edit": "تعديل",
+      "archive": "أرشفة",
+      "unarchive": "إلغاء الأرشفة",
+      "delete": "حذف"
+    },
+    "form": {
+      "createTitle": "مادة جديدة",
+      "editTitle": "تعديل المادة",
+      "createDescription": "أضف مادة لتبدأ بمتابعة الدروس والتقدّم.",
+      "editDescription": "حدّث الاسم أو اللون أو الأيقونة لهذه المادة.",
+      "nameLabel": "الاسم",
+      "namePlaceholder": "مثال: التفاضل والتكامل ٢",
+      "colorLabel": "اللون",
+      "iconLabel": "الأيقونة",
+      "cancel": "إلغاء",
+      "submitting": "جارٍ الحفظ...",
+      "submitCreate": "إنشاء المادة",
+      "submitEdit": "حفظ التغييرات",
+      "errors": {
+        "nameRequired": "الاسم مطلوب",
+        "nameMax": "يجب ألا يتجاوز الاسم 80 حرفاً",
+        "colorInvalid": "اختر لوناً",
+        "iconRequired": "اختر أيقونة"
+      }
+    },
+    "delete": {
+      "title": "حذف المادة؟",
+      "description": "سيؤدي هذا إلى حذف \"{name}\" نهائياً مع جميع دروسها وواجباتها واختباراتها. لا يمكن التراجع عن هذا الإجراء.",
+      "confirm": "حذف المادة",
+      "cancel": "إلغاء",
+      "genericError": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
+    },
+    "detail": {
+      "backToList": "العودة إلى المواد",
+      "notFoundTitle": "المادة غير موجودة",
+      "notFoundDescription": "ربما تم حذف هذه المادة.",
+      "archivedNote": "مؤرشفة",
+      "edit": "تعديل",
+      "archive": "أرشفة",
+      "unarchive": "إلغاء الأرشفة",
+      "delete": "حذف",
+      "totalLessons": "إجمالي الدروس",
+      "attendanceRate": "معدّل الحضور",
+      "studyRate": "معدّل المذاكرة",
+      "homeworkProgress": "تقدّم الواجبات",
+      "totalStudyMinutes": "وقت المذاكرة",
+      "minutesSuffix": "د"
+    }
   }
 }

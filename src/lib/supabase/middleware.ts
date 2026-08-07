@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { env } from "@/lib/env";
 import { routing } from "@/i18n/routing";
+import type { Database } from "@/lib/types/database";
 
 /**
  * Path segments (locale prefix stripped) that never require a session.
@@ -51,7 +52,7 @@ export async function updateSession(
 ): Promise<NextResponse> {
   let response = intlResponse;
 
-  const supabase = createServerClient(
+  const supabase = createServerClient<Database>(
     env.NEXT_PUBLIC_SUPABASE_URL,
     env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {

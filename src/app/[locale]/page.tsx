@@ -1,11 +1,6 @@
-import { getTranslations, setRequestLocale } from "next-intl/server";
-import type { AppLocale } from "@/i18n/routing";
+import { getTranslations } from "next-intl/server";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { StudyLineMark } from "@/components/shared/study-line-mark";
-
-interface HomePageProps {
-  params: Promise<{ locale: AppLocale }>;
-}
 
 const SWATCHES = [
   { className: "bg-background", label: "Background" },
@@ -19,10 +14,7 @@ const SWATCHES = [
   { className: "bg-destructive", label: "Destructive — Margin" },
 ] as const;
 
-export default async function HomePage({ params }: HomePageProps) {
-  const { locale } = await params;
-  setRequestLocale(locale);
-
+export default async function HomePage() {
   const t = await getTranslations("app");
   const tp = await getTranslations("themePreview");
 
@@ -76,17 +68,21 @@ export default async function HomePage({ params }: HomePageProps) {
           <p className="text-muted-foreground font-mono text-sm">
             Geist Mono — 04:32:00 · 87% attendance · Level 12
           </p>
-          <p className="text-muted-foreground text-sm">{tp("typographyBody")}</p>
+          <p className="text-muted-foreground text-sm">
+            {tp("typographyBody")}
+          </p>
         </div>
       </section>
 
       {/* Glassmorphism */}
       <section className="flex flex-col gap-4">
         <h2 className="font-display text-2xl">{tp("glassHeading")}</h2>
-        <div className="from-primary/30 via-highlighter/20 to-success/30 relative overflow-hidden rounded-2xl bg-gradient-to-br p-8">
+        <div className="from-primary/30 via-highlighter/20 to-success/30 relative overflow-hidden rounded-2xl bg-linear-to-br p-8">
           <div className="glass-panel rounded-xl p-5">
             <p className="text-foreground text-sm font-medium">.glass-panel</p>
-            <p className="text-muted-foreground mt-1 text-sm">{tp("glassBody")}</p>
+            <p className="text-muted-foreground mt-1 text-sm">
+              {tp("glassBody")}
+            </p>
           </div>
         </div>
       </section>

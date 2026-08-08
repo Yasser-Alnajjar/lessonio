@@ -32,6 +32,10 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "55mb",
     },
+    // Keeps navigations, prefetches, and Server Actions (all mutations in
+    // this app) pending instead of throwing when the network drops, then
+    // retries them automatically once connectivity returns.
+    useOffline: true,
   },
 };
 

@@ -62,7 +62,14 @@ export default async function LocaleLayout({
       >
         <NextIntlClientProvider>
           <QueryProvider>
-            <ThemeProvider>{children}</ThemeProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              {children}
+            </ThemeProvider>
           </QueryProvider>
         </NextIntlClientProvider>
       </body>

@@ -24,8 +24,8 @@ export async function generateMetadata({
 
   return {
     title: {
-      default: t("name"),
-      template: `%s · ${t("name")}`,
+      default: "Study Line",
+      template: `%s · Study Line`,
     },
     description: t("tagline"),
   };
@@ -62,7 +62,14 @@ export default async function LocaleLayout({
       >
         <NextIntlClientProvider>
           <QueryProvider>
-            <ThemeProvider>{children}</ThemeProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              {children}
+            </ThemeProvider>
           </QueryProvider>
         </NextIntlClientProvider>
       </body>

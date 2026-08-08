@@ -19,6 +19,7 @@ import type {
   LoginInput,
   RegisterInput,
   ResetPasswordInput,
+  UpdateProfileInput,
 } from "@/lib/types/auth";
 
 export async function login(input: LoginInput): Promise<MutationResult> {
@@ -76,6 +77,29 @@ export async function resetPassword(
   const { error } = await supabase.auth.updateUser({
     password: input.password,
   });
+
+  if (error) {
+    return { success: false, error: error.message };
+  }
+
+  revalidatePath("/", "layout");
+  return { success: true, error: null };
+}
+
+export async function updateProfile(
+  input: UpdateProfileInput,
+): Promise<MutationResult> {
+  const supabase = await createClient();
+  const { data: authData, error: authError } = await supabase.auth.getUser();
+
+  if (authError || !authData.user) {
+    return { success: false, error: "You must be signed in." };
+  }
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ full_name: input.fullName, timezone: input.timezone })
+    .eq("id", authData.user.id);
 
   if (error) {
     return { success: false, error: error.message };

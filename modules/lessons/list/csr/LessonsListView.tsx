@@ -16,7 +16,6 @@ import {
 } from "@/components/ui-system/filter-sidebar";
 import { LessonCard } from "@/components/ui-system/lesson-card";
 import { SearchInput } from "@/components/ui-system/search-input";
-import { STUDY_STATUS_META } from "@/components/ui-system/status-badge";
 import { useRouter } from "@/i18n/navigation";
 import useTranslate from "@/hooks/useTranslate";
 import { STUDY_STATUSES } from "@/lib/types/lesson";

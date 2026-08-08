@@ -50,3 +50,14 @@ export function createResetPasswordSchema(t: Translator) {
       path: ["confirmPassword"],
     });
 }
+
+export function createUpdateProfileSchema(t: Translator) {
+  return z.object({
+    fullName: z
+      .string()
+      .trim()
+      .min(2, t("errors.fullNameMin"))
+      .max(80, t("errors.fullNameMax")),
+    timezone: z.string().min(1, t("errors.timezoneRequired")),
+  });
+}

@@ -65,5 +65,6 @@ export const authActions = {
   register: authMutations.register,
   requestPasswordReset: authMutations.requestPasswordReset,
   resetPassword: authMutations.resetPassword,
+  updateProfile: authMutations.updateProfile,
   logout: authMutations.logout,
 };

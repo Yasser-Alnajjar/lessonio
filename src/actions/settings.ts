@@ -2,20 +2,16 @@ import "server-only";
 
 import { parseNotificationPreferences } from "@/lib/notifications/preferences";
 import { createClient } from "@/lib/supabase/server";
-import type { ActionResult, MutationResult } from "@/lib/types/common";
+import type { ActionResult } from "@/lib/types/common";
 import type { ThemeMode, UserSettings } from "@/lib/types/settings";
 import { THEME_MODES } from "@/lib/types/settings";
-import { updateNotificationPreferences } from "./settings.mutations";
+import { deleteAccount, exportData, updateNotificationPreferences } from "./settings.mutations";
 
 function toThemeMode(value: string): ThemeMode {
   return (THEME_MODES as readonly string[]).includes(value) ? (value as ThemeMode) : "system";
 }
 
 export const settingsActions = {
-  /**
-   * Implemented ahead of Phase 16 because Phase 14 needs
-   * `notificationPreferences` to decide what to generate and how to deliver it.
-   */
   async get(): Promise<ActionResult<UserSettings>> {
     const supabase = await createClient();
     const { data: authData, error: authError } = await supabase.auth.getUser();
@@ -50,17 +46,6 @@ export const settingsActions = {
   },
 
   updateNotificationPreferences,
-
-  /** TODO(Phase 16 — Settings): replace stubs with Supabase queries. */
-  async update(_input: Partial<UserSettings>): Promise<MutationResult> {
-    return { success: false, error: "Not implemented until Phase 16." };
-  },
-
-  async exportData(): Promise<ActionResult<{ downloadUrl: string }>> {
-    return { data: null, error: "Not implemented until Phase 16." };
-  },
-
-  async deleteAccount(): Promise<MutationResult> {
-    return { success: false, error: "Not implemented until Phase 16." };
-  },
+  exportData,
+  deleteAccount,
 };

@@ -9,6 +9,7 @@ import "@fontsource-variable/fraunces/full.css";
 import { routing, localeDirections, type AppLocale } from "@/i18n/routing";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { QueryProvider } from "@/components/providers/query-provider";
+import { OfflineBanner } from "@/components/shared/offline-banner";
 import "../globals.css";
 
 interface LocaleLayoutProps {
@@ -68,6 +69,7 @@ export default async function LocaleLayout({
               enableSystem
               disableTransitionOnChange
             >
+              <OfflineBanner />
               {children}
             </ThemeProvider>
           </QueryProvider>

@@ -20,6 +20,10 @@
     "back": "Back",
     "noDataYet": "No data yet"
   },
+  "offline": {
+    "banner": "You're offline. Changes will sync automatically once you're back online.",
+    "waitingForConnection": "Waiting for connection..."
+  },
   "nav": {
     "dashboard": "Dashboard",
     "subjects": "Subjects",

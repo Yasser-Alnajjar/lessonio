@@ -93,7 +93,7 @@ export const LessonsDetailView = ({
         href="/lessons/list"
         className="flex w-fit items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground hover:underline"
       >
-        <ArrowLeft className="size-4" />
+        <ArrowLeft className="size-4 rtl:rotate-180" />
         {t("backToList")}
       </Link>
 

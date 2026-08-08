@@ -160,6 +160,14 @@
     "dark": "داكن",
     "system": "تلقائي"
   },
+  "filters": {
+    "title": "الفلاتر",
+    "clearAll": "مسح الكل",
+    "status": "الحالة",
+    "subject": "المادة",
+    "dateRange": "نطاق التاريخ",
+    "done": "تم"
+  },
   "dashboard": {
     "greeting": {
       "morning": "صباح الخير، {name}",
@@ -226,7 +234,8 @@
       "edit": "تعديل",
       "archive": "أرشفة",
       "unarchive": "إلغاء الأرشفة",
-      "delete": "حذف"
+      "delete": "حذف",
+      "count": "{count, plural, =0 {لا توجد دروس} =1 {درس واحد} =2 {درسان} few {# دروس} many {# درسًا} other {# درس}}"
     },
     "form": {
       "createTitle": "مادة جديدة",

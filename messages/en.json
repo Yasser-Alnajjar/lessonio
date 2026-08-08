@@ -160,6 +160,14 @@
     "dark": "Dark",
     "system": "System"
   },
+  "filters": {
+    "title": "Filters",
+    "clearAll": "Clear all",
+    "status": "Status",
+    "subject": "Subject",
+    "dateRange": "Date range",
+    "done": "Done"
+  },
   "dashboard": {
     "greeting": {
       "morning": "Good morning, {name}",
@@ -226,7 +234,8 @@
       "edit": "Edit",
       "archive": "Archive",
       "unarchive": "Unarchive",
-      "delete": "Delete"
+      "delete": "Delete",
+      "count": "{count, plural, =0 {No lessons} =1 {# lesson} other {# lessons}}"
     },
     "form": {
       "createTitle": "New subject",

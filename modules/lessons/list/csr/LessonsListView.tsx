@@ -60,8 +60,9 @@ export const LessonsListView = ({
 
   const statusOptions = STUDY_STATUSES.map((status) => ({
     value: status,
-    label: STUDY_STATUS_META[status].label,
+    label: t(`status.study.${status}`),
   }));
+
   const subjectOptions = subjects.map((subject) => ({
     value: subject.id,
     label: subject.name,

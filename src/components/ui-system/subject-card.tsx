@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { SUBJECT_ICON_COMPONENTS } from "@/lib/constants/subjects";
 import { cn } from "@/lib/utils";
 import type { Subject, SubjectWithStats } from "@/lib/types/subject";
+import useTranslate from "@/hooks/useTranslate";
 
 export interface SubjectCardProps extends React.ComponentProps<"div"> {
   subject: Subject | SubjectWithStats;
@@ -34,7 +35,7 @@ export function SubjectCard({
   const progress = hasStats(subject)
     ? Math.min(100, Math.max(0, subject.stats.studyRate))
     : null;
-
+  const t = useTranslate("subjects.card");
   const content = (
     <Card
       data-slot="subject-card"
@@ -69,8 +70,9 @@ export function SubjectCard({
           </div>
           {hasStats(subject) && (
             <p className="truncate text-xs text-muted-foreground">
-              {subject.stats.totalLessons} lesson
-              {subject.stats.totalLessons === 1 ? "" : "s"}
+              {t("count", {
+                count: subject.stats.totalLessons,
+              })}
             </p>
           )}
         </div>

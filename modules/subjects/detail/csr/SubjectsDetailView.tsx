@@ -2,7 +2,13 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Archive, ArchiveRestore, ArrowLeft, Pencil, Trash2 } from "lucide-react";
+import {
+  Archive,
+  ArchiveRestore,
+  ArrowLeft,
+  Pencil,
+  Trash2,
+} from "lucide-react";
 
 import { updateSubject } from "@/actions/subjects.mutations";
 import { Button } from "@/components/ui/button";
@@ -48,14 +54,23 @@ export const SubjectsDetailView = ({ data }: SubjectsDetailViewProps) => {
   };
 
   const stats = [
-    { key: "totalLessons", label: t("totalLessons"), value: data.stats.totalLessons },
+    {
+      key: "totalLessons",
+      label: t("totalLessons"),
+      value: data.stats.totalLessons,
+    },
     {
       key: "attendanceRate",
       label: t("attendanceRate"),
       value: data.stats.attendanceRate,
       suffix: "%",
     },
-    { key: "studyRate", label: t("studyRate"), value: data.stats.studyRate, suffix: "%" },
+    {
+      key: "studyRate",
+      label: t("studyRate"),
+      value: data.stats.studyRate,
+      suffix: "%",
+    },
     {
       key: "homeworkProgress",
       label: t("homeworkProgress"),
@@ -76,7 +91,7 @@ export const SubjectsDetailView = ({ data }: SubjectsDetailViewProps) => {
         href="/subjects/list"
         className="flex w-fit items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground hover:underline"
       >
-        <ArrowLeft className="size-4" />
+        <ArrowLeft className="size-4 rtl:rotate-180" />
         {t("backToList")}
       </Link>
 
@@ -92,9 +107,13 @@ export const SubjectsDetailView = ({ data }: SubjectsDetailViewProps) => {
             <Icon className="size-6" />
           </span>
           <div>
-            <h1 className="text-xl font-semibold text-foreground">{data.name}</h1>
+            <h1 className="text-xl font-semibold text-foreground">
+              {data.name}
+            </h1>
             {data.isArchived && (
-              <span className="text-xs text-muted-foreground">{t("archivedNote")}</span>
+              <span className="text-xs text-muted-foreground">
+                {t("archivedNote")}
+              </span>
             )}
           </div>
         </div>
@@ -108,7 +127,11 @@ export const SubjectsDetailView = ({ data }: SubjectsDetailViewProps) => {
             {data.isArchived ? <ArchiveRestore /> : <Archive />}
             {data.isArchived ? t("unarchive") : t("archive")}
           </Button>
-          <Button variant="destructive" size="sm" onClick={() => setDeleteOpen(true)}>
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={() => setDeleteOpen(true)}
+          >
             <Trash2 />
             {t("delete")}
           </Button>

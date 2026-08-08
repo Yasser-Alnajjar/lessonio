@@ -23,9 +23,53 @@
     "dashboard": "Dashboard",
     "subjects": "Subjects",
     "lessons": "Lessons",
+    "homework": "Homework",
+    "exams": "Exams",
     "calendar": "Calendar",
     "statistics": "Statistics",
-    "settings": "Settings"
+    "settings": "Settings",
+    "openMenu": "Open menu",
+    "account": "Account"
+  },
+  "landing": {
+    "nav": {
+      "features": "Features",
+      "login": "Log in",
+      "getStarted": "Get started"
+    },
+    "hero": {
+      "eyebrow": "Study Line",
+      "headline": "Every study session, one continuous line.",
+      "subheading": "Study Line turns lessons, homework, exams, and study time into a single trend you can watch move forward.",
+      "ctaPrimary": "Get started free",
+      "ctaSecondary": "Log in",
+      "ctaDashboard": "Go to dashboard"
+    },
+    "features": {
+      "eyebrow": "Everything in one line",
+      "title": "Built to track the whole picture",
+      "subtitle": "From the first lesson to the final exam, Study Line keeps every piece connected.",
+      "subjects": {
+        "title": "Subjects & lessons",
+        "description": "Organize every course, track attendance, and log lessons as you go."
+      },
+      "homework": {
+        "title": "Homework & exams",
+        "description": "Never miss a deadline — track assignments and exam scores in one place."
+      },
+      "calendar": {
+        "title": "Calendar & study sessions",
+        "description": "See your week at a glance and time every study session automatically."
+      },
+      "statistics": {
+        "title": "Statistics & streaks",
+        "description": "Watch your progress trend upward with stats, streaks, and achievements."
+      }
+    },
+    "footer": {
+      "tagline": "Your study, on track.",
+      "rights": "All rights reserved."
+    }
   },
   "auth": {
     "shell": {
@@ -114,16 +158,6 @@
     "light": "Light",
     "dark": "Dark",
     "system": "System"
-  },
-  "themePreview": {
-    "heading": "Every study session, one continuous line.",
-    "subheading": "Study Line turns lessons, homework, and study time into a single trend you can watch move.",
-    "colorsHeading": "Palette",
-    "typographyHeading": "Type",
-    "typographyBody": "Fraunces carries hero moments. Geist Sans runs the interface. Geist Mono aligns every number.",
-    "glassHeading": "Floating surfaces",
-    "glassBody": "Reserved for overlays — the command palette, popovers, the mobile action menu. Standard cards stay solid.",
-    "note": "Theme preview — Phase 3. The real dashboard lands in Phase 7."
   },
   "dashboard": {
     "greeting": {

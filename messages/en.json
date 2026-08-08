@@ -639,6 +639,8 @@
       "heading": "Notifications",
       "empty": "You're all caught up.",
       "markAllRead": "Mark all read",
+      "unread": "Unread",
+      "read": "Read",
       "viewAll": "View all",
       "enable": "Turn on browser notifications",
       "enabled": "Browser notifications are on",

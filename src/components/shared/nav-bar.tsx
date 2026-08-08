@@ -132,7 +132,9 @@ export function NavBar({ user, browserNotificationsEnabled }: NavBarProps) {
             <LanguageSwitch />
           </div>
 
-          <NotificationBell browserNotificationsEnabled={browserNotificationsEnabled} />
+          <NotificationBell
+            browserNotificationsEnabled={browserNotificationsEnabled}
+          />
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -154,7 +156,10 @@ export function NavBar({ user, browserNotificationsEnabled }: NavBarProps) {
               align={isArabic ? "start" : "end"}
               className="w-56"
             >
-              <DropdownMenuLabel className="flex flex-col gap-0.5">
+              <DropdownMenuLabel
+                className="flex flex-col gap-0.5"
+                dir={isArabic ? "rtl" : "ltr"}
+              >
                 <span className="truncate text-sm font-medium">
                   {displayName}
                 </span>
@@ -163,7 +168,7 @@ export function NavBar({ user, browserNotificationsEnabled }: NavBarProps) {
                 </span>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
+              <DropdownMenuItem asChild dir={isArabic ? "rtl" : "ltr"}>
                 <Link href="/settings/profile" className="cursor-pointer">
                   <Settings />
                   {t("settings")}
@@ -172,6 +177,7 @@ export function NavBar({ user, browserNotificationsEnabled }: NavBarProps) {
               <DropdownMenuSeparator />
               <LogoutButton
                 variant="ghost"
+                dir={isArabic ? "rtl" : "ltr"}
                 className="h-auto w-full justify-start gap-2 rounded-sm px-2 py-1.5 text-sm font-normal"
               />
             </DropdownMenuContent>
@@ -200,26 +206,28 @@ export function NavBar({ user, browserNotificationsEnabled }: NavBarProps) {
               </SheetHeader>
 
               <nav className="flex flex-col gap-1 px-1">
-                {[...NAV_ITEMS, ...MOBILE_ONLY_NAV_ITEMS].map(({ href, key, icon: Icon }) => {
-                  const active = isActivePath(pathname, href);
-                  return (
-                    <SheetClose asChild key={key}>
-                      <Link
-                        href={href}
-                        aria-current={active ? "page" : undefined}
-                        className={cn(
-                          "flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                          active
-                            ? "bg-accent text-accent-foreground"
-                            : "text-muted-foreground hover:text-foreground hover:bg-accent/60",
-                        )}
-                      >
-                        <Icon className="size-4" strokeWidth={2} />
-                        {t(key)}
-                      </Link>
-                    </SheetClose>
-                  );
-                })}
+                {[...NAV_ITEMS, ...MOBILE_ONLY_NAV_ITEMS].map(
+                  ({ href, key, icon: Icon }) => {
+                    const active = isActivePath(pathname, href);
+                    return (
+                      <SheetClose asChild key={key}>
+                        <Link
+                          href={href}
+                          aria-current={active ? "page" : undefined}
+                          className={cn(
+                            "flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                            active
+                              ? "bg-accent text-accent-foreground"
+                              : "text-muted-foreground hover:text-foreground hover:bg-accent/60",
+                          )}
+                        >
+                          <Icon className="size-4" strokeWidth={2} />
+                          {t(key)}
+                        </Link>
+                      </SheetClose>
+                    );
+                  },
+                )}
               </nav>
 
               <SheetFooter className="flex-row items-center">

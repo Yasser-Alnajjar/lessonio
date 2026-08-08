@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Check, Mail, Settings2 } from "lucide-react";
-import { useFormatter } from "next-intl";
+import { useFormatter, useLocale } from "next-intl";
 
 import {
   markAllNotificationsAsRead,
@@ -29,13 +29,19 @@ type Tab = "all" | "unread";
 type GroupKey = "today" | "yesterday" | "older";
 
 /** Buckets by calendar day in the viewer's own timezone, newest group first. */
-function groupByDay(notifications: Notification[]): [GroupKey, Notification[]][] {
+function groupByDay(
+  notifications: Notification[],
+): [GroupKey, Notification[]][] {
   const startOfToday = new Date();
   startOfToday.setHours(0, 0, 0, 0);
   const startOfYesterday = new Date(startOfToday);
   startOfYesterday.setDate(startOfYesterday.getDate() - 1);
 
-  const groups: Record<GroupKey, Notification[]> = { today: [], yesterday: [], older: [] };
+  const groups: Record<GroupKey, Notification[]> = {
+    today: [],
+    yesterday: [],
+    older: [],
+  };
 
   for (const notification of notifications) {
     const createdAt = new Date(notification.createdAt);
@@ -49,8 +55,12 @@ function groupByDay(notifications: Notification[]): [GroupKey, Notification[]][]
   );
 }
 
-export const NotificationsCenterView = ({ data }: NotificationsCenterViewProps) => {
+export const NotificationsCenterView = ({
+  data,
+}: NotificationsCenterViewProps) => {
   const t = useTranslate("notifications");
+  const locale = useLocale();
+  const isArabic = locale === "ar";
   const format = useFormatter();
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -62,7 +72,8 @@ export const NotificationsCenterView = ({ data }: NotificationsCenterViewProps) 
   const unreadCount = data.filter((item) => item.readAt === null).length;
 
   const groups = useMemo(() => {
-    const visible = tab === "unread" ? data.filter((item) => item.readAt === null) : data;
+    const visible =
+      tab === "unread" ? data.filter((item) => item.readAt === null) : data;
     return groupByDay(visible);
   }, [data, tab]);
 
@@ -106,8 +117,12 @@ export const NotificationsCenterView = ({ data }: NotificationsCenterViewProps) 
     <div className="flex flex-col gap-6 p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-foreground text-xl font-semibold">{t("center.title")}</h1>
-          <p className="text-muted-foreground text-sm">{t("center.subtitle")}</p>
+          <h1 className="text-foreground text-xl font-semibold">
+            {t("center.title")}
+          </h1>
+          <p className="text-muted-foreground text-sm">
+            {t("center.subtitle")}
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="sm" asChild>
@@ -130,7 +145,11 @@ export const NotificationsCenterView = ({ data }: NotificationsCenterViewProps) 
         </div>
       </div>
 
-      <Tabs value={tab} onValueChange={(value) => setTab(value as Tab)}>
+      <Tabs
+        value={tab}
+        onValueChange={(value) => setTab(value as Tab)}
+        dir={isArabic ? "rtl" : "ltr"}
+      >
         <TabsList>
           <TabsTrigger value="all">{t("center.tabAll")}</TabsTrigger>
           <TabsTrigger value="unread">
@@ -149,9 +168,15 @@ export const NotificationsCenterView = ({ data }: NotificationsCenterViewProps) 
       {groups.length === 0 ? (
         <EmptyState
           variant={data.length === 0 ? "no-data" : "no-results"}
-          title={data.length === 0 ? t("center.emptyTitle") : t("center.emptyUnreadTitle")}
+          title={
+            data.length === 0
+              ? t("center.emptyTitle")
+              : t("center.emptyUnreadTitle")
+          }
           description={
-            data.length === 0 ? t("center.emptyDescription") : t("center.emptyUnreadDescription")
+            data.length === 0
+              ? t("center.emptyDescription")
+              : t("center.emptyUnreadDescription")
           }
         />
       ) : (
@@ -198,7 +223,9 @@ export const NotificationsCenterView = ({ data }: NotificationsCenterViewProps) 
                             </Badge>
                           )}
                         </span>
-                        <span className="text-muted-foreground text-sm">{notification.body}</span>
+                        <span className="text-muted-foreground text-sm">
+                          {notification.body}
+                        </span>
                         <span className="text-muted-foreground/70 text-xs">
                           {format.dateTime(new Date(notification.createdAt), {
                             dateStyle: "medium",
@@ -233,7 +260,9 @@ export const NotificationsCenterView = ({ data }: NotificationsCenterViewProps) 
                           }
                           onClick={() => email.mutate(notification.id)}
                           disabled={email.isPending}
-                          className={cn(emailedId === notification.id && "text-primary")}
+                          className={cn(
+                            emailedId === notification.id && "text-primary",
+                          )}
                         >
                           <Mail />
                         </Button>

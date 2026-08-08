@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Bell } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
@@ -28,7 +28,7 @@ import type { Notification } from "@/lib/types/notification";
 /** How often the bell re-checks for new notifications. */
 const POLL_INTERVAL_MS = 60_000;
 /** How many rows the dropdown itself renders (the query returns up to 10). */
-const VISIBLE_LIMIT = 5;
+const VISIBLE_LIMIT = 10;
 
 export const NOTIFICATIONS_QUERY_KEY = ["notifications", "recent"] as const;
 
@@ -37,13 +37,16 @@ interface NotificationBellProps {
   browserNotificationsEnabled: boolean;
 }
 
-export function NotificationBell({ browserNotificationsEnabled }: NotificationBellProps) {
+export function NotificationBell({
+  browserNotificationsEnabled,
+}: NotificationBellProps) {
   const t = useTranslations("notifications.bell");
   const locale = useLocale();
   const isArabic = locale === "ar";
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { permission, showNotification, markAsShown } = useBrowserNotifications();
+  const { permission, showNotification, markAsShown } =
+    useBrowserNotifications();
 
   const { data } = useQuery({
     queryKey: NOTIFICATIONS_QUERY_KEY,
@@ -57,12 +60,14 @@ export function NotificationBell({ browserNotificationsEnabled }: NotificationBe
 
   const markRead = useMutation({
     mutationFn: (id: string) => markNotificationAsRead(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: NOTIFICATIONS_QUERY_KEY }),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: NOTIFICATIONS_QUERY_KEY }),
   });
 
   const markAllRead = useMutation({
     mutationFn: () => markAllNotificationsAsRead(),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: NOTIFICATIONS_QUERY_KEY }),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: NOTIFICATIONS_QUERY_KEY }),
   });
 
   // The first poll of a session establishes the baseline instead of firing
@@ -91,7 +96,14 @@ export function NotificationBell({ browserNotificationsEnabled }: NotificationBe
         onClick: () => router.push(item.linkPath ?? "/notifications/center"),
       });
     }
-  }, [data, browserNotificationsEnabled, permission, showNotification, markAsShown, router]);
+  }, [
+    data,
+    browserNotificationsEnabled,
+    permission,
+    showNotification,
+    markAsShown,
+    router,
+  ]);
 
   const handleSelect = (notification: Notification) => {
     if (notification.readAt === null) {
@@ -99,7 +111,18 @@ export function NotificationBell({ browserNotificationsEnabled }: NotificationBe
     }
     router.push(notification.linkPath ?? "/notifications/center");
   };
+  const unreadItems = items
+    .slice(0, VISIBLE_LIMIT)
+    .filter((notification) => notification.readAt === null);
 
+  const readItems = items
+    .slice(0, VISIBLE_LIMIT)
+    .filter((notification) => notification.readAt !== null);
+
+  const sections = [
+    { label: t("unread"), items: unreadItems },
+    { label: t("read"), items: readItems },
+  ];
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -108,7 +131,11 @@ export function NotificationBell({ browserNotificationsEnabled }: NotificationBe
           variant="ghost"
           size="icon"
           className="relative rounded-full"
-          aria-label={unreadCount > 0 ? t("unreadLabel", { count: unreadCount }) : t("label")}
+          aria-label={
+            unreadCount > 0
+              ? t("unreadLabel", { count: unreadCount })
+              : t("label")
+          }
         >
           <Bell />
           {unreadCount > 0 && (
@@ -126,51 +153,82 @@ export function NotificationBell({ browserNotificationsEnabled }: NotificationBe
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align={isArabic ? "start" : "end"} className="w-80">
-        <DropdownMenuLabel className="flex items-center justify-between gap-2">
+        <DropdownMenuLabel
+          className="flex items-center justify-between gap-2"
+          dir={isArabic ? "rtl" : "ltr"}
+        >
           <span>{t("heading")}</span>
           {unreadCount > 0 && (
-            <button
+            <Button
               type="button"
               onClick={() => markAllRead.mutate()}
               disabled={markAllRead.isPending}
-              className="text-muted-foreground hover:text-foreground text-xs font-normal disabled:opacity-50"
+              size="sm"
+              variant="ghost"
+              className="disabled:opacity-50"
             >
               {t("markAllRead")}
-            </button>
+            </Button>
           )}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
 
         {items.length === 0 ? (
-          <p className="text-muted-foreground px-2 py-6 text-center text-sm">{t("empty")}</p>
+          <p className="text-muted-foreground px-2 py-6 text-center text-sm">
+            {t("empty")}
+          </p>
         ) : (
-          items.slice(0, VISIBLE_LIMIT).map((notification) => (
-            <DropdownMenuItem
-              key={notification.id}
-              onSelect={() => handleSelect(notification)}
-              className="cursor-pointer items-start gap-2.5 py-2"
-            >
-              <NotificationIcon type={notification.type} />
-              <span className="flex min-w-0 flex-col gap-0.5">
-                <span
-                  className={cn(
-                    "truncate text-sm",
-                    notification.readAt === null ? "font-semibold" : "font-medium",
-                  )}
-                >
-                  {notification.title}
-                </span>
-                <span className="text-muted-foreground line-clamp-2 text-xs">
-                  {notification.body}
-                </span>
-              </span>
-            </DropdownMenuItem>
-          ))
+          sections.map(
+            ({ label, items: sectionItems }) =>
+              sectionItems.length > 0 && (
+                <React.Fragment key={label}>
+                  <DropdownMenuLabel dir={isArabic ? "rtl" : "ltr"}>
+                    {label}
+                  </DropdownMenuLabel>
+
+                  {sectionItems.map((notification) => (
+                    <DropdownMenuItem
+                      key={notification.id}
+                      dir={isArabic ? "rtl" : "ltr"}
+                      onSelect={() => handleSelect(notification)}
+                      className={cn(
+                        "cursor-pointer items-start gap-2.5 py-2",
+                        notification.readAt === null
+                          ? "bg-accent/40"
+                          : "bg-card focus:bg-card opacity-80",
+                      )}
+                    >
+                      <NotificationIcon type={notification.type} />
+
+                      <span className="flex min-w-0 flex-col gap-0.5">
+                        <span
+                          className={cn(
+                            "truncate text-sm",
+                            notification.readAt === null
+                              ? "font-bold"
+                              : "font-medium",
+                          )}
+                        >
+                          {notification.title}
+                        </span>
+
+                        <span className="line-clamp-2 text-xs text-muted-foreground">
+                          {notification.body}
+                        </span>
+                      </span>
+                    </DropdownMenuItem>
+                  ))}
+                </React.Fragment>
+              ),
+          )
         )}
 
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href="/notifications/center" className="cursor-pointer justify-center text-sm">
+          <Link
+            href="/notifications/center"
+            className="cursor-pointer justify-center text-sm"
+          >
             {t("viewAll")}
           </Link>
         </DropdownMenuItem>

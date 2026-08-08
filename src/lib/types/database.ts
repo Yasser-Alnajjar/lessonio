@@ -378,6 +378,8 @@ export type Database = {
         Row: {
           body: string
           created_at: string
+          dedupe_key: string | null
+          emailed_at: string | null
           id: string
           link_path: string | null
           read_at: string | null
@@ -389,6 +391,8 @@ export type Database = {
         Insert: {
           body: string
           created_at?: string
+          dedupe_key?: string | null
+          emailed_at?: string | null
           id?: string
           link_path?: string | null
           read_at?: string | null
@@ -400,6 +404,8 @@ export type Database = {
         Update: {
           body?: string
           created_at?: string
+          dedupe_key?: string | null
+          emailed_at?: string | null
           id?: string
           link_path?: string | null
           read_at?: string | null

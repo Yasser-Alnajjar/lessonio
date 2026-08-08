@@ -3,6 +3,7 @@
 import { useState } from "react";
 import {
   BarChart3,
+  Bell,
   BookOpen,
   CalendarDays,
   ClipboardList,
@@ -38,6 +39,7 @@ import type { User } from "@/lib/types/user";
 import { Link, usePathname } from "@/i18n/navigation";
 import { LanguageSwitch } from "./language-switch";
 import { LogoutButton } from "./logout-button";
+import { NotificationBell } from "./notification-bell";
 import { StudyLineMark } from "./study-line-mark";
 import { ThemeToggle } from "./theme-toggle";
 
@@ -49,6 +51,14 @@ const NAV_ITEMS = [
   { href: "/exams/list", key: "exams", icon: GraduationCap },
   { href: "/calendar/month", key: "calendar", icon: CalendarDays },
   { href: "/statistics/overview", key: "statistics", icon: BarChart3 },
+] as const;
+
+/**
+ * Reachable from the bell on every viewport, so it only needs a slot in the
+ * mobile sheet — where the bell's dropdown would be cramped.
+ */
+const MOBILE_ONLY_NAV_ITEMS = [
+  { href: "/notifications/center", key: "notifications", icon: Bell },
 ] as const;
 
 function isActivePath(pathname: string, href: string): boolean {
@@ -70,9 +80,11 @@ function initialsOf(name: string | null, email: string): string {
 
 interface NavBarProps {
   user: Pick<User, "fullName" | "email" | "avatarUrl">;
+  /** The user's saved `enabledInBrowser` preference, resolved in the layout. */
+  browserNotificationsEnabled: boolean;
 }
 
-export function NavBar({ user }: NavBarProps) {
+export function NavBar({ user, browserNotificationsEnabled }: NavBarProps) {
   const t = useTranslations("nav");
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -119,6 +131,8 @@ export function NavBar({ user }: NavBarProps) {
             <ThemeToggle />
             <LanguageSwitch />
           </div>
+
+          <NotificationBell browserNotificationsEnabled={browserNotificationsEnabled} />
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -186,7 +200,7 @@ export function NavBar({ user }: NavBarProps) {
               </SheetHeader>
 
               <nav className="flex flex-col gap-1 px-1">
-                {NAV_ITEMS.map(({ href, key, icon: Icon }) => {
+                {[...NAV_ITEMS, ...MOBILE_ONLY_NAV_ITEMS].map(({ href, key, icon: Icon }) => {
                   const active = isActivePath(pathname, href);
                   return (
                     <SheetClose asChild key={key}>

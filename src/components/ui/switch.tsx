@@ -1,35 +1,59 @@
-"use client"
+"use client";
+import * as React from "react";
+import * as SwitchPrimitives from "@radix-ui/react-switch";
 
-import * as React from "react"
-import { Switch as SwitchPrimitive } from "radix-ui"
+import { cn } from "@lib/utils";
 
-import { cn } from "@/lib/utils"
+type SwitchSize = "sm" | "md" | "lg";
 
-function Switch({
-  className,
-  size = "default",
-  ...props
-}: React.ComponentProps<typeof SwitchPrimitive.Root> & {
-  size?: "sm" | "default"
-}) {
+interface SwitchProps
+  extends React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root> {
+  size?: SwitchSize;
+}
+
+const sizeClasses = {
+  sm: {
+    root: "h-3.5 w-6",
+    thumb:
+      "h-2.5 w-2.5 data-[state=checked]:translate-x-2.5 rtl:data-[state=checked]:-translate-x-2.5",
+  },
+  md: {
+    root: "h-4 w-7",
+    thumb:
+      "h-3 w-3 data-[state=checked]:translate-x-3 rtl:data-[state=checked]:-translate-x-3",
+  },
+  lg: {
+    root: "h-4.5 w-8",
+    thumb:
+      "h-3.5 w-3.5 data-[state=checked]:translate-x-3.5 rtl:data-[state=checked]:-translate-x-3.5",
+  },
+};
+
+const Switch = React.forwardRef<
+  React.ElementRef<typeof SwitchPrimitives.Root>,
+  SwitchProps
+>(({ className, size = "sm", ...props }, ref) => {
+  const { root, thumb } = sizeClasses[size];
+
   return (
-    <SwitchPrimitive.Root
-      data-slot="switch"
-      data-size={size}
+    <SwitchPrimitives.Root
+      ref={ref}
       className={cn(
-        "peer group/switch inline-flex shrink-0 items-center rounded-full border border-transparent shadow-xs transition-all outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 data-[size=default]:h-[1.15rem] data-[size=default]:w-8 data-[size=sm]:h-3.5 data-[size=sm]:w-6 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input dark:data-[state=unchecked]:bg-input/80",
-        className
+        "peer inline-flex shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-input focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input",
+        root,
+        className,
       )}
       {...props}
     >
-      <SwitchPrimitive.Thumb
-        data-slot="switch-thumb"
+      <SwitchPrimitives.Thumb
         className={cn(
-          "pointer-events-none block rounded-full bg-background ring-0 transition-transform group-data-[size=default]/switch:size-4 group-data-[size=sm]/switch:size-3 data-[state=checked]:translate-x-[calc(100%-2px)] data-[state=unchecked]:translate-x-0 dark:data-[state=checked]:bg-primary-foreground dark:data-[state=unchecked]:bg-foreground"
+          "pointer-events-none rounded-full bg-background shadow-lg ring-0 transition-transform",
+          thumb,
         )}
       />
-    </SwitchPrimitive.Root>
-  )
-}
+    </SwitchPrimitives.Root>
+  );
+});
 
-export { Switch }
+Switch.displayName = "Switch";
+export { Switch };

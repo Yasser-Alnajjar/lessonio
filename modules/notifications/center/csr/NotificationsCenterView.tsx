@@ -1,18 +1,251 @@
 "use client";
 
-import { FeaturePlaceholder } from "@/components/shared/feature-placeholder";
+import { useMemo, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Check, Mail, Settings2 } from "lucide-react";
+import { useFormatter } from "next-intl";
+
+import {
+  markAllNotificationsAsRead,
+  markNotificationAsRead,
+  sendNotificationToEmail,
+} from "@/actions/notifications.mutations";
+import { NOTIFICATIONS_QUERY_KEY } from "@/components/shared/notification-bell";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { EmptyState } from "@/components/ui-system/empty-state";
+import { NotificationIcon } from "@/components/ui-system/notification-icon";
+import useTranslate from "@/hooks/useTranslate";
+import { Link, useRouter } from "@/i18n/navigation";
+import { cn } from "@/lib/utils";
 import type { Notification } from "@/lib/types/notification";
 
 interface NotificationsCenterViewProps {
   data: Notification[];
 }
 
+type Tab = "all" | "unread";
+type GroupKey = "today" | "yesterday" | "older";
+
+/** Buckets by calendar day in the viewer's own timezone, newest group first. */
+function groupByDay(notifications: Notification[]): [GroupKey, Notification[]][] {
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+  const startOfYesterday = new Date(startOfToday);
+  startOfYesterday.setDate(startOfYesterday.getDate() - 1);
+
+  const groups: Record<GroupKey, Notification[]> = { today: [], yesterday: [], older: [] };
+
+  for (const notification of notifications) {
+    const createdAt = new Date(notification.createdAt);
+    if (createdAt >= startOfToday) groups.today.push(notification);
+    else if (createdAt >= startOfYesterday) groups.yesterday.push(notification);
+    else groups.older.push(notification);
+  }
+
+  return (Object.entries(groups) as [GroupKey, Notification[]][]).filter(
+    ([, items]) => items.length > 0,
+  );
+}
+
 export const NotificationsCenterView = ({ data }: NotificationsCenterViewProps) => {
+  const t = useTranslate("notifications");
+  const format = useFormatter();
+  const router = useRouter();
+  const queryClient = useQueryClient();
+
+  const [tab, setTab] = useState<Tab>("all");
+  const [emailedId, setEmailedId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const unreadCount = data.filter((item) => item.readAt === null).length;
+
+  const groups = useMemo(() => {
+    const visible = tab === "unread" ? data.filter((item) => item.readAt === null) : data;
+    return groupByDay(visible);
+  }, [data, tab]);
+
+  /** Both the server-rendered list and the bell's polled cache go stale on a write. */
+  const refresh = () => {
+    queryClient.invalidateQueries({ queryKey: NOTIFICATIONS_QUERY_KEY });
+    router.refresh();
+  };
+
+  const markRead = useMutation({
+    mutationFn: (id: string) => markNotificationAsRead(id),
+    onSuccess: refresh,
+  });
+
+  const markAllRead = useMutation({
+    mutationFn: () => markAllNotificationsAsRead(),
+    onSuccess: refresh,
+  });
+
+  const email = useMutation({
+    mutationFn: (id: string) => sendNotificationToEmail(id),
+    onSuccess: (result, id) => {
+      if (result.success) {
+        setError(null);
+        setEmailedId(id);
+        refresh();
+      } else {
+        setEmailedId(null);
+        setError(result.error ?? t("center.genericError"));
+      }
+    },
+    onError: () => setError(t("center.genericError")),
+  });
+
+  const handleOpen = (notification: Notification) => {
+    if (notification.readAt === null) markRead.mutate(notification.id);
+    if (notification.linkPath) router.push(notification.linkPath);
+  };
+
   return (
-    <FeaturePlaceholder
-      title="Notifications"
-      description="This view will be built in Phase 14 (Notifications)."
-      itemCount={data.length}
-    />
+    <div className="flex flex-col gap-6 p-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-foreground text-xl font-semibold">{t("center.title")}</h1>
+          <p className="text-muted-foreground text-sm">{t("center.subtitle")}</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/settings/notification-preferences">
+              <Settings2 />
+              {t("center.settingsLink")}
+            </Link>
+          </Button>
+          {unreadCount > 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => markAllRead.mutate()}
+              disabled={markAllRead.isPending}
+            >
+              <Check />
+              {t("center.markAllRead")}
+            </Button>
+          )}
+        </div>
+      </div>
+
+      <Tabs value={tab} onValueChange={(value) => setTab(value as Tab)}>
+        <TabsList>
+          <TabsTrigger value="all">{t("center.tabAll")}</TabsTrigger>
+          <TabsTrigger value="unread">
+            {t("center.tabUnread")}
+            {unreadCount > 0 && ` (${unreadCount})`}
+          </TabsTrigger>
+        </TabsList>
+      </Tabs>
+
+      {error && (
+        <p role="alert" className="text-destructive text-sm">
+          {error}
+        </p>
+      )}
+
+      {groups.length === 0 ? (
+        <EmptyState
+          variant={data.length === 0 ? "no-data" : "no-results"}
+          title={data.length === 0 ? t("center.emptyTitle") : t("center.emptyUnreadTitle")}
+          description={
+            data.length === 0 ? t("center.emptyDescription") : t("center.emptyUnreadDescription")
+          }
+        />
+      ) : (
+        <div className="flex flex-col gap-6">
+          {groups.map(([group, items]) => (
+            <section key={group} className="flex flex-col gap-2">
+              <h2 className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
+                {t(`center.${group}`)}
+              </h2>
+              <ul className="flex flex-col gap-2">
+                {items.map((notification) => {
+                  const isUnread = notification.readAt === null;
+
+                  return (
+                    <li
+                      key={notification.id}
+                      className={cn(
+                        "border-border flex items-start gap-3 rounded-xl border p-3 transition-colors",
+                        isUnread ? "bg-accent/40" : "bg-card",
+                      )}
+                    >
+                      <NotificationIcon type={notification.type} />
+
+                      <button
+                        type="button"
+                        onClick={() => handleOpen(notification)}
+                        className="flex min-w-0 flex-1 flex-col items-start gap-1 text-start"
+                      >
+                        <span className="flex flex-wrap items-center gap-2">
+                          <span
+                            className={cn(
+                              "text-sm",
+                              isUnread ? "font-semibold" : "font-medium",
+                            )}
+                          >
+                            {notification.title}
+                          </span>
+                          <Badge variant="outline" className="font-normal">
+                            {t(`types.${notification.type}`)}
+                          </Badge>
+                          {isUnread && (
+                            <Badge variant="default" className="font-normal">
+                              {t("center.unread")}
+                            </Badge>
+                          )}
+                        </span>
+                        <span className="text-muted-foreground text-sm">{notification.body}</span>
+                        <span className="text-muted-foreground/70 text-xs">
+                          {format.dateTime(new Date(notification.createdAt), {
+                            dateStyle: "medium",
+                            timeStyle: "short",
+                          })}
+                        </span>
+                      </button>
+
+                      <div className="flex shrink-0 items-center gap-1">
+                        {isUnread && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            aria-label={t("center.markRead")}
+                            title={t("center.markRead")}
+                            onClick={() => markRead.mutate(notification.id)}
+                            disabled={markRead.isPending}
+                          >
+                            <Check />
+                          </Button>
+                        )}
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          aria-label={t("center.emailMe")}
+                          title={
+                            emailedId === notification.id
+                              ? t("center.emailSent")
+                              : t("center.emailMe")
+                          }
+                          onClick={() => email.mutate(notification.id)}
+                          disabled={email.isPending}
+                          className={cn(emailedId === notification.id && "text-primary")}
+                        >
+                          <Mail />
+                        </Button>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          ))}
+        </div>
+      )}
+    </div>
   );
 };

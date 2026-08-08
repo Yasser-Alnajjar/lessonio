@@ -23,9 +23,18 @@ export default async function AppLayout({ children }: AppLayoutProps) {
     return null;
   }
 
+  // The bell lives in the nav on every page, so its browser-popup preference
+  // is resolved once here rather than fetched per route.
+  const { data: settings } = await Actions.Settings.get();
+
   return (
     <div className="bg-background flex min-h-svh flex-col">
-      <NavBar user={user} />
+      <NavBar
+        user={user}
+        browserNotificationsEnabled={
+          settings?.notificationPreferences.enabledInBrowser ?? true
+        }
+      />
       <main className="mx-auto w-full max-w-7xl flex-1">{children}</main>
     </div>
   );

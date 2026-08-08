@@ -28,6 +28,7 @@
     "exams": "الاختبارات",
     "calendar": "التقويم",
     "statistics": "الإحصائيات",
+    "notifications": "الإشعارات",
     "settings": "الإعدادات",
     "openMenu": "فتح القائمة",
     "account": "الحساب"
@@ -623,6 +624,66 @@
       "absent": "غائب",
       "late": "متأخر",
       "cancelled": "ملغى"
+    }
+  },
+  "notifications": {
+    "types": {
+      "upcoming_lesson": "درس قادم",
+      "homework_due": "واجب مستحق",
+      "daily_reminder": "تذكير يومي",
+      "review_reminder": "تذكير بالمراجعة"
+    },
+    "bell": {
+      "label": "الإشعارات",
+      "unreadLabel": "{count} إشعارات غير مقروءة",
+      "heading": "الإشعارات",
+      "empty": "لا جديد لديك.",
+      "markAllRead": "تعليم الكل كمقروء",
+      "viewAll": "عرض الكل",
+      "enable": "تفعيل إشعارات المتصفح",
+      "enabled": "إشعارات المتصفح مفعّلة",
+      "blocked": "إشعارات المتصفح محظورة في إعدادات متصفحك."
+    },
+    "center": {
+      "title": "الإشعارات",
+      "subtitle": "الدروس والمواعيد والتذكيرات فور ظهورها.",
+      "tabAll": "الكل",
+      "tabUnread": "غير المقروء",
+      "markAllRead": "تعليم الكل كمقروء",
+      "markRead": "تعليم كمقروء",
+      "emailMe": "أرسله إلى بريدي",
+      "emailSent": "تم الإرسال إلى بريدك.",
+      "emailed": "أُرسل بالبريد",
+      "unread": "غير مقروء",
+      "today": "اليوم",
+      "yesterday": "أمس",
+      "older": "سابقًا",
+      "settingsLink": "إعدادات الإشعارات",
+      "emptyTitle": "لا توجد إشعارات بعد",
+      "emptyDescription": "ستظهر هنا التذكيرات الخاصة بالدروس والواجبات والمراجعة.",
+      "emptyUnreadTitle": "لا يوجد غير مقروء",
+      "emptyUnreadDescription": "قرأت كل شيء. انتقل إلى الكل لعرض الإشعارات السابقة.",
+      "genericError": "حدث خطأ ما. حاول مرة أخرى."
+    },
+    "preferences": {
+      "title": "تفضيلات الإشعارات",
+      "subtitle": "اختر ما تريد التذكير به، وأين يصلك.",
+      "channelsTitle": "القنوات",
+      "browserLabel": "إشعارات المتصفح",
+      "browserDescription": "إظهار تنبيه على سطح المكتب أثناء فتح Study Line.",
+      "emailLabel": "إشعارات البريد الإلكتروني",
+      "emailDescription": "إرسال الإشعارات الجديدة أيضًا إلى البريد الإلكتروني لحسابك.",
+      "typesTitle": "ما الذي تريد التنبيه بشأنه",
+      "permissionPrompt": "لم يمنح متصفحك الإذن بعد.",
+      "permissionGranted": "تم منح الإذن.",
+      "permissionDenied": "الإذن محظور. أعد تفعيله من إعدادات الموقع في متصفحك.",
+      "permissionUnsupported": "هذا المتصفح لا يدعم الإشعارات.",
+      "requestPermission": "السماح بالإشعارات",
+      "save": "حفظ التفضيلات",
+      "saving": "جارٍ الحفظ...",
+      "saved": "تم حفظ التفضيلات.",
+      "genericError": "حدث خطأ ما. حاول مرة أخرى.",
+      "missingSettings": "تعذر تحميل إعداداتك. جرّب إعادة تحميل الصفحة."
     }
   }
 }

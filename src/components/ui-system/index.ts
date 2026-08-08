@@ -11,3 +11,4 @@ export * from "./statistic-card";
 export * from "./chart-card";
 export * from "./confirm-dialog";
 export * from "./loading-attachment-card";
+export * from "./notification-icon";

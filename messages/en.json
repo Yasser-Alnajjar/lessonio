@@ -17,7 +17,8 @@
     "search": "Search",
     "error": "Something went wrong",
     "retry": "Retry",
-    "back": "Back"
+    "back": "Back",
+    "noDataYet": "No data yet"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -548,6 +549,71 @@
       "more": "+{count} more",
       "dayEmpty": "No lessons scheduled for this day.",
       "rescheduleError": "Couldn't reschedule the lesson. Please try again."
+    }
+  },
+  "statistics": {
+    "title": "Statistics",
+    "subtitle": "Your study patterns, at a glance.",
+    "cards": {
+      "studyTimeThisMonth": "Study time this month",
+      "attendanceRate": "Attendance rate",
+      "homeworkCompletion": "Homework completion",
+      "avgExamScore": "Average exam score",
+      "currentStreak": "Current streak",
+      "lessonsCompleted": "Lessons completed"
+    },
+    "cardSuffix": {
+      "days": "d",
+      "hours": "h",
+      "minutes": "m"
+    },
+    "charts": {
+      "weeklyStudyTime": {
+        "title": "Weekly study time",
+        "description": "Minutes studied over the last 7 days",
+        "empty": "No study sessions logged this week."
+      },
+      "monthlyLessons": {
+        "title": "Monthly lessons",
+        "description": "Lessons scheduled per month",
+        "empty": "No lessons in the last 6 months."
+      },
+      "attendanceBreakdown": {
+        "title": "Attendance",
+        "description": "How lessons were attended",
+        "empty": "No attendance data yet."
+      },
+      "subjectDistribution": {
+        "title": "Subject distribution",
+        "description": "Time spent by subject",
+        "empty": "Add lessons to see your subject mix."
+      },
+      "studyProgress": {
+        "title": "Study progress",
+        "description": "Cumulative study hours over the last 8 weeks",
+        "empty": "Start studying to build your progress line."
+      },
+      "heatMap": {
+        "title": "Activity heat map",
+        "description": "Daily study activity over the last 12 weeks",
+        "empty": "No activity to show yet."
+      },
+      "dailyActivity": {
+        "title": "Daily activity",
+        "description": "Average minutes studied by day of week",
+        "empty": "No activity to show yet."
+      },
+      "monthlyGrowth": {
+        "title": "Monthly growth",
+        "description": "Total study time trend over the last 6 months",
+        "empty": "Not enough history yet."
+      }
+    },
+    "attendance": {
+      "attended": "Attended",
+      "absent": "Absent",
+      "late": "Late",
+      "cancelled": "Cancelled"
     }
   }
 }

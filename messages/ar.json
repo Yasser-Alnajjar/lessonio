@@ -17,7 +17,8 @@
     "search": "بحث",
     "error": "حدث خطأ ما",
     "retry": "إعادة المحاولة",
-    "back": "رجوع"
+    "back": "رجوع",
+    "noDataYet": "لا توجد بيانات بعد"
   },
   "nav": {
     "dashboard": "لوحة التحكم",
@@ -548,6 +549,71 @@
       "more": "+{count} أخرى",
       "dayEmpty": "لا توجد دروس مجدولة لهذا اليوم.",
       "rescheduleError": "تعذّرت إعادة جدولة الدرس. حاول مرة أخرى."
+    }
+  },
+  "statistics": {
+    "title": "الإحصائيات",
+    "subtitle": "أنماط مذاكرتك، بلمحة واحدة.",
+    "cards": {
+      "studyTimeThisMonth": "وقت المذاكرة هذا الشهر",
+      "attendanceRate": "معدل الحضور",
+      "homeworkCompletion": "إنجاز الواجبات",
+      "avgExamScore": "متوسط درجات الاختبارات",
+      "currentStreak": "التتابع الحالي",
+      "lessonsCompleted": "الدروس المكتملة"
+    },
+    "cardSuffix": {
+      "days": "ي",
+      "hours": "س",
+      "minutes": "د"
+    },
+    "charts": {
+      "weeklyStudyTime": {
+        "title": "وقت المذاكرة الأسبوعي",
+        "description": "الدقائق المذاكرة خلال آخر 7 أيام",
+        "empty": "لا توجد جلسات مذاكرة مسجلة هذا الأسبوع."
+      },
+      "monthlyLessons": {
+        "title": "الدروس الشهرية",
+        "description": "عدد الدروس المجدولة لكل شهر",
+        "empty": "لا توجد دروس خلال آخر 6 أشهر."
+      },
+      "attendanceBreakdown": {
+        "title": "الحضور",
+        "description": "كيفية حضور الدروس",
+        "empty": "لا توجد بيانات حضور بعد."
+      },
+      "subjectDistribution": {
+        "title": "توزيع المواد",
+        "description": "الوقت المُمضى في كل مادة",
+        "empty": "أضف دروسًا لعرض توزيع موادك."
+      },
+      "studyProgress": {
+        "title": "تقدّم المذاكرة",
+        "description": "ساعات المذاكرة التراكمية خلال آخر 8 أسابيع",
+        "empty": "ابدأ المذاكرة لبناء خط تقدّمك."
+      },
+      "heatMap": {
+        "title": "خريطة النشاط الحرارية",
+        "description": "نشاط المذاكرة اليومي خلال آخر 12 أسبوعًا",
+        "empty": "لا يوجد نشاط لعرضه بعد."
+      },
+      "dailyActivity": {
+        "title": "النشاط اليومي",
+        "description": "متوسط الدقائق المذاكرة حسب يوم الأسبوع",
+        "empty": "لا يوجد نشاط لعرضه بعد."
+      },
+      "monthlyGrowth": {
+        "title": "النمو الشهري",
+        "description": "اتجاه إجمالي وقت المذاكرة خلال آخر 6 أشهر",
+        "empty": "لا يوجد سجل كافٍ بعد."
+      }
+    },
+    "attendance": {
+      "attended": "حاضر",
+      "absent": "غائب",
+      "late": "متأخر",
+      "cancelled": "ملغى"
     }
   }
 }

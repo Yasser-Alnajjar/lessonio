@@ -391,5 +391,129 @@
       "deleteConfirm": "Delete",
       "deleteCancel": "Cancel"
     }
+  },
+  "homework": {
+    "list": {
+      "title": "Homework",
+      "subtitle": "Every assignment, tracked from deadline to done.",
+      "newHomework": "New homework",
+      "noLessonsHint": "Add a lesson first — homework needs one to belong to.",
+      "searchPlaceholder": "Search homework...",
+      "filterSubject": "Subject",
+      "filterDateRange": "Deadline range",
+      "showCompleted": "Show completed",
+      "hideCompleted": "Hide completed",
+      "emptyTitle": "No homework yet",
+      "emptyDescription": "Add your first homework to start tracking deadlines.",
+      "emptyAction": "New homework",
+      "noResultsTitle": "No matching homework",
+      "noResultsDescription": "Try a different search term or clear your filters."
+    },
+    "card": {
+      "actionsLabel": "Homework actions",
+      "edit": "Edit",
+      "delete": "Delete",
+      "overdue": "Overdue"
+    },
+    "form": {
+      "createTitle": "New homework",
+      "editTitle": "Edit homework",
+      "createDescription": "Add an assignment and track it through to completion.",
+      "editDescription": "Update the lesson, title, or deadline for this homework.",
+      "lessonLabel": "Lesson",
+      "lessonPlaceholder": "Choose a lesson",
+      "titleLabel": "Title",
+      "titlePlaceholder": "e.g. Problem set 3",
+      "deadlineLabel": "Deadline",
+      "cancel": "Cancel",
+      "submitting": "Saving...",
+      "submitCreate": "Create homework",
+      "submitEdit": "Save changes",
+      "errors": {
+        "lessonRequired": "Choose a lesson",
+        "titleRequired": "Title is required",
+        "titleMax": "Title must be 160 characters or fewer",
+        "deadlineRequired": "Deadline is required"
+      }
+    },
+    "delete": {
+      "title": "Delete homework?",
+      "description": "This permanently deletes \"{title}\". This cannot be undone.",
+      "confirm": "Delete homework",
+      "cancel": "Cancel",
+      "genericError": "Something went wrong. Please try again."
+    }
+  },
+  "exams": {
+    "list": {
+      "title": "Exams",
+      "subtitle": "Every exam, from schedule to score.",
+      "newExam": "New exam",
+      "noLessonsHint": "Add a lesson first — exams need one to belong to.",
+      "searchPlaceholder": "Search exams...",
+      "filterSubject": "Subject",
+      "filterDateRange": "Date range",
+      "showPast": "Show past exams",
+      "hidePast": "Hide past exams",
+      "emptyTitle": "No exams yet",
+      "emptyDescription": "Add your first exam to start tracking scores.",
+      "emptyAction": "New exam",
+      "noResultsTitle": "No matching exams",
+      "noResultsDescription": "Try a different search term or clear your filters."
+    },
+    "card": {
+      "actionsLabel": "Exam actions",
+      "edit": "Edit",
+      "delete": "Delete",
+      "notGraded": "Not graded yet",
+      "scorePlaceholder": "Score",
+      "recordScore": "Save",
+      "outOf": "points"
+    },
+    "form": {
+      "createTitle": "New exam",
+      "editTitle": "Edit exam",
+      "createDescription": "Schedule an exam and record its score once it's graded.",
+      "editDescription": "Update the lesson, title, date, or score for this exam.",
+      "lessonLabel": "Lesson",
+      "lessonPlaceholder": "Choose a lesson",
+      "titleLabel": "Title",
+      "titlePlaceholder": "e.g. Midterm exam",
+      "dateLabel": "Date",
+      "totalScoreLabel": "Total score",
+      "scoreLabel": "Score",
+      "scorePlaceholder": "Not graded yet",
+      "cancel": "Cancel",
+      "submitting": "Saving...",
+      "submitCreate": "Create exam",
+      "submitEdit": "Save changes",
+      "errors": {
+        "lessonRequired": "Choose a lesson",
+        "titleRequired": "Title is required",
+        "titleMax": "Title must be 160 characters or fewer",
+        "dateRequired": "Date is required",
+        "totalScoreInvalid": "Total score must be a positive number",
+        "scoreInvalid": "Score cannot be negative",
+        "scoreExceedsTotal": "Score cannot exceed the total score"
+      }
+    },
+    "delete": {
+      "title": "Delete exam?",
+      "description": "This permanently deletes \"{title}\". This cannot be undone.",
+      "confirm": "Delete exam",
+      "cancel": "Cancel",
+      "genericError": "Something went wrong. Please try again."
+    }
+  },
+  "calendar": {
+    "month": {
+      "title": "Calendar",
+      "subtitle": "Every lesson, laid out by day — drag a lesson to reschedule it.",
+      "previous": "Previous month",
+      "next": "Next month",
+      "more": "+{count} more",
+      "dayEmpty": "No lessons scheduled for this day.",
+      "rescheduleError": "Couldn't reschedule the lesson. Please try again."
+    }
   }
 }

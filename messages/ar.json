@@ -391,5 +391,129 @@
       "deleteConfirm": "حذف",
       "deleteCancel": "إلغاء"
     }
+  },
+  "homework": {
+    "list": {
+      "title": "الواجبات",
+      "subtitle": "كل واجب، متتبَّع من الموعد النهائي حتى الإنجاز.",
+      "newHomework": "واجب جديد",
+      "noLessonsHint": "أضف درسًا أولاً — يحتاج كل واجب إلى درس ينتمي إليه.",
+      "searchPlaceholder": "البحث في الواجبات...",
+      "filterSubject": "المادة",
+      "filterDateRange": "نطاق الموعد النهائي",
+      "showCompleted": "إظهار المنجزة",
+      "hideCompleted": "إخفاء المنجزة",
+      "emptyTitle": "لا توجد واجبات بعد",
+      "emptyDescription": "أضف واجبك الأول لتبدأ بتتبع المواعيد النهائية.",
+      "emptyAction": "واجب جديد",
+      "noResultsTitle": "لا توجد واجبات مطابقة",
+      "noResultsDescription": "جرّب كلمة بحث مختلفة أو امسح عوامل التصفية."
+    },
+    "card": {
+      "actionsLabel": "إجراءات الواجب",
+      "edit": "تعديل",
+      "delete": "حذف",
+      "overdue": "متأخر"
+    },
+    "form": {
+      "createTitle": "واجب جديد",
+      "editTitle": "تعديل الواجب",
+      "createDescription": "أضف واجبًا وتتبعه حتى الإنجاز.",
+      "editDescription": "حدّث الدرس أو العنوان أو الموعد النهائي لهذا الواجب.",
+      "lessonLabel": "الدرس",
+      "lessonPlaceholder": "اختر درسًا",
+      "titleLabel": "العنوان",
+      "titlePlaceholder": "مثال: مجموعة مسائل 3",
+      "deadlineLabel": "الموعد النهائي",
+      "cancel": "إلغاء",
+      "submitting": "جارٍ الحفظ...",
+      "submitCreate": "إنشاء الواجب",
+      "submitEdit": "حفظ التغييرات",
+      "errors": {
+        "lessonRequired": "اختر درسًا",
+        "titleRequired": "العنوان مطلوب",
+        "titleMax": "يجب ألا يتجاوز العنوان 160 حرفًا",
+        "deadlineRequired": "الموعد النهائي مطلوب"
+      }
+    },
+    "delete": {
+      "title": "حذف الواجب؟",
+      "description": "سيؤدي هذا إلى حذف \"{title}\" نهائيًا. لا يمكن التراجع عن هذا الإجراء.",
+      "confirm": "حذف الواجب",
+      "cancel": "إلغاء",
+      "genericError": "حدث خطأ ما. حاول مرة أخرى."
+    }
+  },
+  "exams": {
+    "list": {
+      "title": "الاختبارات",
+      "subtitle": "كل اختبار، من الجدولة إلى الدرجة.",
+      "newExam": "اختبار جديد",
+      "noLessonsHint": "أضف درسًا أولاً — يحتاج كل اختبار إلى درس ينتمي إليه.",
+      "searchPlaceholder": "البحث في الاختبارات...",
+      "filterSubject": "المادة",
+      "filterDateRange": "النطاق الزمني",
+      "showPast": "إظهار الاختبارات السابقة",
+      "hidePast": "إخفاء الاختبارات السابقة",
+      "emptyTitle": "لا توجد اختبارات بعد",
+      "emptyDescription": "أضف اختبارك الأول لتبدأ بتتبع الدرجات.",
+      "emptyAction": "اختبار جديد",
+      "noResultsTitle": "لا توجد اختبارات مطابقة",
+      "noResultsDescription": "جرّب كلمة بحث مختلفة أو امسح عوامل التصفية."
+    },
+    "card": {
+      "actionsLabel": "إجراءات الاختبار",
+      "edit": "تعديل",
+      "delete": "حذف",
+      "notGraded": "لم يُصحَّح بعد",
+      "scorePlaceholder": "الدرجة",
+      "recordScore": "حفظ",
+      "outOf": "نقطة"
+    },
+    "form": {
+      "createTitle": "اختبار جديد",
+      "editTitle": "تعديل الاختبار",
+      "createDescription": "جدول اختبارًا وسجّل درجته بعد تصحيحه.",
+      "editDescription": "حدّث الدرس أو العنوان أو التاريخ أو الدرجة لهذا الاختبار.",
+      "lessonLabel": "الدرس",
+      "lessonPlaceholder": "اختر درسًا",
+      "titleLabel": "العنوان",
+      "titlePlaceholder": "مثال: اختبار منتصف الفصل",
+      "dateLabel": "التاريخ",
+      "totalScoreLabel": "الدرجة الكلية",
+      "scoreLabel": "الدرجة",
+      "scorePlaceholder": "لم يُصحَّح بعد",
+      "cancel": "إلغاء",
+      "submitting": "جارٍ الحفظ...",
+      "submitCreate": "إنشاء الاختبار",
+      "submitEdit": "حفظ التغييرات",
+      "errors": {
+        "lessonRequired": "اختر درسًا",
+        "titleRequired": "العنوان مطلوب",
+        "titleMax": "يجب ألا يتجاوز العنوان 160 حرفًا",
+        "dateRequired": "التاريخ مطلوب",
+        "totalScoreInvalid": "يجب أن تكون الدرجة الكلية رقمًا موجبًا",
+        "scoreInvalid": "لا يمكن أن تكون الدرجة سالبة",
+        "scoreExceedsTotal": "لا يمكن أن تتجاوز الدرجة الدرجة الكلية"
+      }
+    },
+    "delete": {
+      "title": "حذف الاختبار؟",
+      "description": "سيؤدي هذا إلى حذف \"{title}\" نهائيًا. لا يمكن التراجع عن هذا الإجراء.",
+      "confirm": "حذف الاختبار",
+      "cancel": "إلغاء",
+      "genericError": "حدث خطأ ما. حاول مرة أخرى."
+    }
+  },
+  "calendar": {
+    "month": {
+      "title": "التقويم",
+      "subtitle": "كل درس، مرتب حسب اليوم — اسحب درسًا لإعادة جدولته.",
+      "previous": "الشهر السابق",
+      "next": "الشهر التالي",
+      "more": "+{count} أخرى",
+      "dayEmpty": "لا توجد دروس مجدولة لهذا اليوم.",
+      "rescheduleError": "تعذّرت إعادة جدولة الدرس. حاول مرة أخرى."
+    }
   }
 }

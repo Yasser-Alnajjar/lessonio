@@ -21,3 +21,7 @@ export interface CreateHomeworkInput {
   title: string;
   deadline: string;
 }
+
+export type UpdateHomeworkInput = Partial<CreateHomeworkInput> & {
+  completed?: boolean;
+};

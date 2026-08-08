@@ -2,8 +2,17 @@ import { Actions } from "@/actions";
 import { HomeworkListView } from "../csr/HomeworkListView";
 
 export const HomeworkList = async () => {
-  const { data } = await Actions.Homework.getAll();
-  const safeData = data ?? [];
+  const [{ data: homework }, { data: lessons }, { data: subjects }] = await Promise.all([
+    Actions.Homework.getAll(),
+    Actions.Lessons.getAll(),
+    Actions.Subjects.getAll(),
+  ]);
 
-  return <HomeworkListView data={safeData} />;
+  return (
+    <HomeworkListView
+      data={homework ?? []}
+      lessons={(lessons ?? []).filter((lesson) => !lesson.isArchived)}
+      subjects={subjects ?? []}
+    />
+  );
 };

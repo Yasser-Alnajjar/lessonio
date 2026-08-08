@@ -14,6 +14,7 @@ export interface Exam extends AuditFields {
 export interface ExamWithRelations extends Exam {
   subjectName: string;
   subjectColor: string;
+  lessonTitle: string;
   /** null while the exam hasn't been scored yet. */
   percentage: number | null;
 }
@@ -25,6 +26,8 @@ export interface CreateExamInput {
   totalScore: number;
   score?: number;
 }
+
+export type UpdateExamInput = Partial<CreateExamInput>;
 
 /** Pure helper — percentage is always derived, never stored. */
 export function calculateExamPercentage(

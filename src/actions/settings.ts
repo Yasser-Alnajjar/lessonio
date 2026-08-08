@@ -2,7 +2,7 @@ import "server-only";
 
 import { parseNotificationPreferences } from "@/lib/notifications/preferences";
 import { createClient } from "@/lib/supabase/server";
-import type { ActionResult, MutationResult } from "@/lib/types/common";
+import type { ActionResult } from "@/lib/types/common";
 import type { ThemeMode, UserSettings } from "@/lib/types/settings";
 import { THEME_MODES } from "@/lib/types/settings";
 import { deleteAccount, exportUserData, updateNotificationPreferences } from "./settings.mutations";
@@ -12,10 +12,6 @@ function toThemeMode(value: string): ThemeMode {
 }
 
 export const settingsActions = {
-  /**
-   * Implemented ahead of Phase 16 because Phase 14 needs
-   * `notificationPreferences` to decide what to generate and how to deliver it.
-   */
   async get(): Promise<ActionResult<UserSettings>> {
     const supabase = await createClient();
     const { data: authData, error: authError } = await supabase.auth.getUser();

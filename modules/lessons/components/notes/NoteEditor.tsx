@@ -14,7 +14,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import type { LessonNote } from "@/lib/types/lesson-note";
-import { useRouter } from "@navigation";
 
 export interface NoteEditorProps {
   note: LessonNote;
@@ -31,7 +30,6 @@ const MARKDOWN_CLASSNAME =
 export function NoteEditor({ note, setNotes, onDeleted }: NoteEditorProps) {
   const locale = useLocale();
   const isArabic = locale === "ar";
-  const router = useRouter();
   const t = useTranslations("lessons.notes");
   const [title, setTitle] = useState(note.title);
   const [content, setContent] = useState(note.contentMarkdown);

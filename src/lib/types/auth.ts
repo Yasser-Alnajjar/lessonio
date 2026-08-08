@@ -5,6 +5,7 @@ import type {
   createLoginSchema,
   createRegisterSchema,
   createResetPasswordSchema,
+  createUpdateProfileSchema,
 } from "@/lib/validations/auth";
 
 export type LoginInput = z.infer<ReturnType<typeof createLoginSchema>>;
@@ -14,4 +15,7 @@ export type ForgotPasswordInput = z.infer<
 >;
 export type ResetPasswordInput = z.infer<
   ReturnType<typeof createResetPasswordSchema>
+>;
+export type UpdateProfileInput = z.infer<
+  ReturnType<typeof createUpdateProfileSchema>
 >;

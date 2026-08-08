@@ -21,6 +21,7 @@ import {
   type NotificationPreferences,
   type UserSettings,
 } from "@/lib/types/settings";
+import { SettingsNav } from "../../components/SettingsNav";
 
 interface SettingsNotificationPreferencesViewProps {
   data: UserSettings | null;
@@ -78,6 +79,8 @@ export const SettingsNotificationPreferencesView = ({
   return (
     <div className="flex  justify-center">
       <div className="flex flex-col gap-4 w-full max-w-2xl mt-4">
+        <SettingsNav />
+
         <div>
           <h1 className="text-foreground text-xl font-semibold">
             {t("title")}

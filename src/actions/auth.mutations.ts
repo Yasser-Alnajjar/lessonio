@@ -96,10 +96,12 @@ export async function updateProfile(
     return { success: false, error: "You must be signed in." };
   }
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("profiles")
     .update({ full_name: input.fullName, timezone: input.timezone })
     .eq("id", authData.user.id);
+  console.log("error", error);
+  console.log("data", data);
 
   if (error) {
     return { success: false, error: error.message };

@@ -5,10 +5,16 @@ import { createClient } from "@/lib/supabase/server";
 import type { ActionResult } from "@/lib/types/common";
 import type { ThemeMode, UserSettings } from "@/lib/types/settings";
 import { THEME_MODES } from "@/lib/types/settings";
-import { deleteAccount, exportUserData, updateNotificationPreferences } from "./settings.mutations";
+import {
+  deleteAccount,
+  exportData,
+  updateNotificationPreferences,
+} from "./settings.mutations";
 
 function toThemeMode(value: string): ThemeMode {
-  return (THEME_MODES as readonly string[]).includes(value) ? (value as ThemeMode) : "system";
+  return (THEME_MODES as readonly string[]).includes(value)
+    ? (value as ThemeMode)
+    : "system";
 }
 
 export const settingsActions = {
@@ -39,18 +45,15 @@ export const settingsActions = {
         userId: row.user_id,
         theme: toThemeMode(row.theme),
         locale: row.locale,
-        notificationPreferences: parseNotificationPreferences(row.notification_preferences),
+        notificationPreferences: parseNotificationPreferences(
+          row.notification_preferences,
+        ),
       },
       error: null,
     };
   },
 
   updateNotificationPreferences,
-  exportData: exportUserData,
+  exportData,
   deleteAccount,
-
-  /** TODO(Phase 16 — Settings): replace stub with a Supabase update (theme/locale). */
-  async update(_input: Partial<UserSettings>): Promise<MutationResult> {
-    return { success: false, error: "Not implemented until Phase 16." };
-  },
 };

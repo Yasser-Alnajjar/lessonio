@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { ActionResult } from "@/lib/types/common";
 import type { ThemeMode, UserSettings } from "@/lib/types/settings";
 import { THEME_MODES } from "@/lib/types/settings";
-import { deleteAccount, exportData, updateNotificationPreferences } from "./settings.mutations";
+import { deleteAccount, exportUserData, updateNotificationPreferences } from "./settings.mutations";
 
 function toThemeMode(value: string): ThemeMode {
   return (THEME_MODES as readonly string[]).includes(value) ? (value as ThemeMode) : "system";
@@ -46,6 +46,11 @@ export const settingsActions = {
   },
 
   updateNotificationPreferences,
-  exportData,
+  exportData: exportUserData,
   deleteAccount,
+
+  /** TODO(Phase 16 — Settings): replace stub with a Supabase update (theme/locale). */
+  async update(_input: Partial<UserSettings>): Promise<MutationResult> {
+    return { success: false, error: "Not implemented until Phase 16." };
+  },
 };

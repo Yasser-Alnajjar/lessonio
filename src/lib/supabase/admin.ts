@@ -11,15 +11,14 @@ import type { Database } from "@/lib/types/database";
  * can read and write every user's rows, so every query made through it must
  * scope itself by `user_id` by hand.
  *
- * Two callers, both doing something a signed-in user's own policies
- * structurally cannot grant them:
- * - `src/actions/notifications.jobs.ts` — `notifications` gives `authenticated`
- *   no insert policy, because rows are derived from a user's data by a
- *   scheduled job rather than created by the user; reached through the
- *   cron-secret-protected route handler.
- * - `src/actions/settings.mutations.ts` `deleteAccount` — deleting an
- *   `auth.users` row requires the `auth.admin` API, which no RLS policy on
- *   any table can expose to `authenticated`.
+ * Two legitimate callers:
+ *  - `src/actions/notifications.jobs.ts` — `notifications` grants
+ *    `authenticated` no insert policy, since notification rows are derived
+ *    from a user's data by a scheduled job rather than created by the user.
+ *    Reached through the cron-secret-protected route handler.
+ *  - `src/actions/settings.mutations.ts` (`deleteAccount`) — Supabase Auth
+ *    has no self-delete endpoint; `auth.admin.deleteUser` only exists on the
+ *    service-role client.
  *
  * Never import this from a Client Component, and never reach for it to work
  * around an RLS policy that is doing its job — use `createClient()` from

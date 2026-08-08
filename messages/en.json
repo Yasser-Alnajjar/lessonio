@@ -687,63 +687,24 @@
     }
   },
   "settings": {
-    "nav": {
-      "label": "Settings sections",
-      "profile": "Profile",
-      "appearance": "Appearance",
-      "notifications": "Notifications",
-      "data": "Backup & data"
-    },
-    "profile": {
-      "title": "Profile",
-      "subtitle": "Your name and timezone, used across Study Line.",
-      "emailLabel": "Email",
-      "emailNote": "Your email can't be changed here.",
-      "missingProfile": "We couldn't load your profile. Try reloading the page.",
-      "fullNameLabel": "Full name",
-      "fullNamePlaceholder": "e.g. Ada Lovelace",
-      "timezoneLabel": "Timezone",
-      "timezonePlaceholder": "Choose your timezone",
-      "timezoneDescription": "Used to time your daily reminders and lesson notifications correctly.",
-      "save": "Save changes",
-      "saving": "Saving...",
-      "saved": "Profile updated.",
-      "genericError": "Something went wrong. Please try again.",
-      "errors": {
-        "fullNameMin": "Enter your full name.",
-        "fullNameMax": "Full name is too long.",
-        "timezoneRequired": "Choose a timezone."
-      }
-    },
-    "appearance": {
-      "title": "Appearance",
-      "subtitle": "Choose how Study Line looks and which language it speaks.",
-      "themeTitle": "Theme",
-      "themeDescription": "Switch between light, dark, or match your system.",
-      "languageTitle": "Language",
-      "languageDescription": "Switch the interface between English and Arabic."
-    },
     "data": {
       "title": "Backup & data",
-      "subtitle": "Export everything you've tracked, or permanently delete your account.",
+      "subtitle": "Download a copy of everything you've stored, or permanently delete your account.",
       "missingSettings": "We couldn't load your settings. Try reloading the page.",
       "exportTitle": "Export your data",
-      "exportDescription": "Download a JSON backup of your subjects, lessons, notes, homework, exams, study sessions, and more.",
-      "exportButton": "Download backup",
-      "exportPreparing": "Preparing...",
-      "exportError": "Couldn't prepare your export. Please try again.",
-      "dangerTitle": "Danger zone",
-      "dangerDescription": "Deleting your account permanently removes every subject, lesson, note, and record you've tracked. This cannot be undone.",
-      "deleteButton": "Delete account",
-      "deleteDialog": {
-        "title": "Delete your account?",
-        "description": "This permanently deletes your account and everything in it — subjects, lessons, notes, homework, exams, and study history. This cannot be undone.",
-        "confirmLabel": "Type {email} to confirm",
-        "cancel": "Cancel",
-        "confirm": "Delete my account",
-        "deleting": "Deleting...",
-        "genericError": "Something went wrong. Please try again."
-      }
+      "exportDescription": "Download a JSON file with every subject, lesson, note, homework, exam, and reminder in your account.",
+      "exportButton": "Download my data",
+      "exporting": "Preparing download...",
+      "exportSuccess": "Your download has started.",
+      "dangerZoneTitle": "Danger zone",
+      "deleteAccountDescription": "Permanently delete {email} and everything in it. This cannot be undone.",
+      "deleteAccountDescriptionNoEmail": "Permanently delete your account and everything in it. This cannot be undone.",
+      "deleteAccountButton": "Delete account",
+      "deleteConfirmTitle": "Delete your account?",
+      "deleteConfirmDescription": "This permanently deletes your account, subjects, lessons, notes, attachments, and every other record tied to it. This cannot be undone.",
+      "deleteConfirmButton": "Delete my account",
+      "deleteCancelButton": "Cancel",
+      "genericError": "Something went wrong. Please try again."
     }
   }
 }

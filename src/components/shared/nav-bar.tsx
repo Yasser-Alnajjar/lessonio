@@ -136,7 +136,10 @@ export function NavBar({ user }: NavBarProps) {
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuContent
+              align={isArabic ? "start" : "end"}
+              className="w-56"
+            >
               <DropdownMenuLabel className="flex flex-col gap-0.5">
                 <span className="truncate text-sm font-medium">
                   {displayName}

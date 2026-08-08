@@ -28,6 +28,7 @@
     "exams": "Exams",
     "calendar": "Calendar",
     "statistics": "Statistics",
+    "notifications": "Notifications",
     "settings": "Settings",
     "openMenu": "Open menu",
     "account": "Account"
@@ -623,6 +624,66 @@
       "absent": "Absent",
       "late": "Late",
       "cancelled": "Cancelled"
+    }
+  },
+  "notifications": {
+    "types": {
+      "upcoming_lesson": "Upcoming lesson",
+      "homework_due": "Homework due",
+      "daily_reminder": "Daily reminder",
+      "review_reminder": "Review reminder"
+    },
+    "bell": {
+      "label": "Notifications",
+      "unreadLabel": "{count} unread notifications",
+      "heading": "Notifications",
+      "empty": "You're all caught up.",
+      "markAllRead": "Mark all read",
+      "viewAll": "View all",
+      "enable": "Turn on browser notifications",
+      "enabled": "Browser notifications are on",
+      "blocked": "Browser notifications are blocked in your browser settings."
+    },
+    "center": {
+      "title": "Notifications",
+      "subtitle": "Lessons, deadlines, and reminders as they come up.",
+      "tabAll": "All",
+      "tabUnread": "Unread",
+      "markAllRead": "Mark all read",
+      "markRead": "Mark as read",
+      "emailMe": "Email this to me",
+      "emailSent": "Sent to your inbox.",
+      "emailed": "Emailed",
+      "unread": "Unread",
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "older": "Earlier",
+      "settingsLink": "Notification settings",
+      "emptyTitle": "No notifications yet",
+      "emptyDescription": "Reminders about lessons, homework, and reviews will show up here.",
+      "emptyUnreadTitle": "Nothing unread",
+      "emptyUnreadDescription": "You've read everything. Switch to All to see past notifications.",
+      "genericError": "Something went wrong. Please try again."
+    },
+    "preferences": {
+      "title": "Notification preferences",
+      "subtitle": "Choose what you're reminded about, and where.",
+      "channelsTitle": "Channels",
+      "browserLabel": "Browser notifications",
+      "browserDescription": "Show a desktop popup while Study Line is open.",
+      "emailLabel": "Email notifications",
+      "emailDescription": "Also send new notifications to your account's email address.",
+      "typesTitle": "What to notify me about",
+      "permissionPrompt": "Your browser hasn't granted permission yet.",
+      "permissionGranted": "Permission granted.",
+      "permissionDenied": "Permission is blocked. Re-enable it in your browser's site settings.",
+      "permissionUnsupported": "This browser doesn't support notifications.",
+      "requestPermission": "Allow notifications",
+      "save": "Save preferences",
+      "saving": "Saving...",
+      "saved": "Preferences saved.",
+      "genericError": "Something went wrong. Please try again.",
+      "missingSettings": "We couldn't load your settings. Try reloading the page."
     }
   }
 }

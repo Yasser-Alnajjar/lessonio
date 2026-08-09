@@ -40,7 +40,7 @@ export async function AuthShell({ children }: AuthShellProps) {
       </section>
 
       <section className="flex flex-col gap-6 p-6 sm:p-10">
-        <div className="flex items-center justify-between lg:justify-end gap-2">
+        <div className="flex items-center justify-between lg:justify-end gap-2 flex-wrap">
           <div className="flex items-center gap-2 lg:hidden">
             <StudyLineMark className="h-7 w-auto" />
             <span className="font-display text-base">{t("brand")}</span>

@@ -32,6 +32,8 @@
     "exams": "الاختبارات",
     "calendar": "التقويم",
     "statistics": "الإحصائيات",
+    "goals": "الأهداف",
+    "achievements": "الإنجازات",
     "notifications": "الإشعارات",
     "settings": "الإعدادات",
     "openMenu": "فتح القائمة",
@@ -748,6 +750,109 @@
         "cancel": "إلغاء",
         "confirm": "حذف حسابي",
         "deleting": "جارٍ الحذف...",
+        "genericError": "حدث خطأ ما. حاول مرة أخرى."
+      }
+    }
+  },
+  "search": {
+    "trigger": {
+      "label": "بحث"
+    },
+    "palette": {
+      "placeholder": "ابحث في المواد، الدروس، الملاحظات، المعلمين، الوسوم...",
+      "prompt": "ابدأ الكتابة للبحث في كل ما يخص ستَدي لاين.",
+      "empty": "لا توجد نتائج لـ \"{query}\"",
+      "viewAll": "عرض جميع نتائج \"{query}\""
+    },
+    "groups": {
+      "subject": "المواد",
+      "lesson": "الدروس",
+      "note": "الملاحظات",
+      "teacher": "المعلمون",
+      "tag": "الوسوم"
+    },
+    "results": {
+      "title": "بحث",
+      "subtitle": "نتائج \"{query}\"",
+      "promptTitle": "ابحث في كل شيء",
+      "promptDescription": "اعثر على المواد والدروس والملاحظات والمعلمين والوسوم في مكان واحد.",
+      "emptyTitle": "لا توجد نتائج",
+      "emptyDescription": "لم يتطابق أي شيء مع \"{query}\". جرّب كلمة بحث مختلفة."
+    }
+  },
+  "gamification": {
+    "achievements": {
+      "title": "الإنجازات",
+      "subtitle": "إنجازات تفتحها أثناء دراستك.",
+      "unlockedOn": "فُتح في {date}",
+      "locked": "مقفل",
+      "progressLabel": "اكتمل {progress}%",
+      "emptyTitle": "لا توجد إنجازات بعد",
+      "emptyDescription": "واصل الدراسة — إنجازك الأول أقرب مما تظن.",
+      "items": {
+        "firstLesson": {
+          "title": "الدرس الأول",
+          "description": "سجّل درسك الأول."
+        },
+        "streak7": {
+          "title": "تتابع 7 أيام",
+          "description": "ادرس سبعة أيام متتالية."
+        },
+        "streak30": {
+          "title": "تتابع 30 يومًا",
+          "description": "ادرس ثلاثين يومًا متتاليًا."
+        },
+        "hundredHours": {
+          "title": "100 ساعة",
+          "description": "سجّل 100 ساعة من إجمالي وقت الدراسة."
+        },
+        "perfectAttendance": {
+          "title": "حضور كامل",
+          "description": "احضر كل درس خلال شهر."
+        },
+        "examAce": {
+          "title": "نجم الامتحانات",
+          "description": "احصل على 90% أو أعلى في امتحان."
+        }
+      }
+    },
+    "goals": {
+      "title": "الأهداف",
+      "subtitle": "حدّد هدف وقت الدراسة وتابع تقدمك نحوه.",
+      "currentPeriod": "الفترة الحالية",
+      "weekly": "أسبوعي",
+      "monthly": "شهري",
+      "noGoalDescription": "لم يتم تحديد هدف لهذه الفترة بعد.",
+      "setGoal": "تحديد هدف",
+      "achievedOfTarget": "{achieved} / {target} دقيقة",
+      "pastGoals": "الأهداف السابقة",
+      "noPastGoals": "لا توجد أهداف سابقة بعد.",
+      "deleteAction": "حذف",
+      "form": {
+        "createTitle": "تحديد هدف",
+        "editTitle": "تعديل الهدف",
+        "createDescription": "اختر فترة وهدف وقت دراسة تسعى إليه.",
+        "editDescription": "حدّث الهدف لهذه الفترة.",
+        "periodLabel": "الفترة",
+        "weekly": "أسبوعي",
+        "monthly": "شهري",
+        "targetMinutesLabel": "الهدف (بالدقائق)",
+        "targetMinutesPlaceholder": "مثال: 300",
+        "cancel": "إلغاء",
+        "submitting": "جارٍ الحفظ...",
+        "submitCreate": "تحديد الهدف",
+        "submitEdit": "حفظ التغييرات",
+        "errors": {
+          "periodRequired": "اختر فترة",
+          "targetRequired": "الهدف مطلوب",
+          "targetMin": "يجب أن يكون الهدف دقيقة واحدة على الأقل"
+        }
+      },
+      "delete": {
+        "title": "حذف الهدف؟",
+        "description": "سيؤدي هذا إلى حذف هدفك {period} نهائيًا. لا يمكن التراجع عن هذا الإجراء.",
+        "confirm": "حذف الهدف",
+        "cancel": "إلغاء",
         "genericError": "حدث خطأ ما. حاول مرة أخرى."
       }
     }

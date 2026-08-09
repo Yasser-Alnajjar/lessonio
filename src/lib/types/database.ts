@@ -621,7 +621,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      sync_user_achievements: { Args: never; Returns: undefined }
     }
     Enums: {
       [_ in never]: never

@@ -12,6 +12,8 @@ import {
   Menu,
   NotebookText,
   Settings,
+  Target,
+  Trophy,
 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
@@ -37,6 +39,7 @@ import {
 import { cn } from "@/lib/utils";
 import type { User } from "@/lib/types/user";
 import { Link, usePathname } from "@/i18n/navigation";
+import { GlobalSearch } from "./global-search";
 import { LanguageSwitch } from "./language-switch";
 import { LogoutButton } from "./logout-button";
 import { NotificationBell } from "./notification-bell";
@@ -51,6 +54,8 @@ const NAV_ITEMS = [
   { href: "/exams/list", key: "exams", icon: GraduationCap },
   { href: "/calendar/month", key: "calendar", icon: CalendarDays },
   { href: "/statistics/overview", key: "statistics", icon: BarChart3 },
+  { href: "/gamification/goals", key: "goals", icon: Target },
+  { href: "/gamification/achievements", key: "achievements", icon: Trophy },
 ] as const;
 
 /**
@@ -61,9 +66,24 @@ const MOBILE_ONLY_NAV_ITEMS = [
   { href: "/notifications/center", key: "notifications", icon: Bell },
 ] as const;
 
+const ALL_NAV_HREFS = [...NAV_ITEMS, ...MOBILE_ONLY_NAV_ITEMS].map((item) => item.href);
+
+/**
+ * Matches on the first path segment ("domain") so any sub-route (e.g. a
+ * lesson detail page) still highlights its domain's single list nav item.
+ * When a domain has more than one nav entry (gamification/goals vs
+ * gamification/achievements), that's too coarse — it would light up both —
+ * so those domains additionally require the second segment to match.
+ */
 function isActivePath(pathname: string, href: string): boolean {
   const domain = `/${href.split("/")[1]}`;
-  return pathname === domain || pathname.startsWith(`${domain}/`);
+  const inDomain = pathname === domain || pathname.startsWith(`${domain}/`);
+  if (!inDomain) return false;
+
+  const siblings = ALL_NAV_HREFS.filter((h) => h.startsWith(`${domain}/`));
+  if (siblings.length <= 1) return true;
+
+  return pathname.split("/")[2] === href.split("/")[2];
 }
 
 function initialsOf(name: string | null, email: string): string {
@@ -127,10 +147,7 @@ export function NavBar({ user, browserNotificationsEnabled }: NavBarProps) {
         </nav>
 
         <div className="flex items-center gap-2">
-          <div className="hidden items-center gap-2 lg:flex">
-            <ThemeToggle />
-            <LanguageSwitch />
-          </div>
+          <GlobalSearch />
 
           <NotificationBell
             browserNotificationsEnabled={browserNotificationsEnabled}

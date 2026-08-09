@@ -3,6 +3,7 @@ import "server-only";
 import { format, parseISO, differenceInCalendarDays, subDays } from "date-fns";
 
 import { createClient } from "@/lib/supabase/server";
+import { computeLevel, computeXp } from "@/lib/gamification/xp";
 import type { ActionResult } from "@/lib/types/common";
 import type {
   DashboardOverviewData,
@@ -12,6 +13,7 @@ import type {
 import type { GamificationProgress } from "@/lib/types/gamification";
 import type { Lesson, LessonWithRelations } from "@/lib/types/lesson";
 import type { Database } from "@/lib/types/database";
+import { syncAndFetchUserAchievements } from "./gamification";
 
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
 type LessonRow = Database["public"]["Tables"]["lessons"]["Row"];
@@ -20,18 +22,6 @@ const TODAY_LESSON_WINDOW = 30;
 const UPCOMING_LESSON_LIMIT = 5;
 const RECENT_ACTIVITY_LIMIT = 8;
 const WEEK_LENGTH_DAYS = 7;
-
-/**
- * XP/level have no backing schema yet — achievements/goals CRUD (and any
- * XP formula) lands in a later "relevant CRUD phases" milestone. Streak is
- * real (derived from study_sessions); these stay static until that schema
- * exists, rather than inventing a scoring formula here.
- */
-const PLACEHOLDER_XP: Pick<GamificationProgress, "xp" | "level" | "xpToNextLevel"> = {
-  xp: 0,
-  level: 1,
-  xpToNextLevel: 100,
-};
 
 function mapLessonRow(
   row: LessonRow,
@@ -291,16 +281,59 @@ async function fetchProgress(
   supabase: SupabaseServerClient,
   userId: string,
 ): Promise<GamificationProgress> {
-  const { data: sessions } = await supabase
-    .from("study_sessions")
-    .select("started_at")
-    .eq("user_id", userId);
+  const [
+    { data: sessions },
+    { count: completedLessons },
+    { count: completedHomework },
+    { count: scoredExams },
+    { count: aceExams },
+    achievements,
+  ] = await Promise.all([
+    supabase.from("study_sessions").select("started_at, duration_minutes").eq("user_id", userId),
+    supabase
+      .from("lessons")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId)
+      .in("study_status", ["completed", "reviewed"]),
+    supabase
+      .from("homework")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId)
+      .eq("completed", true),
+    supabase
+      .from("exams")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId)
+      .not("score", "is", null),
+    supabase
+      .from("exams")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId)
+      .gte("percentage", 90),
+    syncAndFetchUserAchievements(supabase, userId),
+  ]);
 
   const { currentStreakDays, longestStreakDays } = computeStreaks(
     (sessions ?? []).map((row) => format(parseISO(row.started_at), "yyyy-MM-dd")),
   );
 
-  return { ...PLACEHOLDER_XP, currentStreakDays, longestStreakDays };
+  const studyMinutes = (sessions ?? []).reduce(
+    (sum, row) => sum + (row.duration_minutes ?? 0),
+    0,
+  );
+  const unlockedAchievements = achievements.filter((item) => item.unlockedAt !== null).length;
+
+  const xp = computeXp({
+    completedLessons: completedLessons ?? 0,
+    studyMinutes,
+    completedHomework: completedHomework ?? 0,
+    scoredExams: scoredExams ?? 0,
+    aceExams: aceExams ?? 0,
+    unlockedAchievements,
+  });
+  const { level, xpToNextLevel } = computeLevel(xp);
+
+  return { xp, level, xpToNextLevel, currentStreakDays, longestStreakDays };
 }
 
 async function fetchGreetingName(

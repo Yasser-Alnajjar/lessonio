@@ -3,12 +3,6 @@
 import { useLocale } from "next-intl";
 
 import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { usePathname, useRouter } from "@navigation";
 
@@ -30,27 +24,15 @@ export const LanguageSwitch = ({ className }: LanguageSwitchProps) => {
   };
 
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            type="button"
-            onClick={changeLanguage}
-            aria-label={
-              locale === "ar" ? "Switch to English" : "التبديل إلى العربية"
-            }
-            variant="ghost"
-            size="sm"
-            className={cn(className)}
-          >
-            {newLocale === "ar" ? "العربية" : "English"}
-          </Button>
-        </TooltipTrigger>
-
-        <TooltipContent>
-          {newLocale === "ar" ? "العربية" : "English"}
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Button
+      type="button"
+      onClick={changeLanguage}
+      aria-label={locale === "ar" ? "Switch to English" : "التبديل إلى العربية"}
+      variant="ghost"
+      size="sm"
+      className={cn(className)}
+    >
+      {newLocale === "ar" ? "العربية" : "English"}
+    </Button>
   );
 };

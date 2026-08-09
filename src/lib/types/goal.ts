@@ -11,3 +11,10 @@ export interface Goal extends AuditFields {
   achievedMinutes: number;
   periodStart: string; // ISO date
 }
+
+export interface CreateGoalInput {
+  period: GoalPeriod;
+  targetMinutes: number;
+}
+
+export type UpdateGoalInput = Partial<CreateGoalInput>;

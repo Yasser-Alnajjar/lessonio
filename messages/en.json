@@ -32,6 +32,8 @@
     "exams": "Exams",
     "calendar": "Calendar",
     "statistics": "Statistics",
+    "goals": "Goals",
+    "achievements": "Achievements",
     "notifications": "Notifications",
     "settings": "Settings",
     "openMenu": "Open menu",
@@ -748,6 +750,109 @@
         "cancel": "Cancel",
         "confirm": "Delete my account",
         "deleting": "Deleting...",
+        "genericError": "Something went wrong. Please try again."
+      }
+    }
+  },
+  "search": {
+    "trigger": {
+      "label": "Search"
+    },
+    "palette": {
+      "placeholder": "Search subjects, lessons, notes, teachers, tags...",
+      "prompt": "Start typing to search everything in Study Line.",
+      "empty": "No results for \"{query}\"",
+      "viewAll": "View all results for \"{query}\""
+    },
+    "groups": {
+      "subject": "Subjects",
+      "lesson": "Lessons",
+      "note": "Notes",
+      "teacher": "Teachers",
+      "tag": "Tags"
+    },
+    "results": {
+      "title": "Search",
+      "subtitle": "Results for \"{query}\"",
+      "promptTitle": "Search everything",
+      "promptDescription": "Find subjects, lessons, notes, teachers, and tags in one place.",
+      "emptyTitle": "No results",
+      "emptyDescription": "Nothing matched \"{query}\". Try a different search term."
+    }
+  },
+  "gamification": {
+    "achievements": {
+      "title": "Achievements",
+      "subtitle": "Milestones you unlock as you study.",
+      "unlockedOn": "Unlocked {date}",
+      "locked": "Locked",
+      "progressLabel": "{progress}% complete",
+      "emptyTitle": "No achievements yet",
+      "emptyDescription": "Keep studying — your first achievement is closer than you think.",
+      "items": {
+        "firstLesson": {
+          "title": "First Lesson",
+          "description": "Log your first lesson."
+        },
+        "streak7": {
+          "title": "7-Day Streak",
+          "description": "Study seven days in a row."
+        },
+        "streak30": {
+          "title": "30-Day Streak",
+          "description": "Study thirty days in a row."
+        },
+        "hundredHours": {
+          "title": "100 Hours",
+          "description": "Log 100 hours of total study time."
+        },
+        "perfectAttendance": {
+          "title": "Perfect Attendance",
+          "description": "Attend every lesson in a month."
+        },
+        "examAce": {
+          "title": "Exam Ace",
+          "description": "Score 90% or higher on an exam."
+        }
+      }
+    },
+    "goals": {
+      "title": "Goals",
+      "subtitle": "Set a study-time target and track your progress toward it.",
+      "currentPeriod": "Current period",
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "noGoalDescription": "No goal set for this period yet.",
+      "setGoal": "Set a goal",
+      "achievedOfTarget": "{achieved} / {target} min",
+      "pastGoals": "Past goals",
+      "noPastGoals": "No past goals yet.",
+      "deleteAction": "Delete",
+      "form": {
+        "createTitle": "Set a goal",
+        "editTitle": "Edit goal",
+        "createDescription": "Choose a period and a study-time target to aim for.",
+        "editDescription": "Update the target for this goal.",
+        "periodLabel": "Period",
+        "weekly": "Weekly",
+        "monthly": "Monthly",
+        "targetMinutesLabel": "Target (minutes)",
+        "targetMinutesPlaceholder": "e.g. 300",
+        "cancel": "Cancel",
+        "submitting": "Saving...",
+        "submitCreate": "Set goal",
+        "submitEdit": "Save changes",
+        "errors": {
+          "periodRequired": "Choose a period",
+          "targetRequired": "Target is required",
+          "targetMin": "Target must be at least 1 minute"
+        }
+      },
+      "delete": {
+        "title": "Delete goal?",
+        "description": "This permanently deletes your {period} goal. This cannot be undone.",
+        "confirm": "Delete goal",
+        "cancel": "Cancel",
         "genericError": "Something went wrong. Please try again."
       }
     }

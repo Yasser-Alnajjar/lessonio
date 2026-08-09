@@ -10,7 +10,7 @@ import type { Database } from "@/lib/types/database";
  * Everything else is protected by default — new routes are gated unless
  * explicitly listed here.
  */
-const PUBLIC_SEGMENTS = new Set<string>(["", "auth/reset-password"]);
+const PUBLIC_SEGMENTS = new Set<string>(["", "docs", "auth/reset-password"]);
 
 /** Auth routes a signed-in user should be bounced away from. */
 const SIGNED_OUT_ONLY_SEGMENTS = new Set<string>([

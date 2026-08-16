@@ -1,6 +1,7 @@
 export * from "./common";
 export * from "./user";
 export * from "./subject";
+export * from "./class-schedule";
 export * from "./lesson";
 export * from "./lesson-note";
 export * from "./attachment";

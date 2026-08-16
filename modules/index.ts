@@ -1,6 +1,7 @@
 export * as Auth from "./auth";
 export * as Dashboard from "./dashboard";
 export * as Subjects from "./subjects";
+export * as ClassSchedules from "./class-schedules";
 export * as Lessons from "./lessons";
 export * as Homework from "./homework";
 export * as Exams from "./exams";

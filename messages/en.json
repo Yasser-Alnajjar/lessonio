@@ -27,6 +27,7 @@
   "nav": {
     "dashboard": "Dashboard",
     "subjects": "Subjects",
+    "classes": "Classes",
     "lessons": "Lessons",
     "homework": "Homework",
     "exams": "Exams",
@@ -397,6 +398,81 @@
       "homeworkProgress": "Homework progress",
       "totalStudyMinutes": "Study time",
       "minutesSuffix": "min"
+    }
+  },
+  "classSchedules": {
+    "list": {
+      "title": "Classes",
+      "subtitle": "Track the recurring classes you attend each week.",
+      "newClass": "Add Class",
+      "emptyTitle": "No classes found",
+      "emptyDescription": "Add your first recurring class to start tracking when and where you attend.",
+      "emptyAction": "Add Class",
+      "noSubjectsTitle": "No subjects yet",
+      "noSubjectsDescription": "Create a subject first, then add a class schedule for it."
+    },
+    "card": {
+      "actionsLabel": "Class actions",
+      "edit": "Edit",
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "delete": "Delete",
+      "active": "Active",
+      "inactive": "Inactive",
+      "hoursSuffix": "h",
+      "minutesSuffix": "m"
+    },
+    "form": {
+      "createTitle": "Add Class",
+      "editTitle": "Edit Class",
+      "createDescription": "Add a recurring class schedule for a subject.",
+      "editDescription": "Update the schedule, teacher, or location for this class.",
+      "subjectLabel": "Subject",
+      "subjectPlaceholder": "Select a subject",
+      "scheduleLabel": "Class Schedule",
+      "dayLabel": "Day",
+      "addDay": "Add another day",
+      "removeDay": "Remove day",
+      "startTimeLabel": "Start Time",
+      "durationLabel": "Duration (minutes)",
+      "teacherLabel": "Teacher",
+      "teacherPlaceholder": "e.g. Ahmed",
+      "locationLabel": "Location",
+      "locationPlaceholder": "e.g. ABC Center",
+      "startsOnLabel": "Starts On",
+      "endsOnLabel": "Ends On",
+      "activeLabel": "Active",
+      "cancel": "Cancel",
+      "submitting": "Saving...",
+      "submitCreate": "Create Class",
+      "submitEdit": "Save changes",
+      "errors": {
+        "subjectRequired": "Choose a subject",
+        "teacherMax": "Teacher must be 120 characters or fewer",
+        "locationMax": "Location must be 120 characters or fewer",
+        "daysRequired": "Add at least one schedule entry",
+        "startTimeRequired": "Start time is required",
+        "durationInvalid": "Duration must be a positive number",
+        "startsOnRequired": "Start date is required",
+        "endsOnInvalid": "End date must be on or after the start date",
+        "duplicateDay": "Each day can only appear once in this class"
+      }
+    },
+    "delete": {
+      "title": "Delete class?",
+      "description": "This permanently deletes the \"{name}\" class schedule. This cannot be undone.",
+      "confirm": "Delete class",
+      "cancel": "Cancel",
+      "genericError": "Something went wrong. Please try again."
+    },
+    "days": {
+      "sunday": "Sunday",
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday"
     }
   },
   "lessons": {

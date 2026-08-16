@@ -5,6 +5,7 @@ import {
   BarChart3,
   Bell,
   BookOpen,
+  CalendarClock,
   CalendarDays,
   ClipboardList,
   GraduationCap,
@@ -49,6 +50,7 @@ import { ThemeToggle } from "./theme-toggle";
 const NAV_ITEMS = [
   { href: "/dashboard/overview", key: "dashboard", icon: LayoutDashboard },
   { href: "/subjects/list", key: "subjects", icon: BookOpen },
+  { href: "/class-schedules/list", key: "classes", icon: CalendarClock },
   { href: "/lessons/list", key: "lessons", icon: NotebookText },
   { href: "/homework/list", key: "homework", icon: ClipboardList },
   { href: "/exams/list", key: "exams", icon: GraduationCap },

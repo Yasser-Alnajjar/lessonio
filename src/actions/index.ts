@@ -1,6 +1,7 @@
 import { attachmentsActions } from "./attachments";
 import { authActions } from "./auth";
 import { calendarActions } from "./calendar";
+import { classSchedulesActions } from "./class-schedules";
 import { dashboardActions } from "./dashboard";
 import { examsActions } from "./exams";
 import { gamificationActions } from "./gamification";
@@ -23,6 +24,7 @@ export const Actions = {
   Auth: authActions,
   Dashboard: dashboardActions,
   Subjects: subjectsActions,
+  ClassSchedules: classSchedulesActions,
   Lessons: lessonsActions,
   Notes: notesActions,
   Attachments: attachmentsActions,

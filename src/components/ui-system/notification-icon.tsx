@@ -1,6 +1,6 @@
 "use client";
 
-import { BellRing, CalendarClock, ClipboardList, RotateCcw } from "lucide-react";
+import { BellRing, CalendarClock, ClipboardList, RotateCcw, Users } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import type { NotificationType } from "@/lib/types/notification";
@@ -21,6 +21,10 @@ const TYPE_META: Record<
   daily_reminder: {
     icon: BellRing,
     className: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
+  },
+  upcoming_class: {
+    icon: Users,
+    className: "bg-rose-500/10 text-rose-600 dark:text-rose-400",
   },
   review_reminder: {
     icon: RotateCcw,

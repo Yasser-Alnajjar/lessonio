@@ -39,7 +39,7 @@ export function ThemeToggle() {
       <div
         role="radiogroup"
         aria-label={t("toggleLabel")}
-        className="bg-muted relative inline-flex items-center gap-0.5 rounded-full p-1"
+        className="bg-muted relative inline-flex items-center gap-0.5 rounded-full p-1 w-fit"
       >
         {OPTIONS.map(({ value, icon: Icon, label }) => {
           const isActive = active === value;

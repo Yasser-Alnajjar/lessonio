@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { GeistSans } from "geist/font/sans";
-import { GeistMono } from "geist/font/mono";
+
+import { Open_Sans, Cairo } from "next/font/google";
+
 import "@fontsource-variable/fraunces/full.css";
 
 import { routing, localeDirections, type AppLocale } from "@/i18n/routing";
@@ -11,12 +12,22 @@ import { ThemeProvider } from "@/components/providers/theme-provider";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { OfflineBanner } from "@/components/shared/offline-banner";
 import "../globals.css";
+import { cn } from "@/lib/utils";
 
 interface LocaleLayoutProps {
   children: React.ReactNode;
   params: Promise<{ locale: string }>;
 }
-
+const cairo = Cairo({
+  weight: ["200", "300", "400", "500", "600", "700", "800", "900"],
+  subsets: ["latin"],
+  variable: "--font-cairo",
+});
+const openSans = Open_Sans({
+  weight: ["300", "400", "500", "600", "700", "800"],
+  subsets: ["latin"],
+  variable: "--font-open-sans",
+});
 export async function generateMetadata({
   params,
 }: Pick<LocaleLayoutProps, "params">): Promise<Metadata> {
@@ -59,7 +70,10 @@ export default async function LocaleLayout({
       data-scroll-behavior="smooth"
     >
       <body
-        className={`${GeistSans.variable} ${GeistMono.variable} bg-background text-foreground font-sans antialiased`}
+        className={cn(
+          `  bg-background text-foreground font-cairo  antialiased`,
+          locale === "ar" ? cairo.className : openSans.className,
+        )}
       >
         <NextIntlClientProvider>
           <QueryProvider>

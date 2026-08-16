@@ -1,13 +1,5 @@
 "use client";
 
-/**
- * The one signature element for Study Line: a hand-drawn-feeling line
- * tracing an ascending path, with a pen nib marking the current point —
- * a literal read of the product name and its core idea (visible momentum
- * over time). Used sparingly: hero moments and the dashboard greeting,
- * never as generic decoration. The stroke draws in once on mount and
- * respects prefers-reduced-motion (handled globally via CSS).
- */
 export function StudyLineMark({ className }: { className?: string }) {
   return (
     <svg

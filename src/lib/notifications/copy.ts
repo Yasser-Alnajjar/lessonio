@@ -42,6 +42,14 @@ interface ReviewReminderParams {
   subjectName: string;
 }
 
+interface UpcomingClassParams {
+  subjectName: string;
+  teacher: string | null;
+  location: string | null;
+  /** Minutes from now until the class starts; 0 means it's starting now. */
+  minutesUntil: number;
+}
+
 /** Trims a `HH:MM:SS` Postgres time down to `HH:MM` for display. */
 export function formatTime(time: string): string {
   return time.slice(0, 5);
@@ -146,18 +154,45 @@ export function reviewReminderCopy(
   };
 }
 
+export function upcomingClassCopy(
+  locale: AppLocale,
+  { subjectName, teacher, location, minutesUntil }: UpcomingClassParams,
+): NotificationCopy {
+  const details = [teacher, location].filter(Boolean).join(" · ");
+
+  if (locale === "ar") {
+    const when = minutesUntil <= 0 ? "الآن" : `خلال ${minutesUntil} دقيقة`;
+    return {
+      title: "حصة قادمة",
+      body: details ? `${subjectName} تبدأ ${when} — ${details}.` : `${subjectName} تبدأ ${when}.`,
+      linkPath: "/class-schedules/list",
+    };
+  }
+
+  const when = minutesUntil <= 0 ? "now" : `in ${minutesUntil} minute${minutesUntil === 1 ? "" : "s"}`;
+  return {
+    title: "Upcoming class",
+    body: details
+      ? `${subjectName} starts ${when} — ${details}.`
+      : `${subjectName} starts ${when}.`,
+    linkPath: "/class-schedules/list",
+  };
+}
+
 /** Localized label per type, used by the notifications center and email subject. */
 const TYPE_LABELS: Record<AppLocale, Record<NotificationType, string>> = {
   en: {
     upcoming_lesson: "Upcoming lesson",
     homework_due: "Homework due",
     daily_reminder: "Daily reminder",
+    upcoming_class: "Upcoming class",
     review_reminder: "Review reminder",
   },
   ar: {
     upcoming_lesson: "درس قادم",
     homework_due: "واجب مستحق",
     daily_reminder: "تذكير يومي",
+    upcoming_class: "حصة قادمة",
     review_reminder: "تذكير بالمراجعة",
   },
 };

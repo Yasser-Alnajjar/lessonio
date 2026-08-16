@@ -38,7 +38,10 @@
     "notifications": "Notifications",
     "settings": "Settings",
     "openMenu": "Open menu",
-    "account": "Account"
+    "account": "Account",
+    "label": "Main navigation",
+    "toggleSidebar": "Toggle sidebar",
+    "language": "Language"
   },
   "landing": {
     "nav": {
@@ -824,6 +827,7 @@
       "upcoming_lesson": "Upcoming lesson",
       "homework_due": "Homework due",
       "daily_reminder": "Daily reminder",
+      "upcoming_class": "Upcoming class",
       "review_reminder": "Review reminder"
     },
     "bell": {

@@ -1,8 +1,15 @@
-import { getLocale } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 
 import { Actions } from "@/actions";
 import { redirect } from "@/i18n/navigation";
-import { NavBar } from "@/components/shared/nav-bar";
+import { AppSidebar } from "@/components/shared/app-sidebar";
+import { GlobalSearch } from "@/components/shared/global-search";
+import { NotificationBell } from "@/components/shared/notification-bell";
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -23,19 +30,29 @@ export default async function AppLayout({ children }: AppLayoutProps) {
     return null;
   }
 
-  // The bell lives in the nav on every page, so its browser-popup preference
-  // is resolved once here rather than fetched per route.
+  // The bell lives in the header on every page, so its browser-popup
+  // preference is resolved once here rather than fetched per route.
   const { data: settings } = await Actions.Settings.get();
+  const t = await getTranslations("nav");
 
   return (
-    <div className="bg-background flex min-h-svh flex-col">
-      <NavBar
-        user={user}
-        browserNotificationsEnabled={
-          settings?.notificationPreferences.enabledInBrowser ?? true
-        }
-      />
-      <main className="mx-auto w-full max-w-7xl flex-1">{children}</main>
-    </div>
+    <SidebarProvider>
+      <AppSidebar user={user} />
+      <SidebarInset>
+        <header className="border-border bg-background/80 sticky top-0 z-40 flex h-16 items-center gap-2 border-b px-4 backdrop-blur-md">
+          <SidebarTrigger aria-label={t("toggleSidebar")} />
+          <div className="flex-1" />
+          <GlobalSearch />
+          <NotificationBell
+            browserNotificationsEnabled={
+              settings?.notificationPreferences.enabledInBrowser ?? true
+            }
+          />
+        </header>
+        <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-4">
+          {children}
+        </main>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }

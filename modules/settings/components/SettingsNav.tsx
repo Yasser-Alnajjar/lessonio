@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, Database, Palette, User } from "lucide-react";
+import { Bell, Database, User } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { Link, usePathname } from "@/i18n/navigation";
@@ -8,8 +8,12 @@ import { cn } from "@/lib/utils";
 
 const SETTINGS_NAV_ITEMS = [
   { href: "/settings/profile", key: "profile", icon: User },
-  { href: "/settings/appearance", key: "appearance", icon: Palette },
-  { href: "/settings/notification-preferences", key: "notifications", icon: Bell },
+  // { href: "/settings/appearance", key: "appearance", icon: Palette },
+  {
+    href: "/settings/notification-preferences",
+    key: "notifications",
+    icon: Bell,
+  },
   { href: "/settings/data", key: "data", icon: Database },
 ] as const;
 
@@ -18,7 +22,10 @@ export function SettingsNav() {
   const pathname = usePathname();
 
   return (
-    <nav aria-label={t("label")} className="border-border flex flex-wrap gap-1 border-b pb-3">
+    <nav
+      aria-label={t("label")}
+      className="border-border flex flex-wrap gap-1 border-b pb-3"
+    >
       {SETTINGS_NAV_ITEMS.map(({ href, key, icon: Icon }) => {
         const active = pathname === href;
         return (

@@ -10,12 +10,14 @@ import {
   notificationTypeLabel,
   resolveLocale,
   reviewReminderCopy,
+  upcomingClassCopy,
   upcomingLessonCopy,
 } from "@/lib/notifications/copy";
-import { addDays, daysBetween, localIsoDate } from "@/lib/notifications/dates";
+import { addDays, daysBetween, localClock, localIsoDate } from "@/lib/notifications/dates";
 import { renderNotificationEmail } from "@/lib/notifications/email-template";
 import { parseNotificationPreferences } from "@/lib/notifications/preferences";
 import type { createClient } from "@/lib/supabase/server";
+import type { ClassScheduleEntry } from "@/lib/types/class-schedule";
 import type { Database } from "@/lib/types/database";
 import type { NotificationType } from "@/lib/types/notification";
 import type { NotificationPreferences } from "@/lib/types/settings";
@@ -26,6 +28,14 @@ type NotificationInsert = Database["public"]["Tables"]["notifications"]["Insert"
 
 /** Lessons this far ahead of the user's local "today" produce an upcoming-lesson notice. */
 const UPCOMING_LESSON_DAYS = 1;
+/**
+ * A class produces an upcoming-class notice once its start time is within
+ * this many minutes. Because generation only runs when a signed-in user's
+ * session triggers it — at most once per REFRESH_INTERVAL_MS, and never at
+ * all if they don't open the app — this is a best-effort lead time, not a
+ * guaranteed push a fixed number of minutes before start.
+ */
+const UPCOMING_CLASS_LEAD_MINUTES = 10;
 /** Homework due within this many days of the user's local "today" is "due soon". */
 const HOMEWORK_DUE_DAYS = 2;
 /** A lesson must be at least this old before we nag about reviewing it. */
@@ -164,34 +174,46 @@ async function generateNotifications(
   userId: string,
   claim: GenerationClaim,
 ): Promise<CreatedNotification[]> {
-  const today = localIsoDate(new Date(), claim.timezone);
+  const now = new Date();
+  const today = localIsoDate(now, claim.timezone);
 
-  const [{ data: subjectRows }, { data: lessonRows }, { data: homeworkRows }, { data: reviewRows }] =
-    await Promise.all([
-      supabase.from("subjects").select("id, name").eq("user_id", userId),
-      supabase
-        .from("lessons")
-        .select("id, subject_id, title, date, time")
-        .eq("user_id", userId)
-        .gte("date", today)
-        .lte("date", addDays(today, UPCOMING_LESSON_DAYS)),
-      supabase
-        .from("homework")
-        .select("id, subject_id, title, deadline")
-        .eq("user_id", userId)
-        .eq("completed", false)
-        .gte("deadline", today)
-        .lte("deadline", addDays(today, HOMEWORK_DUE_DAYS)),
-      supabase
-        .from("lessons")
-        .select("id, subject_id, title, date")
-        .eq("user_id", userId)
-        .neq("review_status", "reviewed")
-        .gte("date", addDays(today, -REVIEW_MAX_AGE_DAYS))
-        .lte("date", addDays(today, -REVIEW_AGE_DAYS))
-        .order("date", { ascending: false })
-        .limit(REVIEW_REMINDERS_PER_RUN),
-    ]);
+  const [
+    { data: subjectRows },
+    { data: lessonRows },
+    { data: homeworkRows },
+    { data: reviewRows },
+    { data: classScheduleRows },
+  ] = await Promise.all([
+    supabase.from("subjects").select("id, name").eq("user_id", userId),
+    supabase
+      .from("lessons")
+      .select("id, subject_id, title, date, time")
+      .eq("user_id", userId)
+      .gte("date", today)
+      .lte("date", addDays(today, UPCOMING_LESSON_DAYS)),
+    supabase
+      .from("homework")
+      .select("id, subject_id, title, deadline")
+      .eq("user_id", userId)
+      .eq("completed", false)
+      .gte("deadline", today)
+      .lte("deadline", addDays(today, HOMEWORK_DUE_DAYS)),
+    supabase
+      .from("lessons")
+      .select("id, subject_id, title, date")
+      .eq("user_id", userId)
+      .neq("review_status", "reviewed")
+      .gte("date", addDays(today, -REVIEW_MAX_AGE_DAYS))
+      .lte("date", addDays(today, -REVIEW_AGE_DAYS))
+      .order("date", { ascending: false })
+      .limit(REVIEW_REMINDERS_PER_RUN),
+    supabase
+      .from("class_schedules")
+      .select("id, subject_id, teacher, location, schedules, starts_on, ends_on")
+      .eq("user_id", userId)
+      .eq("is_active", true)
+      .lte("starts_on", today),
+  ]);
 
   const subjectNames = new Map((subjectRows ?? []).map((row) => [row.id, row.name]));
   const { locale } = claim;
@@ -248,6 +270,32 @@ async function generateNotifications(
         subjectName: subjectNameOf(lesson.subject_id),
       }),
     );
+  }
+
+  const clock = localClock(now, claim.timezone);
+
+  for (const classSchedule of classScheduleRows ?? []) {
+    if (classSchedule.ends_on && classSchedule.ends_on < today) continue;
+
+    const entries = classSchedule.schedules as unknown as ClassScheduleEntry[];
+    for (const entry of entries) {
+      if (entry.dayOfWeek !== clock.weekday) continue;
+
+      const [hours = 0, minutes = 0] = entry.startTime.split(":").map(Number);
+      const minutesUntil = hours * 60 + minutes - clock.minutesOfDay;
+      if (minutesUntil < 0 || minutesUntil > UPCOMING_CLASS_LEAD_MINUTES) continue;
+
+      add(
+        "upcoming_class",
+        `upcoming_class:${classSchedule.id}:${entry.dayOfWeek}:${today}`,
+        upcomingClassCopy(locale, {
+          subjectName: subjectNameOf(classSchedule.subject_id),
+          teacher: classSchedule.teacher,
+          location: classSchedule.location,
+          minutesUntil,
+        }),
+      );
+    }
   }
 
   add(

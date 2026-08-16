@@ -19,6 +19,7 @@ export const DEFAULT_NOTIFICATION_PREFERENCES: NotificationPreferences = {
     upcoming_lesson: true,
     homework_due: true,
     daily_reminder: true,
+    upcoming_class: true,
     review_reminder: true,
   },
 };

@@ -38,7 +38,10 @@
     "notifications": "الإشعارات",
     "settings": "الإعدادات",
     "openMenu": "فتح القائمة",
-    "account": "الحساب"
+    "account": "الحساب",
+    "label": "التنقل الرئيسي",
+    "toggleSidebar": "تبديل الشريط الجانبي",
+    "language": "اللغة"
   },
   "landing": {
     "nav": {
@@ -824,6 +827,7 @@
       "upcoming_lesson": "درس قادم",
       "homework_due": "واجب مستحق",
       "daily_reminder": "تذكير يومي",
+      "upcoming_class": "حصة قادمة",
       "review_reminder": "تذكير بالمراجعة"
     },
     "bell": {

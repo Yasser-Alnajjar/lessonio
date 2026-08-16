@@ -54,3 +54,66 @@ export function daysBetween(from: string, to: string): number {
   const end = Date.parse(`${to}T00:00:00Z`);
   return Math.round((end - start) / 86_400_000);
 }
+
+const WEEKDAY_INDEX: Record<string, number> = {
+  Sun: 0,
+  Mon: 1,
+  Tue: 2,
+  Wed: 3,
+  Thu: 4,
+  Fri: 5,
+  Sat: 6,
+};
+
+const CLOCK_FORMATTERS = new Map<string, Intl.DateTimeFormat>();
+
+function clockFormatterFor(timeZone: string): Intl.DateTimeFormat {
+  let formatter = CLOCK_FORMATTERS.get(timeZone);
+
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat("en-US", {
+      timeZone,
+      weekday: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+    CLOCK_FORMATTERS.set(timeZone, formatter);
+  }
+
+  return formatter;
+}
+
+export interface LocalClock {
+  /** 0 = Sunday .. 6 = Saturday, matching ClassScheduleEntry.dayOfWeek. */
+  weekday: number;
+  /** Minutes since local midnight, 0-1439. */
+  minutesOfDay: number;
+}
+
+/**
+ * Resolves the weekday and minute-of-day for `instant` in `timeZone`, for
+ * comparing against a class schedule's dayOfWeek/startTime. Falls back to
+ * UTC when the stored timezone is absent or not one the runtime recognizes,
+ * same as `localIsoDate`.
+ */
+export function localClock(instant: Date, timeZone: string | null): LocalClock {
+  let formatter: Intl.DateTimeFormat;
+  try {
+    formatter = clockFormatterFor(timeZone ?? "UTC");
+    formatter.format(instant);
+  } catch {
+    formatter = clockFormatterFor("UTC");
+  }
+
+  const parts = formatter.formatToParts(instant);
+  const weekdayName = parts.find((part) => part.type === "weekday")?.value ?? "Sun";
+  const hour = Number(parts.find((part) => part.type === "hour")?.value ?? "0");
+  const minute = Number(parts.find((part) => part.type === "minute")?.value ?? "0");
+
+  return {
+    weekday: WEEKDAY_INDEX[weekdayName] ?? 0,
+    // Some ICU versions render midnight as hour "24" under hour12:false.
+    minutesOfDay: (hour % 24) * 60 + minute,
+  };
+}

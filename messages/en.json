@@ -42,6 +42,7 @@
   "landing": {
     "nav": {
       "features": "Features",
+      "docs": "Docs",
       "login": "Log in",
       "getStarted": "Get started"
     },
@@ -77,6 +78,116 @@
     "footer": {
       "tagline": "Your study, on track.",
       "rights": "All rights reserved."
+    }
+  },
+  "docs": {
+    "meta": {
+      "title": "Docs",
+      "description": "Learn how Study Line helps you track subjects, lessons, homework, exams, and study time in one continuous line."
+    },
+    "backHome": "Back to home",
+    "hero": {
+      "eyebrow": "Documentation",
+      "title": "How Study Line works",
+      "subtitle": "A quick tour of everything you can track, plan, and celebrate — all folded into one continuous line."
+    },
+    "gettingStarted": {
+      "title": "Getting started",
+      "subtitle": "Three steps and you're tracking.",
+      "steps": {
+        "step1": {
+          "title": "Create your account",
+          "description": "Sign up free — no credit card, just your study line waiting to start."
+        },
+        "step2": {
+          "title": "Add your subjects",
+          "description": "Set up the courses you're taking so lessons, homework, and exams have somewhere to live."
+        },
+        "step3": {
+          "title": "Log as you go",
+          "description": "Track lessons, homework, exams, and study sessions — Study Line turns them into one trend you can watch move forward."
+        }
+      }
+    },
+    "features": {
+      "title": "Everything you can do",
+      "subtitle": "Every feature connects back to the same line of progress.",
+      "subjects": {
+        "title": "Subjects",
+        "description": "Organize every course you're taking and keep attendance in one place."
+      },
+      "lessons": {
+        "title": "Lessons",
+        "description": "Log lessons as they happen, attach notes, and build a running record per subject."
+      },
+      "homework": {
+        "title": "Homework",
+        "description": "Track assignments and due dates so nothing slips through."
+      },
+      "exams": {
+        "title": "Exams",
+        "description": "Record exam dates and scores to see how each subject is trending."
+      },
+      "calendar": {
+        "title": "Calendar",
+        "description": "See your week at a glance, with lessons, homework, and exams laid out by day."
+      },
+      "studySessions": {
+        "title": "Study sessions",
+        "description": "Time your study sessions and build a history of focused work."
+      },
+      "statistics": {
+        "title": "Statistics",
+        "description": "Watch progress trend upward with charts, streaks, and subject breakdowns."
+      },
+      "gamification": {
+        "title": "Goals & achievements",
+        "description": "Earn XP, level up, set goals, and unlock achievements as you study."
+      },
+      "notifications": {
+        "title": "Notifications",
+        "description": "Get reminders for upcoming homework, exams, and streaks at risk."
+      },
+      "search": {
+        "title": "Global search",
+        "description": "Find any subject, lesson, homework, or exam in a couple of keystrokes."
+      },
+      "settings": {
+        "title": "Settings",
+        "description": "Personalize your profile, theme, language, and notification preferences."
+      },
+      "offline": {
+        "title": "Offline support",
+        "description": "Keep working without a connection — changes sync automatically once you're back online."
+      }
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "items": {
+        "privacy": {
+          "question": "Is my data private?",
+          "answer": "Yes. Your study data is yours — you can export it anytime from Settings."
+        },
+        "free": {
+          "question": "Is Study Line free to use?",
+          "answer": "Yes, creating an account and tracking your studies is free."
+        },
+        "offline": {
+          "question": "Does it work without internet?",
+          "answer": "Yes. Study Line keeps working offline and syncs your changes automatically once you're reconnected."
+        },
+        "languages": {
+          "question": "What languages are supported?",
+          "answer": "Study Line is available in English and Arabic, including full right-to-left layout."
+        }
+      }
+    },
+    "cta": {
+      "title": "Ready to draw your line?",
+      "subtitle": "Join Study Line and turn every lesson into progress.",
+      "primary": "Get started free",
+      "go_to_dashboard": "Go to dashboard",
+      "secondary": "Log in"
     }
   },
   "auth": {

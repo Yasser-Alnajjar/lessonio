@@ -36,6 +36,9 @@ export default async function LandingPage() {
           </div>
 
           <div className="ms-auto flex items-center gap-2">
+            <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
+              <Link href="/docs">{t("nav.docs")}</Link>
+            </Button>
             <div className="hidden items-center gap-2 sm:flex">
               <ThemeToggle />
               <LanguageSwitch />

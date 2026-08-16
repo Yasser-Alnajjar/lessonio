@@ -4,7 +4,7 @@ import { mapNotificationRow } from "@/lib/notifications/map";
 import { createClient } from "@/lib/supabase/server";
 import type { ActionResult } from "@/lib/types/common";
 import type { Notification } from "@/lib/types/notification";
-import { runScheduledNotificationsJob } from "./notifications.jobs";
+import { ensureNotificationsForUser } from "./notifications.generate";
 import {
   getRecentNotifications,
   markAllNotificationsAsRead,
@@ -24,6 +24,10 @@ export const notificationsActions = {
     if (authError || !authData.user) {
       return { data: [], error: null };
     }
+
+    // The center is the one place a user goes specifically to read
+    // notifications, so bring them up to date before listing.
+    await ensureNotificationsForUser(supabase, authData.user.id, authData.user.email ?? null);
 
     const { data: rows, error } = await supabase
       .from("notifications")
@@ -64,7 +68,4 @@ export const notificationsActions = {
   markAsRead: markNotificationAsRead,
   markAllAsRead: markAllNotificationsAsRead,
   sendToEmail: sendNotificationToEmail,
-
-  /** Invoked only by the cron-secret-protected `/api/cron/notifications` route. */
-  runScheduledJob: runScheduledNotificationsJob,
 };

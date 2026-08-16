@@ -7,14 +7,13 @@ import { z } from "zod";
  * by the browser bundle and therefore holds NEXT_PUBLIC_* vars exclusively.
  *
  * Unlike that file, this schema is parsed *lazily* rather than at module load.
- * `next build` and `next dev` both import route handlers eagerly, and a build
- * machine without a Resend key or cron secret is a normal state (the features
- * degrade gracefully) — an eager `parse()` would turn that into a hard build
- * failure. Callers ask for what they need at the point they need it.
+ * `next build` and `next dev` both import server modules eagerly, and a build
+ * machine without a Resend key or service-role key is a normal state (the
+ * features degrade gracefully) — an eager `parse()` would turn that into a
+ * hard build failure. Callers ask for what they need at the point they need it.
  */
 const serverEnvSchema = z.object({
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1).optional(),
-  CRON_SECRET: z.string().min(1).optional(),
   RESEND_API_KEY: z.string().min(1).optional(),
   EMAIL_FROM: z.string().min(1).optional(),
 });
@@ -26,7 +25,6 @@ let cached: ServerEnv | null = null;
 export function getServerEnv(): ServerEnv {
   cached ??= serverEnvSchema.parse({
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
-    CRON_SECRET: process.env.CRON_SECRET,
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     EMAIL_FROM: process.env.EMAIL_FROM,
   });

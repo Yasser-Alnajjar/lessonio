@@ -22,6 +22,7 @@ import { mapNotificationRow } from "@/lib/notifications/map";
 import { createClient } from "@/lib/supabase/server";
 import type { ActionResult, MutationResult } from "@/lib/types/common";
 import type { Notification } from "@/lib/types/notification";
+import { ensureNotificationsForUser } from "./notifications.generate";
 
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
 
@@ -30,12 +31,12 @@ const RECENT_LIMIT = 10;
 
 async function getAuthedUserId(
   supabase: SupabaseServerClient,
-): Promise<{ userId: string } | { error: string }> {
+): Promise<{ userId: string; email: string | null } | { error: string }> {
   const { data, error } = await supabase.auth.getUser();
   if (error || !data.user) {
     return { error: "You must be signed in." };
   }
-  return { userId: data.user.id };
+  return { userId: data.user.id, email: data.user.email ?? null };
 }
 
 export interface RecentNotifications {
@@ -43,11 +44,20 @@ export interface RecentNotifications {
   unreadCount: number;
 }
 
-/** Polled by the notification bell — returns the latest few plus the badge count. */
+/**
+ * Polled by the notification bell — returns the latest few plus the badge count.
+ *
+ * This poll is also what drives notification generation now that nothing is
+ * scheduled: `ensureNotificationsForUser` throttles itself, so the common poll
+ * costs one extra `settings` read and the generation itself happens at most
+ * once per refresh interval per user.
+ */
 export async function getRecentNotifications(): Promise<ActionResult<RecentNotifications>> {
   const supabase = await createClient();
   const auth = await getAuthedUserId(supabase);
   if ("error" in auth) return { data: null, error: auth.error };
+
+  await ensureNotificationsForUser(supabase, auth.userId, auth.email);
 
   const [{ data: rows, error }, { count, error: countError }] = await Promise.all([
     supabase
@@ -112,7 +122,7 @@ export async function markAllNotificationsAsRead(): Promise<MutationResult> {
 
 /**
  * Emails a single notification to the signed-in user on demand — the manual
- * counterpart to the job's automatic sends. Both the row lookup and the
+ * counterpart to the automatic sends in `notifications.generate.ts`. Both the row lookup and the
  * recipient come from the session, so a user can only ever email themselves
  * their own notification.
  */

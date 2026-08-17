@@ -7,7 +7,7 @@ import { Loader2 } from "lucide-react";
 import { signInWithOAuth } from "@/actions/auth.mutations";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { GoogleIcon, MicrosoftIcon } from "@/components/shared/oauth-icons";
+import { GoogleIcon } from "@/components/shared/oauth-icons";
 import type { OAuthProvider } from "@/lib/types/auth";
 
 interface OAuthButtonsProps {
@@ -23,7 +23,9 @@ interface OAuthButtonsProps {
  */
 export function OAuthButtons({ next }: OAuthButtonsProps) {
   const t = useTranslations("auth.oauth");
-  const [pendingProvider, setPendingProvider] = useState<OAuthProvider | null>(null);
+  const [pendingProvider, setPendingProvider] = useState<OAuthProvider | null>(
+    null,
+  );
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -49,34 +51,19 @@ export function OAuthButtons({ next }: OAuthButtonsProps) {
         <Separator className="flex-1" />
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        <Button
-          type="button"
-          variant="outline"
-          disabled={isPending}
-          onClick={() => handleClick("google")}
-        >
-          {isPending && pendingProvider === "google" ? (
-            <Loader2 className="animate-spin" />
-          ) : (
-            <GoogleIcon className="size-4" />
-          )}
-          {t("google")}
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          disabled={isPending}
-          onClick={() => handleClick("azure")}
-        >
-          {isPending && pendingProvider === "azure" ? (
-            <Loader2 className="animate-spin" />
-          ) : (
-            <MicrosoftIcon className="size-4" />
-          )}
-          {t("microsoft")}
-        </Button>
-      </div>
+      <Button
+        type="button"
+        variant="outline"
+        disabled={isPending}
+        onClick={() => handleClick("google")}
+      >
+        {isPending && pendingProvider === "google" ? (
+          <Loader2 className="animate-spin" />
+        ) : (
+          <GoogleIcon className="size-4" />
+        )}
+        {t("google")}
+      </Button>
 
       {error && (
         <p role="alert" className="text-destructive text-sm font-medium">

@@ -8,6 +8,7 @@ import { useTranslations } from "next-intl";
 import { CheckCircle2, Loader2, UserPlus } from "lucide-react";
 
 import { register } from "@/actions/auth.mutations";
+import { OAuthButtons } from "@/components/shared/oauth-buttons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -168,6 +169,10 @@ export const RegisterForm = () => {
                 </Button>
               </form>
             </Form>
+
+            <div className="mt-6">
+              <OAuthButtons />
+            </div>
 
             <p className="text-muted-foreground mt-6 text-center text-sm">
               {t("haveAccount")}{" "}

@@ -202,6 +202,11 @@
       "body": "Every lesson, every study session, every streak — tracked in one continuous line you can watch move forward.",
       "footnote": "Your data stays yours. Export it anytime from Settings."
     },
+    "oauth": {
+      "orContinueWith": "Or continue with",
+      "google": "Google",
+      "microsoft": "Microsoft"
+    },
     "login": {
       "title": "Welcome back",
       "subtitle": "Log in to pick up your study line where you left off.",
@@ -214,6 +219,7 @@
       "forgotPassword": "Forgot password?",
       "noAccount": "Don't have an account?",
       "registerLink": "Create one",
+      "oauthError": "Something went wrong signing you in. Please try again.",
       "errors": {
         "emailInvalid": "Enter a valid email address.",
         "passwordRequired": "Enter your password."

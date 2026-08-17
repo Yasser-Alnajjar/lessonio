@@ -9,6 +9,7 @@ import { useTranslations } from "next-intl";
 import { Loader2, LogIn } from "lucide-react";
 
 import { login } from "@/actions/auth.mutations";
+import { OAuthButtons } from "@/components/shared/oauth-buttons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -72,6 +73,12 @@ export const LoginForm = () => {
         <CardDescription>{t("subtitle")}</CardDescription>
       </CardHeader>
       <CardContent>
+        {searchParams.get("error") === "oauth" && (
+          <p role="alert" className="text-destructive mb-4 text-sm font-medium">
+            {t("oauthError")}
+          </p>
+        )}
+
         <Form {...form}>
           <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
             <FormField
@@ -136,6 +143,10 @@ export const LoginForm = () => {
             </Button>
           </form>
         </Form>
+
+        <div className="mt-6">
+          <OAuthButtons next={searchParams.get("next") ?? undefined} />
+        </div>
 
         <p className="text-muted-foreground mt-6 text-center text-sm">
           {t("noAccount")}{" "}

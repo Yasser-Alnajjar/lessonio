@@ -62,6 +62,7 @@ export const authActions = {
   },
 
   login: authMutations.login,
+  signInWithOAuth: authMutations.signInWithOAuth,
   register: authMutations.register,
   requestPasswordReset: authMutations.requestPasswordReset,
   resetPassword: authMutations.resetPassword,

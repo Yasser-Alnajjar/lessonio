@@ -9,14 +9,18 @@
  * `src/actions/auth.ts` re-exports these under `Actions.Auth.*` for SSR use.
  */
 
+import type { Route } from "next";
+import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
 import { createClient } from "@/lib/supabase/server";
 import { env } from "@/lib/env";
+import { getSafeRedirectPath } from "@/lib/utils";
 import type { MutationResult } from "@/lib/types/common";
 import type {
   ForgotPasswordInput,
   LoginInput,
+  OAuthProvider,
   RegisterInput,
   ResetPasswordInput,
   UpdateProfileInput,
@@ -35,6 +39,39 @@ export async function login(input: LoginInput): Promise<MutationResult> {
 
   revalidatePath("/", "layout");
   return { success: true, error: null };
+}
+
+/**
+ * Redirects to the provider's consent screen on success — Supabase creates
+ * (or links) the `auth.users`/`profiles` row on first sign-in, so this same
+ * action covers both login and signup for OAuth providers. The callback
+ * route (`src/app/api/auth/callback/route.ts`) exchanges the returned code
+ * for a session.
+ */
+export async function signInWithOAuth(
+  provider: OAuthProvider,
+  next?: string,
+): Promise<MutationResult> {
+  const supabase = await createClient();
+
+  const redirectTo = new URL("/api/auth/callback", env.NEXT_PUBLIC_APP_URL);
+  if (next) {
+    redirectTo.searchParams.set(
+      "next",
+      getSafeRedirectPath(next, "/dashboard/overview"),
+    );
+  }
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider,
+    options: { redirectTo: redirectTo.toString() },
+  });
+
+  if (error || !data.url) {
+    return { success: false, error: error?.message ?? "Something went wrong." };
+  }
+
+  redirect(data.url as Route);
 }
 
 export async function register(input: RegisterInput): Promise<MutationResult> {
@@ -96,12 +133,10 @@ export async function updateProfile(
     return { success: false, error: "You must be signed in." };
   }
 
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from("profiles")
     .update({ full_name: input.fullName, timezone: input.timezone })
     .eq("id", authData.user.id);
-  console.log("error", error);
-  console.log("data", data);
 
   if (error) {
     return { success: false, error: error.message };

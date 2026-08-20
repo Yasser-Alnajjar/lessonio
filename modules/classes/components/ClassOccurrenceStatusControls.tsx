@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 
 import { updateClassOccurrenceStatus } from "@/actions/class-occurrences.mutations";
@@ -21,7 +21,6 @@ import type {
   ClassOccurrenceWithRelations,
 } from "@/lib/types/class-occurrence";
 
-/** Select value standing in for `attendanceStatus: null` — "not recorded yet". */
 const ATTENDANCE_UNSET_VALUE = "unset";
 
 export interface ClassOccurrenceStatusControlsProps {
@@ -29,20 +28,43 @@ export interface ClassOccurrenceStatusControlsProps {
   onUpdated?: () => void;
 }
 
-/**
- * Records attendance and exam state against one specific date. The write is
- * scoped to this occurrence's id, so next week's occurrence of the same class
- * keeps its own independent state.
- */
 export function ClassOccurrenceStatusControls({
   occurrence,
   onUpdated,
 }: ClassOccurrenceStatusControlsProps) {
   const t = useTranslations("classes.status");
   const [isPending, startTransition] = useTransition();
+  const [now, setNow] = useState(() => Date.now());
+
+  const hasStarted = useMemo(() => {
+    const start = new Date(
+      `${occurrence.date}T${occurrence.startTime}`,
+    ).getTime();
+
+    return now >= start;
+  }, [occurrence.date, occurrence.startTime, now]);
+
+  useEffect(() => {
+    if (hasStarted) return;
+
+    const start = new Date(
+      `${occurrence.date}T${occurrence.startTime}`,
+    ).getTime();
+
+    const delay = Math.max(start - Date.now(), 0);
+
+    const timeout = window.setTimeout(() => {
+      setNow(Date.now());
+    }, delay);
+
+    return () => window.clearTimeout(timeout);
+  }, [occurrence.date, occurrence.startTime, hasStarted]);
 
   const attendanceOptions = [
-    { label: t("attendance.not_recorded"), value: ATTENDANCE_UNSET_VALUE },
+    {
+      label: t("attendance.not_recorded"),
+      value: ATTENDANCE_UNSET_VALUE,
+    },
     ...ATTENDANCE_STATUSES.map((status) => ({
       label: t(`attendance.${status}`),
       value: status,
@@ -60,6 +82,7 @@ export function ClassOccurrenceStatusControls({
         attendanceStatus:
           value === ATTENDANCE_UNSET_VALUE ? null : (value as AttendanceStatus),
       });
+
       onUpdated?.();
     });
 
@@ -68,8 +91,11 @@ export function ClassOccurrenceStatusControls({
       await updateClassOccurrenceStatus(occurrence.id, {
         examStatus: value as ClassExamStatus,
       });
+
       onUpdated?.();
     });
+
+  const controlsDisabled = isPending || !hasStarted;
 
   return (
     <div className="grid gap-3 sm:grid-cols-2">
@@ -77,14 +103,16 @@ export function ClassOccurrenceStatusControls({
         <label className="text-xs font-medium text-muted-foreground">
           {t("attendance.label")}
         </label>
+
         <Select
           value={occurrence.attendanceStatus ?? ATTENDANCE_UNSET_VALUE}
           onValueChange={onAttendanceChange}
-          disabled={isPending}
+          disabled={controlsDisabled}
         >
           <SelectTrigger className="w-full">
             <SelectValue />
           </SelectTrigger>
+
           <SelectContent>
             {attendanceOptions.map((option) => (
               <SelectItem key={option.value} value={option.value}>
@@ -94,14 +122,21 @@ export function ClassOccurrenceStatusControls({
           </SelectContent>
         </Select>
       </div>
+
       <div className="flex flex-col gap-1.5">
         <label className="text-xs font-medium text-muted-foreground">
           {t("exam.label")}
         </label>
-        <Select value={occurrence.examStatus} onValueChange={onExamChange} disabled={isPending}>
+
+        <Select
+          value={occurrence.examStatus}
+          onValueChange={onExamChange}
+          disabled={controlsDisabled}
+        >
           <SelectTrigger className="w-full">
             <SelectValue />
           </SelectTrigger>
+
           <SelectContent>
             {examOptions.map((option) => (
               <SelectItem key={option.value} value={option.value}>
@@ -114,4 +149,3 @@ export function ClassOccurrenceStatusControls({
     </div>
   );
 }
-

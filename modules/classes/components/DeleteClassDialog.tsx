@@ -9,31 +9,31 @@ import type { ClassWithSubject } from "@/lib/types/class";
 export interface DeleteClassDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  klass: ClassWithSubject | null;
+  item: ClassWithSubject | null;
   onDeleted?: () => void;
 }
 
 export function DeleteClassDialog({
   open,
   onOpenChange,
-  klass,
+  item,
   onDeleted,
 }: DeleteClassDialogProps) {
   const t = useTranslations("classes.delete");
 
-  if (!klass) return null;
+  if (!item) return null;
 
   return (
     <ConfirmDialog
       open={open}
       onOpenChange={onOpenChange}
       title={t("title")}
-      description={t("description", { name: klass.subjectName })}
+      description={t("description", { name: item.subjectName })}
       confirmLabel={t("confirm")}
       cancelLabel={t("cancel")}
       variant="destructive"
       onConfirm={async () => {
-        const result = await deleteClass(klass.id);
+        const result = await deleteClass(item.id);
         if (!result.success) {
           throw new Error(result.error || t("genericError"));
         }

@@ -47,7 +47,7 @@ import type { Subject } from "@/lib/types/subject";
 export interface ClassFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  klass?: ClassWithSubject | null;
+  item?: ClassWithSubject | null;
   subjects: Subject[];
   onSaved?: () => void;
 }
@@ -73,7 +73,7 @@ function defaultValues(subjects: Subject[]): CreateClassInput {
 export function ClassFormDialog({
   open,
   onOpenChange,
-  klass,
+  item,
   subjects,
   onSaved,
 }: ClassFormDialogProps) {
@@ -81,7 +81,7 @@ export function ClassFormDialog({
   const tDays = useTranslations("classes.days");
   const locale = useLocale();
   const isArabic = locale === "ar";
-  const isEdit = Boolean(klass);
+  const isEdit = Boolean(item);
   const [formError, setFormError] = useState<string | null>(null);
 
   const schema = useMemo(() => createClassSchema(t), [t]);
@@ -102,17 +102,17 @@ export function ClassFormDialog({
     if (open) {
       setFormError(null);
       form.reset(
-        klass
+        item
           ? {
-              subjectId: klass.subjectId,
-              teacher: klass.teacher ?? "",
-              location: klass.location ?? "",
-              meetings: klass.meetings.map((meeting) => ({
+              subjectId: item.subjectId,
+              teacher: item.teacher ?? "",
+              location: item.location ?? "",
+              meetings: item.meetings.map((meeting) => ({
                 dayOfWeek: meeting.dayOfWeek,
                 startTime: meeting.startTime,
                 durationMinutes: meeting.durationMinutes,
               })),
-              isActive: klass.isActive,
+              isActive: item.isActive,
             }
           : defaultValues(subjects),
       );
@@ -121,7 +121,7 @@ export function ClassFormDialog({
 
   const mutation = useMutation({
     mutationFn: (values: CreateClassInput) =>
-      isEdit && klass ? updateClass(klass.id, values) : createClass(values),
+      isEdit && item ? updateClass(item.id, values) : createClass(values),
     onSuccess: (result) => {
       if (!result.success) {
         setFormError(result.error);

@@ -13,11 +13,15 @@ import { cn } from "@/lib/utils";
 import type { ClassWithSubject } from "@/lib/types/class";
 
 export interface RecurringClassCardProps extends React.ComponentProps<"div"> {
-  klass: ClassWithSubject;
+  item: ClassWithSubject;
   actions?: React.ReactNode;
 }
 
-function formatDuration(minutes: number, hLabel: string, mLabel: string): string {
+function formatDuration(
+  minutes: number,
+  hLabel: string,
+  mLabel: string,
+): string {
   const hours = Math.floor(minutes / 60);
   const remaining = minutes % 60;
   if (hours === 0) return `${remaining}${mLabel}`;
@@ -31,7 +35,7 @@ function formatDuration(minutes: number, hLabel: string, mLabel: string): string
  * `ClassOccurrenceCard`.
  */
 export function RecurringClassCard({
-  klass,
+  item,
   actions,
   className,
   ...props
@@ -39,8 +43,8 @@ export function RecurringClassCard({
   const t = useTranslations("classes.card");
   const tDays = useTranslations("classes.days");
 
-  const Icon = SUBJECT_ICON_COMPONENTS[klass.subjectIcon];
-  const sortedMeetings = [...klass.meetings].sort(
+  const Icon = SUBJECT_ICON_COMPONENTS[item.subjectIcon];
+  const sortedMeetings = [...item.meetings].sort(
     (a, b) => a.dayOfWeek - b.dayOfWeek,
   );
 
@@ -50,7 +54,7 @@ export function RecurringClassCard({
         data-slot="recurring-class-card"
         className={cn(
           "h-full gap-3 transition-shadow",
-          !klass.isActive && "opacity-60",
+          !item.isActive && "opacity-60",
           className,
         )}
         {...props}
@@ -59,8 +63,8 @@ export function RecurringClassCard({
           <span
             className="flex size-10 shrink-0 items-center justify-center rounded-xl"
             style={{
-              backgroundColor: `color-mix(in oklch, ${klass.subjectColor} 16%, transparent)`,
-              color: klass.subjectColor,
+              backgroundColor: `color-mix(in oklch, ${item.subjectColor} 16%, transparent)`,
+              color: item.subjectColor,
             }}
           >
             <Icon className="size-5" />
@@ -68,13 +72,13 @@ export function RecurringClassCard({
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <h3 className="truncate text-sm font-medium text-foreground">
-                {klass.subjectName}
+                {item.subjectName}
               </h3>
               <Badge
-                variant={klass.isActive ? "default" : "secondary"}
+                variant={item.isActive ? "default" : "secondary"}
                 className="shrink-0 text-[10px]"
               >
-                {klass.isActive ? t("active") : t("inactive")}
+                {item.isActive ? t("active") : t("inactive")}
               </Badge>
             </div>
           </div>
@@ -92,7 +96,10 @@ export function RecurringClassCard({
               t("minutesSuffix"),
             );
             return (
-              <span key={`${entry.dayOfWeek}-${index}`} className="inline-flex items-center gap-1">
+              <span
+                key={`${entry.dayOfWeek}-${index}`}
+                className="inline-flex items-center gap-1"
+              >
                 <span className="font-medium text-foreground">
                   {tDays(WEEKDAY_LABEL_KEYS[entry.dayOfWeek])}
                 </span>
@@ -100,18 +107,18 @@ export function RecurringClassCard({
               </span>
             );
           })}
-          {(klass.teacher || klass.location) && (
+          {(item.teacher || item.location) && (
             <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
-              {klass.teacher && (
+              {item.teacher && (
                 <span className="inline-flex items-center gap-1">
                   <User className="size-3.5" />
-                  {klass.teacher}
+                  {item.teacher}
                 </span>
               )}
-              {klass.location && (
+              {item.location && (
                 <span className="inline-flex items-center gap-1">
                   <MapPin className="size-3.5" />
-                  {klass.location}
+                  {item.location}
                 </span>
               )}
             </div>

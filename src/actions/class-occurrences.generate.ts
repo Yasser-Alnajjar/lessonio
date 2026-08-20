@@ -158,6 +158,26 @@ async function materializeOccurrences(
 }
 
 /**
+ * Called after a class is created, edited, or reactivated: clears the
+ * materialization stamp so the next `ensureClassOccurrencesForUser()` call
+ * (typically the very next page load, right after `revalidatePath`) actually
+ * regenerates occurrences instead of being skipped by the 15-minute
+ * `REFRESH_INTERVAL_MS` cooldown in `claimRun()` — otherwise a class created
+ * shortly after any page in the app materialized occurrences (even with zero
+ * classes at the time) sits with no occurrences, including today's, until
+ * the cooldown expires on its own.
+ */
+export async function resetClassOccurrencesMaterializedAt(
+  supabase: SupabaseServerClient,
+  userId: string,
+): Promise<void> {
+  await supabase
+    .from("settings")
+    .update({ class_occurrences_materialized_at: null })
+    .eq("user_id", userId);
+}
+
+/**
  * Called after a class is edited or deactivated: removes the *future,
  * untouched* occurrences it generated, so the next
  * `ensureClassOccurrencesForUser()` re-materializes them from the new shape.

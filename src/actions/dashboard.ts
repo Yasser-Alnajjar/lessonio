@@ -35,7 +35,8 @@ async function fetchClassAgenda(): Promise<{
   today: ClassOccurrenceWithRelations[];
   upcoming: ClassOccurrenceWithRelations[];
 }> {
-  const { data } = await classOccurrencesActions.getAgenda(UPCOMING_CLASS_LIMIT);
+  const { data } =
+    await classOccurrencesActions.getAgenda(UPCOMING_CLASS_LIMIT);
   return data ?? { today: [], upcoming: [] };
 }
 
@@ -43,36 +44,40 @@ async function fetchRecentActivity(
   supabase: SupabaseServerClient,
   userId: string,
 ): Promise<RecentActivityItem[]> {
-  const [{ data: completedLessons }, { data: notes }, { data: doneHomework }, { data: scoredExams }] =
-    await Promise.all([
-      supabase
-        .from("lessons")
-        .select("id, title, updated_at")
-        .eq("user_id", userId)
-        .eq("study_status", "completed")
-        .order("updated_at", { ascending: false })
-        .limit(RECENT_ACTIVITY_LIMIT),
-      supabase
-        .from("lesson_notes")
-        .select("id, title, created_at")
-        .eq("user_id", userId)
-        .order("created_at", { ascending: false })
-        .limit(RECENT_ACTIVITY_LIMIT),
-      supabase
-        .from("homework")
-        .select("id, title, updated_at")
-        .eq("user_id", userId)
-        .eq("completed", true)
-        .order("updated_at", { ascending: false })
-        .limit(RECENT_ACTIVITY_LIMIT),
-      supabase
-        .from("exams")
-        .select("id, title, score, updated_at")
-        .eq("user_id", userId)
-        .not("score", "is", null)
-        .order("updated_at", { ascending: false })
-        .limit(RECENT_ACTIVITY_LIMIT),
-    ]);
+  const [
+    { data: completedLessons },
+    { data: notes },
+    { data: doneHomework },
+    { data: scoredExams },
+  ] = await Promise.all([
+    supabase
+      .from("lessons")
+      .select("id, title, updated_at")
+      .eq("user_id", userId)
+      .eq("study_status", "completed")
+      .order("updated_at", { ascending: false })
+      .limit(RECENT_ACTIVITY_LIMIT),
+    supabase
+      .from("lesson_notes")
+      .select("id, title, created_at")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(RECENT_ACTIVITY_LIMIT),
+    supabase
+      .from("homework")
+      .select("id, title, updated_at")
+      .eq("user_id", userId)
+      .eq("completed", true)
+      .order("updated_at", { ascending: false })
+      .limit(RECENT_ACTIVITY_LIMIT),
+    supabase
+      .from("exams")
+      .select("id, title, score, updated_at")
+      .eq("user_id", userId)
+      .not("score", "is", null)
+      .order("updated_at", { ascending: false })
+      .limit(RECENT_ACTIVITY_LIMIT),
+  ]);
 
   const items: RecentActivityItem[] = [
     ...(completedLessons ?? []).map((row) => ({
@@ -130,17 +135,26 @@ async function fetchWeeklySummary(
 
   const minutesByDate = new Map<string, number>();
   for (let i = 0; i < WEEK_LENGTH_DAYS; i++) {
-    minutesByDate.set(format(subDays(today, WEEK_LENGTH_DAYS - 1 - i), "yyyy-MM-dd"), 0);
+    minutesByDate.set(
+      format(subDays(today, WEEK_LENGTH_DAYS - 1 - i), "yyyy-MM-dd"),
+      0,
+    );
   }
 
   for (const session of sessions ?? []) {
     if (!session.duration_minutes) continue;
     const dateKey = format(parseISO(session.started_at), "yyyy-MM-dd");
     if (!minutesByDate.has(dateKey)) continue;
-    minutesByDate.set(dateKey, (minutesByDate.get(dateKey) ?? 0) + session.duration_minutes);
+    minutesByDate.set(
+      dateKey,
+      (minutesByDate.get(dateKey) ?? 0) + session.duration_minutes,
+    );
   }
 
-  const dayBreakdown = [...minutesByDate.entries()].map(([date, minutes]) => ({ date, minutes }));
+  const dayBreakdown = [...minutesByDate.entries()].map(([date, minutes]) => ({
+    date,
+    minutes,
+  }));
   const totalMinutes = dayBreakdown.reduce((sum, day) => sum + day.minutes, 0);
   const targetMinutes = goalRows?.[0]?.target_minutes ?? 0;
 
@@ -160,7 +174,10 @@ function computeStreaks(sessionDates: string[]): {
   let run = 1;
   let previousDate = firstDate;
   for (const dateStr of restDates) {
-    const gap = differenceInCalendarDays(parseISO(dateStr), parseISO(previousDate));
+    const gap = differenceInCalendarDays(
+      parseISO(dateStr),
+      parseISO(previousDate),
+    );
     run = gap === 1 ? run + 1 : 1;
     longestStreakDays = Math.max(longestStreakDays, run);
     previousDate = dateStr;
@@ -191,7 +208,10 @@ async function fetchProgress(
     { count: flashcardReviews },
     achievements,
   ] = await Promise.all([
-    supabase.from("study_sessions").select("started_at, duration_minutes").eq("user_id", userId),
+    supabase
+      .from("study_sessions")
+      .select("started_at, duration_minutes")
+      .eq("user_id", userId),
     supabase
       .from("lessons")
       .select("id", { count: "exact", head: true })
@@ -220,14 +240,18 @@ async function fetchProgress(
   ]);
 
   const { currentStreakDays, longestStreakDays } = computeStreaks(
-    (sessions ?? []).map((row) => format(parseISO(row.started_at), "yyyy-MM-dd")),
+    (sessions ?? []).map((row) =>
+      format(parseISO(row.started_at), "yyyy-MM-dd"),
+    ),
   );
 
   const studyMinutes = (sessions ?? []).reduce(
     (sum, row) => sum + (row.duration_minutes ?? 0),
     0,
   );
-  const unlockedAchievements = achievements.filter((item) => item.unlockedAt !== null).length;
+  const unlockedAchievements = achievements.filter(
+    (item) => item.unlockedAt !== null,
+  ).length;
 
   const xp = computeXp({
     completedLessons: completedLessons ?? 0,
@@ -276,18 +300,33 @@ export const dashboardActions = {
         ? authData.user.user_metadata.full_name
         : null;
 
-    const [greetingName, { today, upcoming }, recentActivity, weeklySummary, progress] =
-      await Promise.all([
-        fetchGreetingName(supabase, userId, authFullName, authData.user.email ?? ""),
-        fetchClassAgenda(),
-        fetchRecentActivity(supabase, userId),
-        fetchWeeklySummary(supabase, userId),
-        fetchProgress(supabase, userId),
-      ]);
+    const [
+      greetingName,
+      { today, upcoming },
+      recentActivity,
+      weeklySummary,
+      progress,
+    ] = await Promise.all([
+      fetchGreetingName(
+        supabase,
+        userId,
+        authFullName,
+        authData.user.email ?? "",
+      ),
+      fetchClassAgenda(),
+      fetchRecentActivity(supabase, userId),
+      fetchWeeklySummary(supabase, userId),
+      fetchProgress(supabase, userId),
+    ]);
 
     const overallProgressPercent =
       weeklySummary.targetMinutes > 0
-        ? Math.min(100, Math.round((weeklySummary.totalMinutes / weeklySummary.targetMinutes) * 100))
+        ? Math.min(
+            100,
+            Math.round(
+              (weeklySummary.totalMinutes / weeklySummary.targetMinutes) * 100,
+            ),
+          )
         : 0;
 
     return {

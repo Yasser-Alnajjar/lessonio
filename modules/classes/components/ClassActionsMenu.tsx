@@ -13,14 +13,14 @@ import {
 import type { ClassWithSubject } from "@/lib/types/class";
 
 export interface ClassActionsMenuProps {
-  klass: ClassWithSubject;
+  item: ClassWithSubject;
   onEdit: () => void;
   onToggleActive: () => void;
   onDelete: () => void;
 }
 
 export function ClassActionsMenu({
-  klass,
+  item,
   onEdit,
   onToggleActive,
   onDelete,
@@ -46,8 +46,8 @@ export function ClassActionsMenu({
           {t("edit")}
         </DropdownMenuItem>
         <DropdownMenuItem onSelect={onToggleActive}>
-          {klass.isActive ? <PowerOff /> : <Power />}
-          {klass.isActive ? t("deactivate") : t("activate")}
+          {item.isActive ? <PowerOff /> : <Power />}
+          {item.isActive ? t("deactivate") : t("activate")}
         </DropdownMenuItem>
         <DropdownMenuItem variant="destructive" onSelect={onDelete}>
           <Trash2 />

@@ -34,7 +34,7 @@ interface ClassesListViewProps {
 
 interface FormState {
   open: boolean;
-  klass: ClassWithSubject | null;
+  item: ClassWithSubject | null;
 }
 
 export const ClassesListView = ({
@@ -50,9 +50,11 @@ export const ClassesListView = ({
   const [filter, setFilter] = useState<FilterSidebarValue>(EMPTY_FILTER_VALUE);
   const [formState, setFormState] = useState<FormState>({
     open: false,
-    klass: null,
+    item: null,
   });
-  const [deleteTarget, setDeleteTarget] = useState<ClassWithSubject | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<ClassWithSubject | null>(
+    null,
+  );
 
   const statusOptions = ATTENDANCE_STATUSES.map((status) => ({
     value: status,
@@ -104,12 +106,13 @@ export const ClassesListView = ({
   const visibleToday = filterOccurrences(today);
   const visibleUpcoming = filterOccurrences(upcoming);
 
-  const handleToggleActive = async (klass: ClassWithSubject) => {
-    await toggleActiveClass(klass.id);
+  const handleToggleActive = async (item: ClassWithSubject) => {
+    await toggleActiveClass(item.id);
     router.refresh();
   };
 
-  const openCreate = () => setFormState({ open: true, klass: null });
+  const openCreate = () => setFormState({ open: true, item: null });
+  console.log(visibleUpcoming);
 
   return (
     <div className="flex flex-col gap-8 p-4">
@@ -237,20 +240,22 @@ export const ClassesListView = ({
               {t("list.weeklySchedule")}
             </h2>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {classes.map((klass) => (
-                <RecurringClassCard
-                  key={klass.id}
-                  klass={klass}
-                  actions={
-                    <ClassActionsMenu
-                      klass={klass}
-                      onEdit={() => setFormState({ open: true, klass })}
-                      onToggleActive={() => handleToggleActive(klass)}
-                      onDelete={() => setDeleteTarget(klass)}
-                    />
-                  }
-                />
-              ))}
+              {classes.map((item) => {
+                return (
+                  <RecurringClassCard
+                    key={item.id}
+                    item={item}
+                    actions={
+                      <ClassActionsMenu
+                        item={item}
+                        onEdit={() => setFormState({ open: true, item })}
+                        onToggleActive={() => handleToggleActive(item)}
+                        onDelete={() => setDeleteTarget(item)}
+                      />
+                    }
+                  />
+                );
+              })}
             </div>
           </section>
         </>
@@ -259,7 +264,7 @@ export const ClassesListView = ({
       <ClassFormDialog
         open={formState.open}
         onOpenChange={(open) => setFormState((prev) => ({ ...prev, open }))}
-        klass={formState.klass}
+        item={formState.item}
         subjects={subjects}
         onSaved={() => router.refresh()}
       />
@@ -269,7 +274,7 @@ export const ClassesListView = ({
         onOpenChange={(open) => {
           if (!open) setDeleteTarget(null);
         }}
-        klass={deleteTarget}
+        item={deleteTarget}
         onDeleted={() => {
           setDeleteTarget(null);
           router.refresh();

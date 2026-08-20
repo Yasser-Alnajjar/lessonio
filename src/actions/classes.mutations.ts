@@ -20,7 +20,10 @@ import { createClient } from "@/lib/supabase/server";
 import type { MutationResult } from "@/lib/types/common";
 import type { CreateClassInput, UpdateClassInput } from "@/lib/types/class";
 import type { Database, Json } from "@/lib/types/database";
-import { deleteFutureUntouchedOccurrences } from "./class-occurrences.generate";
+import {
+  deleteFutureUntouchedOccurrences,
+  resetClassOccurrencesMaterializedAt,
+} from "./class-occurrences.generate";
 
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
 type ClassUpdate = Database["public"]["Tables"]["classes"]["Update"];
@@ -57,6 +60,8 @@ export async function createClass(
   if (error) {
     return { success: false, error: error.message };
   }
+
+  await resetClassOccurrencesMaterializedAt(supabase, auth.userId);
 
   revalidatePath("/", "layout");
   return { success: true, error: null };
@@ -96,6 +101,7 @@ export async function updateClass(
   // occurrences nobody has touched yet are cleared and left for the next
   // ensureClassOccurrencesForUser() to re-materialize from the new shape.
   await deleteFutureUntouchedOccurrences(supabase, id);
+  await resetClassOccurrencesMaterializedAt(supabase, auth.userId);
 
   revalidatePath("/", "layout");
   return { success: true, error: null };
@@ -127,11 +133,15 @@ export async function toggleActiveClass(id: string): Promise<MutationResult> {
 
   // Deactivating stops future materialization, so untouched future
   // occurrences are cleared too — see deleteFutureUntouchedOccurrences().
-  // Reactivating needs no cleanup: the next ensureClassOccurrencesForUser()
-  // just resumes materializing forward from today.
   if (current.is_active) {
     await deleteFutureUntouchedOccurrences(supabase, id);
   }
+
+  // Either direction needs the stamp reset: reactivating must resume
+  // materializing forward from today on the very next read rather than
+  // waiting out the cooldown, and deactivating must not leave a stale stamp
+  // masking some other class's changes during the same window.
+  await resetClassOccurrencesMaterializedAt(supabase, auth.userId);
 
   revalidatePath("/", "layout");
   return { success: true, error: null };

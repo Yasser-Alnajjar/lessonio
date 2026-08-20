@@ -1,6 +1,6 @@
 import "server-only";
 
-import { localIsoDate } from "@/lib/notifications/dates";
+import { addDays, localIsoDate } from "@/lib/notifications/dates";
 import { createClient } from "@/lib/supabase/server";
 import type { ActionResult } from "@/lib/types/common";
 import type {
@@ -17,7 +17,7 @@ type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
 type ClassOccurrenceRow =
   Database["public"]["Tables"]["class_occurrences"]["Row"];
 
-/** How many future occurrences the agenda surfaces beyond today. */
+/** How many of tomorrow's occurrences the agenda surfaces. */
 const UPCOMING_LIMIT = 12;
 
 interface SubjectSummary {
@@ -193,10 +193,12 @@ export const classOccurrencesActions = {
   },
 
   /**
-   * Today's and the next few upcoming occurrences, in chronological order —
-   * what the Classes page and the dashboard both show. The two buckets are
-   * queried separately so a day packed with classes can never crowd the
-   * upcoming list out of a shared row limit.
+   * Today's occurrences plus tomorrow's, in chronological order — what the
+   * Classes page and the dashboard both show. "Upcoming" is deliberately
+   * exactly tomorrow, not a rolling future window: Saturday's (or any later)
+   * occurrences never appear here. The two buckets are queried separately so
+   * a day packed with classes can never crowd the other bucket out of a
+   * shared row limit.
    */
   async getAgenda(
     upcomingLimit: number = UPCOMING_LIMIT,
@@ -218,6 +220,7 @@ export const classOccurrencesActions = {
       .maybeSingle();
 
     const todayIso = localIsoDate(new Date(), profile?.timezone ?? null);
+    const tomorrowIso = addDays(todayIso, 1);
 
     const [{ data: todayRows, error: todayError }, { data: upcomingRows, error: upcomingError }] =
       await Promise.all([
@@ -231,8 +234,7 @@ export const classOccurrencesActions = {
           .from("class_occurrences")
           .select("*")
           .eq("user_id", userId)
-          .gt("date", todayIso)
-          .order("date", { ascending: true })
+          .eq("date", tomorrowIso)
           .order("start_time", { ascending: true })
           .limit(upcomingLimit),
       ]);

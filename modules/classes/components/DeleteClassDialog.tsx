@@ -1,16 +1,15 @@
 "use client";
 
-import { format, parseISO } from "date-fns";
 import { useTranslations } from "next-intl";
 
 import { deleteClass } from "@/actions/classes.mutations";
 import { ConfirmDialog } from "@/components/ui-system/confirm-dialog";
-import type { ClassWithRelations } from "@/lib/types/class";
+import type { ClassWithSubject } from "@/lib/types/class";
 
 export interface DeleteClassDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  klass: ClassWithRelations | null;
+  klass: ClassWithSubject | null;
   onDeleted?: () => void;
 }
 
@@ -29,10 +28,7 @@ export function DeleteClassDialog({
       open={open}
       onOpenChange={onOpenChange}
       title={t("title")}
-      description={t("description", {
-        subject: klass.subjectName,
-        date: format(parseISO(klass.date), "MMM d, yyyy"),
-      })}
+      description={t("description", { name: klass.subjectName })}
       confirmLabel={t("confirm")}
       cancelLabel={t("cancel")}
       variant="destructive"

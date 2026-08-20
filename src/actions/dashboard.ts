@@ -11,93 +11,32 @@ import type {
   WeeklyStudySummary,
 } from "@/lib/types/dashboard";
 import type { GamificationProgress } from "@/lib/types/gamification";
-import type { Class, ClassWithRelations } from "@/lib/types/class";
-import type { SubjectIcon } from "@/lib/types/subject";
-import type { Database } from "@/lib/types/database";
-import { ensureClassesForUser } from "./classes.generate";
+import type { ClassOccurrenceWithRelations } from "@/lib/types/class-occurrence";
+import { classOccurrencesActions } from "./class-occurrences";
 import { syncAndFetchUserAchievements } from "./gamification";
 
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
-type ClassRow = Database["public"]["Tables"]["classes"]["Row"];
 
-const TODAY_CLASS_WINDOW = 30;
 const UPCOMING_CLASS_LIMIT = 5;
 const RECENT_ACTIVITY_LIMIT = 8;
 const WEEK_LENGTH_DAYS = 7;
 
-function mapClassRow(
-  row: ClassRow,
-  subjects: Map<string, { name: string; color: string; icon: SubjectIcon }>,
-): ClassWithRelations {
-  const subject = subjects.get(row.subject_id);
-
-  const klass: Class = {
-    id: row.id,
-    userId: row.user_id,
-    subjectId: row.subject_id,
-    classScheduleId: row.class_schedule_id,
-    date: row.date,
-    startTime: row.start_time,
-    durationMinutes: row.duration_minutes,
-    teacher: row.teacher,
-    location: row.location,
-    attendanceStatus: row.attendance_status as Class["attendanceStatus"],
-    examStatus: row.exam_status as Class["examStatus"],
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
-  };
-
-  return {
-    ...klass,
-    subjectName: subject?.name ?? "Unknown subject",
-    subjectColor: subject?.color ?? "#94a3b8",
-    subjectIcon: subject?.icon ?? "book-open",
-  };
-}
-
-async function fetchClassesWithRelations(
-  supabase: SupabaseServerClient,
-  userId: string,
-): Promise<{ today: ClassWithRelations[]; upcoming: ClassWithRelations[] }> {
-  const todayIso = format(new Date(), "yyyy-MM-dd");
-
-  await ensureClassesForUser(supabase, userId);
-
-  const { data: classRows } = await supabase
-    .from("classes")
-    .select("*")
-    .eq("user_id", userId)
-    .gte("date", todayIso)
-    .order("date", { ascending: true })
-    .order("start_time", { ascending: true })
-    .limit(TODAY_CLASS_WINDOW);
-
-  const rows = classRows ?? [];
-  if (rows.length === 0) {
-    return { today: [], upcoming: [] };
-  }
-
-  const subjectIds = [...new Set(rows.map((row) => row.subject_id))];
-  const { data: subjectRows } = await supabase
-    .from("subjects")
-    .select("id, name, color, icon")
-    .in("id", subjectIds);
-
-  const subjects = new Map(
-    (subjectRows ?? []).map((row) => [
-      row.id,
-      { name: row.name, color: row.color, icon: row.icon as SubjectIcon },
-    ]),
-  );
-
-  const withRelations = rows.map((row) => mapClassRow(row, subjects));
-
-  return {
-    today: withRelations.filter((klass) => klass.date === todayIso),
-    upcoming: withRelations
-      .filter((klass) => klass.date > todayIso)
-      .slice(0, UPCOMING_CLASS_LIMIT),
-  };
+/**
+ * Today's and the next few upcoming class occurrences for the dashboard.
+ *
+ * Delegates to `classOccurrencesActions.getAgenda()` rather than re-querying
+ * `class_occurrences` here: that keeps the dashboard reading the exact same
+ * Class domain as the Classes page (including the
+ * `ensureClassOccurrencesForUser()` materialization it runs first), and it
+ * queries today and upcoming as two separate buckets — a day packed with
+ * classes used to consume a shared row limit and leave "Upcoming" empty.
+ */
+async function fetchClassAgenda(): Promise<{
+  today: ClassOccurrenceWithRelations[];
+  upcoming: ClassOccurrenceWithRelations[];
+}> {
+  const { data } = await classOccurrencesActions.getAgenda(UPCOMING_CLASS_LIMIT);
+  return data ?? { today: [], upcoming: [] };
 }
 
 async function fetchRecentActivity(
@@ -340,7 +279,7 @@ export const dashboardActions = {
     const [greetingName, { today, upcoming }, recentActivity, weeklySummary, progress] =
       await Promise.all([
         fetchGreetingName(supabase, userId, authFullName, authData.user.email ?? ""),
-        fetchClassesWithRelations(supabase, userId),
+        fetchClassAgenda(),
         fetchRecentActivity(supabase, userId),
         fetchWeeklySummary(supabase, userId),
         fetchProgress(supabase, userId),

@@ -4,16 +4,16 @@ import { eachDayOfInterval, endOfMonth, format, startOfMonth } from "date-fns";
 
 import type { ActionResult } from "@/lib/types/common";
 import type { CalendarMonthData } from "@/lib/types/calendar";
-import { classesActions } from "./classes";
+import { classOccurrencesActions } from "./class-occurrences";
 import { lessonsActions } from "./lessons";
 import { rescheduleLesson } from "./calendar.mutations";
 
 /** SSR-facing surface for `Actions.Calendar.*`. Mutations re-export the real Server Actions. */
 export const calendarActions = {
   /**
-   * Buckets the month's lessons and classes by date. Reuses `lessonsActions.getAll`
-   * and `classesActions.getAll` (which both support `dateFrom`/`dateTo`) instead of
-   * duplicating their join logic here.
+   * Buckets the month's lessons and class occurrences by date. Reuses
+   * `lessonsActions.getAll` and `classOccurrencesActions.getAll` (which both
+   * support `dateFrom`/`dateTo`) instead of duplicating their join logic here.
    */
   async getMonth(year: number, month: number): Promise<ActionResult<CalendarMonthData>> {
     const monthStart = startOfMonth(new Date(year, month - 1, 1));
@@ -24,7 +24,7 @@ export const calendarActions = {
     const [{ data: lessons, error: lessonsError }, { data: classes, error: classesError }] =
       await Promise.all([
         lessonsActions.getAll({ dateFrom, dateTo }),
-        classesActions.getAll({ dateFrom, dateTo }),
+        classOccurrencesActions.getAll({ dateFrom, dateTo }),
       ]);
     if (lessonsError) {
       return { data: null, error: lessonsError };

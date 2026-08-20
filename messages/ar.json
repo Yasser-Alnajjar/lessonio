@@ -27,8 +27,7 @@
   "nav": {
     "dashboard": "لوحة التحكم",
     "subjects": "المواد",
-    "classes": "الحصص",
-    "schedule": "الجدول",
+    "classes": "الحصص الدراسية",
     "lessons": "الدروس",
     "flashcards": "البطاقات التعليمية",
     "studySessions": "جلسات المذاكرة",
@@ -417,101 +416,39 @@
       "minutesSuffix": "د"
     }
   },
-  "classSchedules": {
-    "list": {
-      "title": "الجدول",
-      "subtitle": "تابع الحصص الأسبوعية المتكررة التي تحضرها.",
-      "newClass": "إضافة جدول",
-      "emptyTitle": "لا توجد حصص",
-      "emptyDescription": "أضف أول حصة متكررة لتبدأ بمتابعة موعد ومكان حضورك.",
-      "emptyAction": "إضافة جدول",
-      "noSubjectsTitle": "لا توجد مواد بعد",
-      "noSubjectsDescription": "أنشئ مادة أولاً، ثم أضف جدول حصص لها."
-    },
-    "card": {
-      "actionsLabel": "إجراءات الحصة",
-      "edit": "تعديل",
-      "activate": "تفعيل",
-      "deactivate": "إيقاف",
-      "delete": "حذف",
-      "active": "نشطة",
-      "inactive": "غير نشطة",
-      "hoursSuffix": "س",
-      "minutesSuffix": "د"
-    },
-    "form": {
-      "createTitle": "إضافة جدول",
-      "editTitle": "تعديل الجدول",
-      "createDescription": "أضف جدول حصة متكررة لمادة.",
-      "editDescription": "حدّث الجدول أو المعلم أو المكان لهذه الحصة.",
-      "subjectLabel": "المادة",
-      "subjectPlaceholder": "اختر مادة",
-      "scheduleLabel": "جدول الحصة",
-      "dayLabel": "اليوم",
-      "addDay": "إضافة يوم آخر",
-      "removeDay": "إزالة اليوم",
-      "startTimeLabel": "وقت البدء",
-      "durationLabel": "المدة (دقائق)",
-      "teacherLabel": "المعلم",
-      "teacherPlaceholder": "مثال: أحمد",
-      "locationLabel": "المكان",
-      "locationPlaceholder": "مثال: مركز ABC",
-      "startsOnLabel": "تاريخ البدء",
-      "endsOnLabel": "تاريخ الانتهاء",
-      "activeLabel": "نشطة",
-      "cancel": "إلغاء",
-      "submitting": "جارٍ الحفظ...",
-      "submitCreate": "إنشاء الجدول",
-      "submitEdit": "حفظ التغييرات",
-      "errors": {
-        "subjectRequired": "اختر مادة",
-        "teacherMax": "يجب ألا يتجاوز اسم المعلم 120 حرفاً",
-        "locationMax": "يجب ألا يتجاوز المكان 120 حرفاً",
-        "daysRequired": "أضف موعداً واحداً على الأقل",
-        "startTimeRequired": "وقت البدء مطلوب",
-        "durationInvalid": "يجب أن تكون المدة رقماً موجباً",
-        "startsOnRequired": "تاريخ البدء مطلوب",
-        "endsOnInvalid": "يجب أن يكون تاريخ الانتهاء بعد أو يساوي تاريخ البدء",
-        "duplicateDay": "لا يمكن أن يتكرر اليوم نفسه في هذه الحصة"
-      }
-    },
-    "delete": {
-      "title": "حذف الجدول؟",
-      "description": "سيؤدي هذا إلى حذف جدول حصة \"{name}\" نهائياً. لا يمكن التراجع عن هذا الإجراء.",
-      "confirm": "حذف الجدول",
-      "cancel": "إلغاء",
-      "genericError": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
-    },
-    "days": {
-      "sunday": "الأحد",
-      "monday": "الإثنين",
-      "tuesday": "الثلاثاء",
-      "wednesday": "الأربعاء",
-      "thursday": "الخميس",
-      "friday": "الجمعة",
-      "saturday": "السبت"
-    }
-  },
   "classes": {
     "list": {
-      "title": "الحصص",
-      "subtitle": "حصصك المجدولة، من الحضور إلى حالة الاختبار.",
+      "title": "الحصص الدراسية",
+      "subtitle": "حصصك الأسبوعية المتكررة، والحضور الذي تسجّله لكل حصة.",
       "newClass": "حصة جديدة",
       "noSubjectsHint": "أنشئ مادة أولاً — تحتاج كل حصة إلى مادة تنتمي إليها.",
       "searchPlaceholder": "البحث في الحصص...",
       "filterStatus": "الحضور",
       "filterSubject": "المادة",
       "filterDateRange": "النطاق الزمني",
+      "today": "حصص اليوم",
+      "upcoming": "الحصص القادمة",
+      "weeklySchedule": "الجدول الأسبوعي",
       "emptyTitle": "لا توجد حصص بعد",
-      "emptyDescription": "أضف حصتك الأولى، أو أضف جدولًا متكررًا لإنشائها تلقائيًا.",
+      "emptyDescription": "أضف حصتك الأسبوعية الأولى — مثل الرياضيات كل يوم إثنين الساعة 4:00 مساءً — وستتكرر تلقائياً بعد ذلك.",
       "emptyAction": "حصة جديدة",
+      "todayEmptyTitle": "لا توجد حصص اليوم",
+      "todayEmptyDescription": "لا تُعقد أي من حصصك اليوم.",
+      "upcomingEmptyTitle": "لا توجد حصص قادمة",
+      "upcomingEmptyDescription": "ستظهر حصصك القادمة هنا مع اقتراب مواعيدها.",
       "noResultsTitle": "لا توجد حصص مطابقة",
       "noResultsDescription": "جرّب كلمة بحث مختلفة أو امسح عوامل التصفية."
     },
     "card": {
       "actionsLabel": "إجراءات الحصة",
       "edit": "تعديل",
-      "delete": "حذف"
+      "activate": "استئناف",
+      "deactivate": "إيقاف مؤقت",
+      "delete": "حذف",
+      "active": "نشطة",
+      "inactive": "متوقفة",
+      "hoursSuffix": "س",
+      "minutesSuffix": "د"
     },
     "status": {
       "attendance": {
@@ -532,36 +469,38 @@
     "form": {
       "createTitle": "حصة جديدة",
       "editTitle": "تعديل الحصة",
-      "createDescription": "أضف حصة — مستقلة، أو منشأة من جدول.",
-      "editDescription": "حدّث التاريخ أو الوقت أو تفاصيل هذه الحصة.",
+      "createDescription": "أضف حصة أسبوعية. ستتكرر كل أسبوع حتى توقفها أو تحذفها.",
+      "editDescription": "حدّث مواعيد هذه الحصة، أو المعلم والمكان.",
       "subjectLabel": "المادة",
       "subjectPlaceholder": "اختر مادة",
-      "dateLabel": "التاريخ",
-      "timeLabel": "الوقت",
-      "durationLabel": "المدة (دقيقة)",
-      "teacherLabel": "المعلّم",
-      "teacherPlaceholder": "مثال: د. سميث",
+      "meetingsLabel": "تُعقد في",
+      "dayLabel": "اليوم",
+      "addDay": "إضافة يوم آخر",
+      "removeDay": "إزالة اليوم",
+      "startTimeLabel": "وقت البدء",
+      "durationLabel": "المدة (دقائق)",
+      "teacherLabel": "المعلم",
+      "teacherPlaceholder": "مثال: أحمد",
       "locationLabel": "المكان",
-      "locationPlaceholder": "مثال: قاعة 204",
-      "classLabel": "الحصة",
-      "classPlaceholder": "اربط بحصة (اختياري)",
-      "classNone": "بلا حصة مرتبطة",
+      "locationPlaceholder": "مثال: مركز ABC",
+      "activeLabel": "نشطة",
       "cancel": "إلغاء",
       "submitting": "جارٍ الحفظ...",
       "submitCreate": "إنشاء الحصة",
       "submitEdit": "حفظ التغييرات",
       "errors": {
         "subjectRequired": "اختر مادة",
-        "dateRequired": "التاريخ مطلوب",
-        "timeRequired": "الوقت مطلوب",
-        "durationInvalid": "يجب أن تكون المدة رقمًا موجبًا",
-        "teacherMax": "يجب ألا يتجاوز اسم المعلّم 120 حرفًا",
-        "locationMax": "يجب ألا يتجاوز المكان 120 حرفًا"
+        "teacherMax": "يجب ألا يتجاوز اسم المعلم 120 حرفاً",
+        "locationMax": "يجب ألا يتجاوز المكان 120 حرفاً",
+        "daysRequired": "أضف يوماً واحداً على الأقل تُعقد فيه الحصة",
+        "startTimeRequired": "وقت البدء مطلوب",
+        "durationInvalid": "يجب أن تكون المدة رقماً موجباً",
+        "duplicateDay": "لا يمكن أن يتكرر اليوم نفسه في هذه الحصة"
       }
     },
     "delete": {
       "title": "حذف الحصة؟",
-      "description": "سيؤدي هذا إلى حذف حصة {subject} بتاريخ {date} نهائيًا. لا يمكن التراجع عن هذا.",
+      "description": "سيؤدي هذا إلى حذف حصة \"{name}\" نهائياً مع كل مواعيدها والحضور المسجَّل عليها. لا يمكن التراجع عن هذا الإجراء.",
       "confirm": "حذف الحصة",
       "cancel": "إلغاء",
       "genericError": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
@@ -572,8 +511,21 @@
       "notFoundDescription": "ربما تم حذف هذه الحصة.",
       "edit": "تعديل",
       "delete": "حذف",
-      "minutesSuffix": "د",
-      "statusTitle": "الحالة"
+      "minutesSuffix": "دقيقة",
+      "scheduleTitle": "الجدول الأسبوعي",
+      "occurrencesTitle": "المواعيد",
+      "occurrencesDescription": "الحضور وحالة الاختبار يخصّان تاريخاً واحداً — تسجيل أسبوع لا يغيّر أسبوعاً آخر أبداً.",
+      "occurrencesEmptyTitle": "لا توجد مواعيد بعد",
+      "occurrencesEmptyDescription": "تُنشأ المواعيد تلقائياً من الجدول الأسبوعي لهذه الحصة."
+    },
+    "days": {
+      "sunday": "الأحد",
+      "monday": "الإثنين",
+      "tuesday": "الثلاثاء",
+      "wednesday": "الأربعاء",
+      "thursday": "الخميس",
+      "friday": "الجمعة",
+      "saturday": "السبت"
     }
   },
   "lessons": {

@@ -7,7 +7,7 @@ export const LessonsList = async () => {
       Actions.Lessons.getAll(),
       Actions.Subjects.getAll(),
       Actions.Tags.getAll(),
-      Actions.Classes.getAll(),
+      Actions.ClassOccurrences.getAll(),
     ]);
 
   return (

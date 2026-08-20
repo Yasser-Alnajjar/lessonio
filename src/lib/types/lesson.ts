@@ -27,7 +27,7 @@ export interface Lesson extends AuditFields {
   id: UUID;
   userId: UUID;
   subjectId: UUID;
-  classId: UUID | null;
+  classOccurrenceId: UUID | null;
   title: string;
   date: string; // ISO date, "2026-08-06"
   studyStatus: StudyStatus;
@@ -47,7 +47,7 @@ export interface LessonWithRelations extends Lesson {
 
 export interface CreateLessonInput {
   subjectId: UUID;
-  classId?: UUID;
+  classOccurrenceId?: UUID;
   title: string;
   date: string;
   tagIds?: UUID[];

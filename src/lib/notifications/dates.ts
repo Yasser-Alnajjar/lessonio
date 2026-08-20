@@ -85,7 +85,7 @@ function clockFormatterFor(timeZone: string): Intl.DateTimeFormat {
 }
 
 export interface LocalClock {
-  /** 0 = Sunday .. 6 = Saturday, matching ClassScheduleEntry.dayOfWeek. */
+  /** 0 = Sunday .. 6 = Saturday, matching ClassMeeting.dayOfWeek. */
   weekday: number;
   /** Minutes since local midnight, 0-1439. */
   minutesOfDay: number;

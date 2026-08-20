@@ -2,6 +2,7 @@ export * from "./status-badge";
 export * from "./empty-state";
 export * from "./subject-card";
 export * from "./lesson-card";
+export * from "./class-occurrence-card";
 export * from "./search-input";
 export * from "./filter-sidebar";
 export * from "./data-table-core";

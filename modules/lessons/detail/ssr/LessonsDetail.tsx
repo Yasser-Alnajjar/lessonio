@@ -23,7 +23,7 @@ export const LessonsDetail = async ({ params }: LessonsDetailProps) => {
     Actions.Notes.getAllForLesson(lessonId),
     Actions.Attachments.getAllForLesson(lessonId),
     Actions.Flashcards.getByLesson(lessonId),
-    Actions.Classes.getAll(),
+    Actions.ClassOccurrences.getAll(),
   ]);
 
   return (

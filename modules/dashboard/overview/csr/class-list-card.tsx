@@ -2,12 +2,12 @@
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui-system/empty-state";
-import { ClassCard } from "@/components/ui-system/class-card";
-import type { ClassWithRelations } from "@/lib/types/class";
+import { ClassOccurrenceCard } from "@/components/ui-system/class-occurrence-card";
+import type { ClassOccurrenceWithRelations } from "@/lib/types/class-occurrence";
 
 interface ClassListCardProps {
   title: string;
-  classes: ClassWithRelations[];
+  classes: ClassOccurrenceWithRelations[];
   emptyMessage: string;
 }
 
@@ -30,11 +30,11 @@ export function ClassListCard({
           />
         ) : (
           <div className="flex flex-col gap-3">
-            {classes.map((klass) => (
-              <ClassCard
-                key={klass.id}
-                klass={klass}
-                href={`/classes/detail/${klass.id}`}
+            {classes.map((occurrence) => (
+              <ClassOccurrenceCard
+                key={occurrence.id}
+                occurrence={occurrence}
+                href={`/classes/detail/${occurrence.classId}`}
               />
             ))}
           </div>

@@ -107,7 +107,7 @@ async function fetchStatsRows(
         .eq("is_archived", false)
         .in("subject_id", subjectIds),
       supabase
-        .from("classes")
+        .from("class_occurrences")
         .select("subject_id, attendance_status")
         .eq("user_id", userId)
         .in("subject_id", subjectIds),

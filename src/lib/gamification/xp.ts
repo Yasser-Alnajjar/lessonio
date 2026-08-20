@@ -3,6 +3,7 @@ import {
   XP_LEVEL_BASE,
   XP_PER_COMPLETED_HOMEWORK,
   XP_PER_COMPLETED_LESSON,
+  XP_PER_FLASHCARD_REVIEW,
   XP_PER_SCORED_EXAM,
   XP_PER_STUDY_HOUR,
   XP_PER_UNLOCKED_ACHIEVEMENT,
@@ -15,6 +16,7 @@ export interface XpCounts {
   scoredExams: number;
   aceExams: number;
   unlockedAchievements: number;
+  flashcardReviews: number;
 }
 
 export function computeXp(counts: XpCounts): number {
@@ -24,7 +26,8 @@ export function computeXp(counts: XpCounts): number {
     counts.completedHomework * XP_PER_COMPLETED_HOMEWORK +
     counts.scoredExams * XP_PER_SCORED_EXAM +
     counts.aceExams * XP_BONUS_EXAM_ACE +
-    counts.unlockedAchievements * XP_PER_UNLOCKED_ACHIEVEMENT
+    counts.unlockedAchievements * XP_PER_UNLOCKED_ACHIEVEMENT +
+    counts.flashcardReviews * XP_PER_FLASHCARD_REVIEW
   );
 }
 

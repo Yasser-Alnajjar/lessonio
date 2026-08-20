@@ -4,7 +4,9 @@ import { calendarActions } from "./calendar";
 import { classSchedulesActions } from "./class-schedules";
 import { dashboardActions } from "./dashboard";
 import { examsActions } from "./exams";
+import { flashcardsActions } from "./flashcards";
 import { gamificationActions } from "./gamification";
+import { gradesActions } from "./grades";
 import { homeworkActions } from "./homework";
 import { lessonsActions } from "./lessons";
 import { notesActions } from "./lesson-notes";
@@ -31,6 +33,8 @@ export const Actions = {
   Tags: tagsActions,
   Homework: homeworkActions,
   Exams: examsActions,
+  Flashcards: flashcardsActions,
+  Grades: gradesActions,
   StudySessions: studySessionsActions,
   Calendar: calendarActions,
   Search: searchActions,

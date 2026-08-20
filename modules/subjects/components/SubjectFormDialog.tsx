@@ -46,6 +46,7 @@ const DEFAULT_VALUES: CreateSubjectInput = {
   name: "",
   color: SUBJECT_COLOR_OPTIONS[0]!,
   icon: SUBJECT_ICON_OPTIONS[0]!,
+  creditHours: 1,
 };
 
 export function SubjectFormDialog({
@@ -75,7 +76,12 @@ export function SubjectFormDialog({
       setFormError(null);
       form.reset(
         subject
-          ? { name: subject.name, color: subject.color, icon: subject.icon }
+          ? {
+              name: subject.name,
+              color: subject.color,
+              icon: subject.icon,
+              creditHours: subject.creditHours,
+            }
           : DEFAULT_VALUES,
       );
     }
@@ -182,6 +188,27 @@ export function SubjectFormDialog({
                         );
                       })}
                     </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="creditHours"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("creditHoursLabel")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min={0.5}
+                      max={20}
+                      step={0.5}
+                      value={field.value}
+                      onChange={(event) => field.onChange(event.target.valueAsNumber)}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -22,6 +22,7 @@ function mapSubjectRow(row: SubjectRow): Subject {
     color: row.color,
     icon: row.icon as SubjectIcon,
     isArchived: row.is_archived,
+    creditHours: row.credit_hours,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };

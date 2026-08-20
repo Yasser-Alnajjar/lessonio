@@ -7,6 +7,7 @@ export const XP_PER_COMPLETED_HOMEWORK = 8;
 export const XP_PER_SCORED_EXAM = 15;
 export const XP_BONUS_EXAM_ACE = 10;
 export const XP_PER_UNLOCKED_ACHIEVEMENT = 50;
+export const XP_PER_FLASHCARD_REVIEW = 2;
 
 /** Level curve divisor: level = floor(sqrt(xp / base)) + 1. */
 export const XP_LEVEL_BASE = 50;

@@ -29,8 +29,11 @@
     "subjects": "Subjects",
     "classes": "Classes",
     "lessons": "Lessons",
+    "flashcards": "Flashcards",
+    "studySessions": "Study sessions",
     "homework": "Homework",
     "exams": "Exams",
+    "grades": "Grades",
     "calendar": "Calendar",
     "statistics": "Statistics",
     "goals": "Goals",
@@ -333,6 +336,7 @@
     },
     "weeklySummary": {
       "title": "This week",
+      "minutes": "{minutes} min",
       "subtitle": "{minutes} of {target} min studied",
       "noGoal": "{minutes} min studied — set a weekly goal to track progress here."
     },
@@ -382,8 +386,11 @@
         "nameRequired": "Name is required",
         "nameMax": "Name must be 80 characters or fewer",
         "colorInvalid": "Choose a color",
-        "iconRequired": "Choose an icon"
-      }
+        "iconRequired": "Choose an icon",
+        "creditHoursInvalid": "Enter a valid number of credit hours",
+        "creditHoursMax": "Credit hours must be 20 or fewer"
+      },
+      "creditHoursLabel": "Credit hours"
     },
     "delete": {
       "title": "Delete subject?",
@@ -604,7 +611,8 @@
       "minutesSuffix": "min",
       "statusTitle": "Status",
       "notesTab": "Notes",
-      "attachmentsTab": "Attachments"
+      "attachmentsTab": "Attachments",
+      "flashcardsTab": "Flashcards"
     },
     "notes": {
       "untitled": "Untitled note",
@@ -637,6 +645,137 @@
       "deleteDescription": "This permanently deletes \"{name}\". This cannot be undone.",
       "deleteConfirm": "Delete",
       "deleteCancel": "Cancel"
+    }
+  },
+  "flashcards": {
+    "form": {
+      "createTitle": "New flashcard",
+      "editTitle": "Edit flashcard",
+      "createDescription": "Add a front/back pair to review with spaced repetition.",
+      "editDescription": "Update this card's front or back.",
+      "frontLabel": "Front",
+      "frontPlaceholder": "Question or prompt",
+      "backLabel": "Back",
+      "backPlaceholder": "Answer",
+      "cancel": "Cancel",
+      "submitting": "Saving...",
+      "submitCreate": "Create card",
+      "submitEdit": "Save changes",
+      "errors": {
+        "lessonRequired": "Choose a lesson",
+        "frontRequired": "Front is required",
+        "frontMax": "Front must be 500 characters or fewer",
+        "backRequired": "Back is required",
+        "backMax": "Back must be 1000 characters or fewer"
+      }
+    },
+    "card": {
+      "actionsLabel": "Flashcard actions",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "delete": {
+      "title": "Delete this flashcard?",
+      "description": "This permanently deletes the card and its review history. This cannot be undone.",
+      "confirm": "Delete card",
+      "cancel": "Cancel",
+      "genericError": "Something went wrong. Please try again."
+    },
+    "panel": {
+      "count": "{count, plural, =0 {No cards} one {# card} other {# cards}}",
+      "reviewDue": "Review due ({count})",
+      "addCard": "Add card",
+      "emptyTitle": "No flashcards yet",
+      "emptyDescription": "Turn this lesson's key facts into cards you can review with spaced repetition.",
+      "dueNow": "Due now",
+      "dueOn": "Due {date}"
+    },
+    "deck": {
+      "title": "Flashcards",
+      "subtitle": "{total} cards across your subjects — {due} due today.",
+      "reviewAllDue": "Review all due ({count})",
+      "emptyTitle": "No flashcards yet",
+      "emptyDescription": "Add cards from a lesson's Flashcards tab to build your first deck.",
+      "cardsLabel": "cards",
+      "dueCount": "{count} due",
+      "review": "Review"
+    },
+    "review": {
+      "title": "Review",
+      "back": "Back",
+      "emptyTitle": "Nothing due right now",
+      "emptyDescription": "You're all caught up — check back later for your next review.",
+      "backToDeck": "Back to deck",
+      "sessionCompleteTitle": "Session complete",
+      "sessionCompleteDescription": "{count, plural, one {You reviewed # card.} other {You reviewed # cards.}}",
+      "progress": "Card {current} of {total}",
+      "tapToFlip": "Tap to reveal the answer",
+      "showAnswer": "Show answer",
+      "grades": {
+        "again": "Again",
+        "hard": "Hard",
+        "good": "Good",
+        "easy": "Easy"
+      }
+    }
+  },
+  "studySessions": {
+    "focus": {
+      "title": "Focus timer",
+      "subtitle": "Start a session and let the timer track your study time.",
+      "viewHistory": "View history",
+      "start": "Start",
+      "stop": "Stop",
+      "cancel": "Cancel",
+      "subjectPlaceholder": "Choose a subject",
+      "lessonPlaceholder": "Choose a lesson",
+      "noSubject": "No subject",
+      "noLesson": "No lesson",
+      "stats": {
+        "today": "Today",
+        "week": "This week",
+        "sessions": "Sessions this week",
+        "average": "Avg. session"
+      },
+      "invalidLesson": "That lesson is no longer available.",
+      "invalidLessonSubject": "That lesson doesn't belong to the selected subject."
+    },
+    "history": {
+      "title": "Study sessions",
+      "subtitle": "Every session you've logged, timed or manual.",
+      "logSession": "Log session",
+      "searchPlaceholder": "Search sessions...",
+      "filterSubject": "Subject",
+      "filterDateRange": "Date range",
+      "emptyTitle": "No study sessions yet",
+      "emptyDescription": "Start the focus timer or log a past session to begin tracking your study time.",
+      "noResultsTitle": "No matching sessions",
+      "noResultsDescription": "Try a different search term or clear your filters.",
+      "delete": "Delete session",
+      "deleteTitle": "Delete this session?",
+      "deleteDescription": "This permanently removes the logged study time. This cannot be undone.",
+      "cancel": "Cancel",
+      "genericError": "Something went wrong. Please try again."
+    },
+    "log": {
+      "title": "Log a study session",
+      "description": "Record time you've already studied — offline, or before you started the timer.",
+      "subjectLabel": "Subject",
+      "subjectPlaceholder": "Choose a subject",
+      "noSubject": "No subject",
+      "lessonLabel": "Lesson",
+      "lessonPlaceholder": "Choose a lesson",
+      "noLesson": "No lesson",
+      "startedAtLabel": "Started at",
+      "durationLabel": "Duration (minutes)",
+      "cancel": "Cancel",
+      "submitting": "Saving...",
+      "submit": "Log session",
+      "errors": {
+        "startedAtRequired": "Start time is required",
+        "durationRequired": "Duration is required",
+        "durationMax": "Duration must be 12 hours or fewer"
+      }
     }
   },
   "homework": {
@@ -750,6 +889,27 @@
       "confirm": "Delete exam",
       "cancel": "Cancel",
       "genericError": "Something went wrong. Please try again."
+    }
+  },
+  "grades": {
+    "overview": {
+      "title": "Grades",
+      "subtitle": "Your term GPA and per-subject averages, computed from scored exams.",
+      "stats": {
+        "gpa": "GPA",
+        "gpaSuffix": "/4.0",
+        "subjectsGraded": "Subjects graded",
+        "examsScored": "Exams scored"
+      },
+      "trendChart": {
+        "title": "Grade trend",
+        "description": "Average exam score per month, last 6 months",
+        "empty": "Score an exam to see your trend here."
+      },
+      "emptyTitle": "No subjects yet",
+      "emptyDescription": "Add a subject and score an exam to start tracking grades.",
+      "noScoredExams": "No scored exams yet",
+      "cardMeta": "{credits, plural, one {# credit hour} other {# credit hours}} · {exams, plural, =0 {no exams} one {# exam} other {# exams}}"
     }
   },
   "calendar": {
@@ -897,6 +1057,7 @@
       "profile": "Profile",
       "appearance": "Appearance",
       "notifications": "Notifications",
+      "grades": "Grades",
       "data": "Backup & data"
     },
     "profile": {
@@ -949,6 +1110,18 @@
         "deleting": "Deleting...",
         "genericError": "Something went wrong. Please try again."
       }
+    },
+    "grades": {
+      "title": "Grade scale",
+      "subtitle": "Set the percentage cutoffs and GPA points for each letter grade.",
+      "letterHeader": "Letter",
+      "minPercentHeader": "Min %",
+      "gradePointsHeader": "GPA points",
+      "invalidScale": "Each grade's minimum must be lower than the one above it, and values must be in range.",
+      "save": "Save scale",
+      "saving": "Saving...",
+      "saved": "Grade scale saved.",
+      "genericError": "Something went wrong. Please try again."
     }
   },
   "search": {

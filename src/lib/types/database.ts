@@ -195,6 +195,104 @@ export type Database = {
           },
         ]
       }
+      flashcard_reviews: {
+        Row: {
+          created_at: string
+          flashcard_id: string
+          id: string
+          quality: number
+          reviewed_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          flashcard_id: string
+          id?: string
+          quality: number
+          reviewed_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          flashcard_id?: string
+          id?: string
+          quality?: number
+          reviewed_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flashcard_reviews_flashcard_id_fkey"
+            columns: ["flashcard_id"]
+            isOneToOne: false
+            referencedRelation: "flashcards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      flashcards: {
+        Row: {
+          back: string
+          created_at: string
+          due_date: string
+          ease_factor: number
+          front: string
+          id: string
+          interval_days: number
+          last_reviewed_at: string | null
+          lesson_id: string
+          repetitions: number
+          subject_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          back: string
+          created_at?: string
+          due_date?: string
+          ease_factor?: number
+          front: string
+          id?: string
+          interval_days?: number
+          last_reviewed_at?: string | null
+          lesson_id: string
+          repetitions?: number
+          subject_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          back?: string
+          created_at?: string
+          due_date?: string
+          ease_factor?: number
+          front?: string
+          id?: string
+          interval_days?: number
+          last_reviewed_at?: string | null
+          lesson_id?: string
+          repetitions?: number
+          subject_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flashcards_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "flashcards_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       goals: {
         Row: {
           achieved_minutes: number
@@ -496,6 +594,7 @@ export type Database = {
       settings: {
         Row: {
           created_at: string
+          grade_scale: Json
           locale: string
           notification_preferences: Json
           notifications_generated_at: string | null
@@ -505,6 +604,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          grade_scale?: Json
           locale?: string
           notification_preferences?: Json
           notifications_generated_at?: string | null
@@ -514,6 +614,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          grade_scale?: Json
           locale?: string
           notification_preferences?: Json
           notifications_generated_at?: string | null
@@ -578,6 +679,7 @@ export type Database = {
         Row: {
           color: string
           created_at: string
+          credit_hours: number
           icon: string
           id: string
           is_archived: boolean
@@ -588,6 +690,7 @@ export type Database = {
         Insert: {
           color: string
           created_at?: string
+          credit_hours?: number
           icon: string
           id?: string
           is_archived?: boolean
@@ -598,6 +701,7 @@ export type Database = {
         Update: {
           color?: string
           created_at?: string
+          credit_hours?: number
           icon?: string
           id?: string
           is_archived?: boolean

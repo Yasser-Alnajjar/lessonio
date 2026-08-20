@@ -6,13 +6,20 @@
     "node": ">=20"
   },
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "typecheck": "tsc --noEmit",
-    "format": "prettier --write .",
+    "build": "rm -rf .next && next build",
+    "build:windows": "bun run next build && xcopy \".\\public\" \".\\.next\\standalone\\public\" /e /i /y && xcopy \".\\.next\\static\" \".\\.next\\standalone\\.next\\static\" /e /i /y",
+    "dev": "next dev",
+    "lint": "bun run format:fix && next lint",
+    "start": "PORT=3000 node server.js",
+    "build:linux": "rm -rf .next && bun run next build && cp -rf ./public/. ./.next/standalone/public && cp -rf ./.next/static/. ./.next/standalone/.next/static",
+    "start:dev:linux": "bun i && bun run build:linux && cd .next/standalone && bun start",
+    "start:dev:windows": "bun i && bun run build:windows && cd \".\\.next\\standalone\" && bun start",
+    "copy:release": "rm -rf release && mkdir -p release && cp -rf .next/standalone/. release && mkdir -p release/.next/static && cp -rf .next/static/. release/.next/static && mkdir -p release/public && cp -rf public/. release/public && [ -d ./locales ] && cp -rf locales release/locales || echo 'No locales dir' && [ -f ./package.json ] && cp -f package.json release/package.json && [ -f ./bun.lock ] && cp -f bun.lock release/bun.lock && [ -f .env.production ] && cp -f .env.production release/.env || echo 'No .env file' && [ -f ./pm2.config.js ] && cp -f pm2.config.js release/pm2.config.js || echo 'No pm2.config.js file' && [ -f ./docker-compose.release.yml ] && cp -f docker-compose.release.yml release/docker-compose.yml || echo 'No docker-compose.release.yml file' && [ -f ./Dockerfile.release ] && cp -f Dockerfile.release release/Dockerfile || echo 'No Dockerfile.release file' && [ -f ./entrypoint.sh ] && cp -f entrypoint.sh release/entrypoint.sh || echo 'No entrypoint.sh file'",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write --list-different .",
+    "deps:update": "npx npm-check-updates --interactive --format group",
+    "type-check": "npx tsc --noEmit",
+    "list:unused-dependencies": "bunx depcheck",
     "supabase:types": "supabase gen types typescript --project-id \"$SUPABASE_PROJECT_ID\" --schema public > src/lib/types/database.ts"
   },
   "dependencies": {

@@ -59,15 +59,18 @@ export function ClassOccurrenceStatusControls({
 
     return () => window.clearTimeout(timeout);
   }, [occurrence.date, occurrence.startTime, hasStarted]);
+  const controlsDisabled = isPending || !hasStarted;
 
   const attendanceOptions = [
     {
       label: t("attendance.not_recorded"),
       value: ATTENDANCE_UNSET_VALUE,
+      disabled: false,
     },
     ...ATTENDANCE_STATUSES.map((status) => ({
       label: t(`attendance.${status}`),
       value: status,
+      disabled: status === "cancelled" && !controlsDisabled,
     })),
   ];
 
@@ -95,8 +98,6 @@ export function ClassOccurrenceStatusControls({
       onUpdated?.();
     });
 
-  const controlsDisabled = isPending || !hasStarted;
-
   return (
     <div className="grid gap-3 sm:grid-cols-2">
       <div className="flex flex-col gap-1.5">
@@ -107,7 +108,6 @@ export function ClassOccurrenceStatusControls({
         <Select
           value={occurrence.attendanceStatus ?? ATTENDANCE_UNSET_VALUE}
           onValueChange={onAttendanceChange}
-          disabled={controlsDisabled}
         >
           <SelectTrigger className="w-full">
             <SelectValue />
@@ -115,7 +115,11 @@ export function ClassOccurrenceStatusControls({
 
           <SelectContent>
             {attendanceOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
+              <SelectItem
+                key={option.value}
+                value={option.value}
+                disabled={option.disabled}
+              >
                 {option.label}
               </SelectItem>
             ))}
@@ -128,11 +132,7 @@ export function ClassOccurrenceStatusControls({
           {t("exam.label")}
         </label>
 
-        <Select
-          value={occurrence.examStatus}
-          onValueChange={onExamChange}
-          disabled={controlsDisabled}
-        >
+        <Select value={occurrence.examStatus} onValueChange={onExamChange}>
           <SelectTrigger className="w-full">
             <SelectValue />
           </SelectTrigger>

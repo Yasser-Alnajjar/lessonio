@@ -51,13 +51,13 @@ export function ClassOccurrenceCard({
     <Card
       data-slot="class-occurrence-card"
       className={cn(
-        "h-full gap-3 transition-shadow",
+        "h-full gap-3 transition-shadow flex flex-col p-4 relative",
         href && "cursor-pointer hover:shadow-md",
         className,
       )}
       {...props}
     >
-      <CardHeader className="flex-row items-start justify-between gap-3 space-y-0">
+      <div className="flex flex-row items-start justify-between gap-3 space-y-0">
         <div className="min-w-0 flex-1">
           <span
             className="mb-1 inline-flex items-center gap-1.5 text-xs font-medium"
@@ -80,8 +80,8 @@ export function ClassOccurrenceCard({
           <StatusBadge kind="attendance" status={occurrence.attendanceStatus} />
           {actions && <div className="w-8 shrink-0" aria-hidden />}
         </div>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-1.5 text-xs text-muted-foreground">
+      </div>
+      <div className="flex flex-1 flex-col gap-1.5 text-xs text-muted-foreground relative">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <span className="inline-flex items-center gap-1">
             <Clock className="size-3.5" />
@@ -105,8 +105,8 @@ export function ClassOccurrenceCard({
             <StatusBadge kind="exam" status={occurrence.examStatus} />
           </div>
         )}
-        {footer && <div className="mt-2">{footer}</div>}
-      </CardContent>
+        {footer && <div className="mt-auto">{footer}</div>}
+      </div>
     </Card>
   );
 
@@ -128,7 +128,7 @@ export function ClassOccurrenceCard({
   return (
     <div className="relative h-full">
       {linked}
-      <div className="absolute end-4 top-4">{actions}</div>
+      <div className="absolute inset-e-4 top-4">{actions}</div>
     </div>
   );
 }

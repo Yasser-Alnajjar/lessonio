@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, Database, User } from "lucide-react";
+import { Bell, Database, GraduationCap, User } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { Link, usePathname } from "@/i18n/navigation";
@@ -14,6 +14,7 @@ const SETTINGS_NAV_ITEMS = [
     key: "notifications",
     icon: Bell,
   },
+  { href: "/settings/grades", key: "grades", icon: GraduationCap },
   { href: "/settings/data", key: "data", icon: Database },
 ] as const;
 

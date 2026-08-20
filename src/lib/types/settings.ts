@@ -1,5 +1,6 @@
 import type { UUID } from "./common";
 import type { Database } from "./database";
+import type { GradeScaleEntry } from "./grade";
 import type { NotificationType } from "./notification";
 
 export const THEME_MODES = ["light", "dark", "system"] as const;
@@ -29,6 +30,7 @@ export interface UserSettings {
   theme: ThemeMode;
   locale: string;
   notificationPreferences: NotificationPreferences;
+  gradeScale: GradeScaleEntry[];
 }
 
 type Tables = Database["public"]["Tables"];

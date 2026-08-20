@@ -32,6 +32,7 @@ export async function createSubject(input: CreateSubjectInput): Promise<Mutation
     name: input.name,
     color: input.color,
     icon: input.icon,
+    credit_hours: input.creditHours,
   });
 
   if (error) {
@@ -57,6 +58,7 @@ export async function updateSubject(
   if (input.name !== undefined) patch.name = input.name;
   if (input.color !== undefined) patch.color = input.color;
   if (input.icon !== undefined) patch.icon = input.icon;
+  if (input.creditHours !== undefined) patch.credit_hours = input.creditHours;
   if (input.isArchived !== undefined) patch.is_archived = input.isArchived;
 
   const { error } = await supabase

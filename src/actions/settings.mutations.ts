@@ -12,7 +12,53 @@ import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import type { ActionResult, MutationResult } from "@/lib/types/common";
+import type { GradeScaleEntry } from "@/lib/types/grade";
 import type { NotificationPreferences, UserDataExport } from "@/lib/types/settings";
+
+const MAX_GRADE_POINTS = 4.3;
+
+/** The client only ever submits a form-shaped array — re-validate range and ordering server-side regardless. */
+function isValidGradeScale(scale: GradeScaleEntry[]): boolean {
+  if (scale.length === 0) return false;
+
+  return scale.every((entry, index) => {
+    const inRange =
+      entry.letter.length > 0 &&
+      entry.letter.length <= 2 &&
+      entry.minPercent >= 0 &&
+      entry.minPercent <= 100 &&
+      entry.gradePoints >= 0 &&
+      entry.gradePoints <= MAX_GRADE_POINTS;
+    if (!inRange) return false;
+
+    // Each entry's threshold must be strictly lower than the previous one.
+    const previous = scale[index - 1];
+    return index === 0 || !previous || entry.minPercent < previous.minPercent;
+  });
+}
+
+export async function updateGradeScale(scale: GradeScaleEntry[]): Promise<MutationResult> {
+  const supabase = await createClient();
+  const { data: authData, error: authError } = await supabase.auth.getUser();
+
+  if (authError || !authData.user) {
+    return { success: false, error: "You must be signed in." };
+  }
+
+  if (!isValidGradeScale(scale)) {
+    return { success: false, error: "Invalid grade scale." };
+  }
+
+  const { error } = await supabase
+    .from("settings")
+    .update({ grade_scale: scale.map((entry) => ({ ...entry })) })
+    .eq("user_id", authData.user.id);
+
+  if (error) return { success: false, error: error.message };
+
+  revalidatePath("/", "layout");
+  return { success: true, error: null };
+}
 
 export async function updateNotificationPreferences(
   preferences: NotificationPreferences,

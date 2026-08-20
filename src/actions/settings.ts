@@ -1,5 +1,6 @@
 import "server-only";
 
+import { parseGradeScale } from "@/lib/grades/scale";
 import { parseNotificationPreferences } from "@/lib/notifications/preferences";
 import { createClient } from "@/lib/supabase/server";
 import type { ActionResult } from "@/lib/types/common";
@@ -8,6 +9,7 @@ import { THEME_MODES } from "@/lib/types/settings";
 import {
   deleteAccount,
   exportData,
+  updateGradeScale,
   updateNotificationPreferences,
 } from "./settings.mutations";
 
@@ -48,12 +50,14 @@ export const settingsActions = {
         notificationPreferences: parseNotificationPreferences(
           row.notification_preferences,
         ),
+        gradeScale: parseGradeScale(row.grade_scale),
       },
       error: null,
     };
   },
 
   updateNotificationPreferences,
+  updateGradeScale,
   exportData,
   deleteAccount,
 };

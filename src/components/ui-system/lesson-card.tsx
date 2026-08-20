@@ -115,7 +115,7 @@ export function LessonCard({
   return (
     <div className="relative h-full">
       {linked}
-      <div className="absolute end-4 top-4">{actions}</div>
+      <div className="absolute inset-e-4 top-4">{actions}</div>
     </div>
   );
 }

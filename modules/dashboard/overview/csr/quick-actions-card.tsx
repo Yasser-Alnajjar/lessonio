@@ -12,7 +12,7 @@ export function QuickActionsCard() {
 
   const actions = [
     { href: "/lessons/list", label: t("addLesson"), icon: PlusCircle },
-    { href: "/study-sessions/history", label: t("startSession"), icon: BookOpenCheck },
+    { href: "/study-sessions/focus", label: t("startSession"), icon: BookOpenCheck },
     { href: "/homework/list", label: t("logHomework"), icon: ClipboardList },
     { href: "/calendar/month", label: t("viewCalendar"), icon: CalendarDays },
   ] as const;

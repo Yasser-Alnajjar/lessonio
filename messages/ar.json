@@ -29,8 +29,11 @@
     "subjects": "المواد",
     "classes": "الحصص",
     "lessons": "الدروس",
+    "flashcards": "البطاقات التعليمية",
+    "studySessions": "جلسات المذاكرة",
     "homework": "الواجبات",
     "exams": "الاختبارات",
+    "grades": "الدرجات",
     "calendar": "التقويم",
     "statistics": "الإحصائيات",
     "goals": "الأهداف",
@@ -333,6 +336,7 @@
     },
     "weeklySummary": {
       "title": "هذا الأسبوع",
+      "minutes": "{minutes} دقيقة",
       "subtitle": "{minutes} من {target} دقيقة مذاكرة",
       "noGoal": "{minutes} دقيقة مذاكرة — عيّن هدفاً أسبوعياً لمتابعة تقدّمك هنا."
     },
@@ -382,8 +386,11 @@
         "nameRequired": "الاسم مطلوب",
         "nameMax": "يجب ألا يتجاوز الاسم 80 حرفاً",
         "colorInvalid": "اختر لوناً",
-        "iconRequired": "اختر أيقونة"
-      }
+        "iconRequired": "اختر أيقونة",
+        "creditHoursInvalid": "أدخل عددًا صحيحًا من الساعات المعتمدة",
+        "creditHoursMax": "يجب ألا تتجاوز الساعات المعتمدة 20"
+      },
+      "creditHoursLabel": "الساعات المعتمدة"
     },
     "delete": {
       "title": "حذف المادة؟",
@@ -569,7 +576,8 @@
       "minutesSuffix": "د",
       "statusTitle": "الحالة",
       "notesTab": "الملاحظات",
-      "attachmentsTab": "المرفقات"
+      "attachmentsTab": "المرفقات",
+      "flashcardsTab": "البطاقات التعليمية"
     },
     "status": {
       "attendance": {
@@ -637,6 +645,137 @@
       "deleteDescription": "سيؤدي هذا إلى حذف \"{name}\" نهائيًا. لا يمكن التراجع عن هذا.",
       "deleteConfirm": "حذف",
       "deleteCancel": "إلغاء"
+    }
+  },
+  "flashcards": {
+    "form": {
+      "createTitle": "بطاقة تعليمية جديدة",
+      "editTitle": "تعديل البطاقة التعليمية",
+      "createDescription": "أضف وجهًا وظهرًا لمراجعته بالتكرار المتباعد.",
+      "editDescription": "حدّث وجه البطاقة أو ظهرها.",
+      "frontLabel": "الوجه",
+      "frontPlaceholder": "سؤال أو عبارة استرجاع",
+      "backLabel": "الظهر",
+      "backPlaceholder": "الإجابة",
+      "cancel": "إلغاء",
+      "submitting": "جارٍ الحفظ...",
+      "submitCreate": "إنشاء البطاقة",
+      "submitEdit": "حفظ التغييرات",
+      "errors": {
+        "lessonRequired": "اختر درسًا",
+        "frontRequired": "الوجه مطلوب",
+        "frontMax": "يجب ألا يتجاوز الوجه 500 حرف",
+        "backRequired": "الظهر مطلوب",
+        "backMax": "يجب ألا يتجاوز الظهر 1000 حرف"
+      }
+    },
+    "card": {
+      "actionsLabel": "إجراءات البطاقة",
+      "edit": "تعديل",
+      "delete": "حذف"
+    },
+    "delete": {
+      "title": "حذف هذه البطاقة؟",
+      "description": "سيؤدي هذا إلى حذف البطاقة وسجل مراجعتها نهائيًا. لا يمكن التراجع عن هذا.",
+      "confirm": "حذف البطاقة",
+      "cancel": "إلغاء",
+      "genericError": "حدث خطأ ما. حاول مرة أخرى."
+    },
+    "panel": {
+      "count": "{count, plural, =0 {لا توجد بطاقات} one {بطاقة واحدة} two {بطاقتان} few {# بطاقات} many {# بطاقة} other {# بطاقة}}",
+      "reviewDue": "مراجعة المستحق ({count})",
+      "addCard": "إضافة بطاقة",
+      "emptyTitle": "لا توجد بطاقات تعليمية بعد",
+      "emptyDescription": "حوّل أهم نقاط هذا الدرس إلى بطاقات تراجعها بالتكرار المتباعد.",
+      "dueNow": "مستحقة الآن",
+      "dueOn": "مستحقة {date}"
+    },
+    "deck": {
+      "title": "البطاقات التعليمية",
+      "subtitle": "{total} بطاقة عبر موادك — {due} مستحقة اليوم.",
+      "reviewAllDue": "مراجعة كل المستحق ({count})",
+      "emptyTitle": "لا توجد بطاقات تعليمية بعد",
+      "emptyDescription": "أضف بطاقات من تبويب البطاقات التعليمية في أي درس لبناء أول مجموعة لك.",
+      "cardsLabel": "بطاقة",
+      "dueCount": "{count} مستحقة",
+      "review": "مراجعة"
+    },
+    "review": {
+      "title": "المراجعة",
+      "back": "رجوع",
+      "emptyTitle": "لا شيء مستحق الآن",
+      "emptyDescription": "أنت على اطلاع كامل — عد لاحقًا لمراجعتك التالية.",
+      "backToDeck": "العودة إلى المجموعة",
+      "sessionCompleteTitle": "اكتملت الجلسة",
+      "sessionCompleteDescription": "{count, plural, one {راجعت بطاقة واحدة.} other {راجعت # بطاقة.}}",
+      "progress": "البطاقة {current} من {total}",
+      "tapToFlip": "اضغط لكشف الإجابة",
+      "showAnswer": "إظهار الإجابة",
+      "grades": {
+        "again": "مجددًا",
+        "hard": "صعب",
+        "good": "جيد",
+        "easy": "سهل"
+      }
+    }
+  },
+  "studySessions": {
+    "focus": {
+      "title": "مؤقّت التركيز",
+      "subtitle": "ابدأ جلسة ودع المؤقّت يتتبّع وقت مذاكرتك.",
+      "viewHistory": "عرض السجل",
+      "start": "بدء",
+      "stop": "إيقاف",
+      "cancel": "إلغاء",
+      "subjectPlaceholder": "اختر مادة",
+      "lessonPlaceholder": "اختر درسًا",
+      "noSubject": "بلا مادة",
+      "noLesson": "بلا درس",
+      "stats": {
+        "today": "اليوم",
+        "week": "هذا الأسبوع",
+        "sessions": "جلسات هذا الأسبوع",
+        "average": "متوسط الجلسة"
+      },
+      "invalidLesson": "هذا الدرس لم يعد متاحًا.",
+      "invalidLessonSubject": "هذا الدرس لا ينتمي إلى المادة المحددة."
+    },
+    "history": {
+      "title": "جلسات المذاكرة",
+      "subtitle": "كل جلسة سجّلتها، بالمؤقّت أو يدويًا.",
+      "logSession": "تسجيل جلسة",
+      "searchPlaceholder": "البحث في الجلسات...",
+      "filterSubject": "المادة",
+      "filterDateRange": "نطاق التاريخ",
+      "emptyTitle": "لا توجد جلسات مذاكرة بعد",
+      "emptyDescription": "ابدأ مؤقّت التركيز أو سجّل جلسة سابقة لبدء تتبّع وقت مذاكرتك.",
+      "noResultsTitle": "لا توجد جلسات مطابقة",
+      "noResultsDescription": "جرّب كلمة بحث مختلفة أو امسح عوامل التصفية.",
+      "delete": "حذف الجلسة",
+      "deleteTitle": "حذف هذه الجلسة؟",
+      "deleteDescription": "سيؤدي هذا إلى إزالة وقت المذاكرة المسجَّل نهائيًا. لا يمكن التراجع عن هذا.",
+      "cancel": "إلغاء",
+      "genericError": "حدث خطأ ما. حاول مرة أخرى."
+    },
+    "log": {
+      "title": "تسجيل جلسة مذاكرة",
+      "description": "سجّل وقتًا ذاكرت فيه مسبقًا — دون اتصال، أو قبل بدء المؤقّت.",
+      "subjectLabel": "المادة",
+      "subjectPlaceholder": "اختر مادة",
+      "noSubject": "بلا مادة",
+      "lessonLabel": "الدرس",
+      "lessonPlaceholder": "اختر درسًا",
+      "noLesson": "بلا درس",
+      "startedAtLabel": "وقت البدء",
+      "durationLabel": "المدة (بالدقائق)",
+      "cancel": "إلغاء",
+      "submitting": "جارٍ الحفظ...",
+      "submit": "تسجيل الجلسة",
+      "errors": {
+        "startedAtRequired": "وقت البدء مطلوب",
+        "durationRequired": "المدة مطلوبة",
+        "durationMax": "يجب ألا تتجاوز المدة 12 ساعة"
+      }
     }
   },
   "homework": {
@@ -750,6 +889,27 @@
       "confirm": "حذف الاختبار",
       "cancel": "إلغاء",
       "genericError": "حدث خطأ ما. حاول مرة أخرى."
+    }
+  },
+  "grades": {
+    "overview": {
+      "title": "الدرجات",
+      "subtitle": "معدلك التراكمي للفصل ومتوسطات كل مادة، محسوبة من الاختبارات المصححة.",
+      "stats": {
+        "gpa": "المعدل التراكمي",
+        "gpaSuffix": "/4.0",
+        "subjectsGraded": "مواد مقيَّمة",
+        "examsScored": "اختبارات مصححة"
+      },
+      "trendChart": {
+        "title": "اتجاه الدرجات",
+        "description": "متوسط درجة الاختبار شهريًا، آخر 6 أشهر",
+        "empty": "سجّل درجة اختبار لترى اتجاهك هنا."
+      },
+      "emptyTitle": "لا توجد مواد بعد",
+      "emptyDescription": "أضف مادة وسجّل درجة اختبار لبدء تتبّع الدرجات.",
+      "noScoredExams": "لا توجد اختبارات مصححة بعد",
+      "cardMeta": "{credits, plural, one {ساعة معتمدة واحدة} two {ساعتان معتمدتان} few {# ساعات معتمدة} many {# ساعة معتمدة} other {# ساعة معتمدة}} · {exams, plural, =0 {لا اختبارات} one {اختبار واحد} two {اختباران} few {# اختبارات} many {# اختبارًا} other {# اختبار}}"
     }
   },
   "calendar": {
@@ -897,6 +1057,7 @@
       "profile": "الملف الشخصي",
       "appearance": "المظهر",
       "notifications": "الإشعارات",
+      "grades": "الدرجات",
       "data": "النسخ الاحتياطي والبيانات"
     },
     "profile": {
@@ -949,6 +1110,18 @@
         "deleting": "جارٍ الحذف...",
         "genericError": "حدث خطأ ما. حاول مرة أخرى."
       }
+    },
+    "grades": {
+      "title": "سلم الدرجات",
+      "subtitle": "حدّد الحد الأدنى للنسبة المئوية ونقاط المعدل التراكمي لكل تقدير حرفي.",
+      "letterHeader": "التقدير",
+      "minPercentHeader": "الحد الأدنى %",
+      "gradePointsHeader": "نقاط المعدل",
+      "invalidScale": "يجب أن يكون الحد الأدنى لكل تقدير أقل من التقدير الذي يعلوه، وأن تكون القيم ضمن النطاق المسموح.",
+      "save": "حفظ السلم",
+      "saving": "جارٍ الحفظ...",
+      "saved": "تم حفظ سلم الدرجات.",
+      "genericError": "حدث خطأ ما. حاول مرة أخرى."
     }
   },
   "search": {

@@ -5,6 +5,8 @@ export * as ClassSchedules from "./class-schedules";
 export * as Lessons from "./lessons";
 export * as Homework from "./homework";
 export * as Exams from "./exams";
+export * as Flashcards from "./flashcards";
+export * as Grades from "./grades";
 export * as StudySessions from "./study-sessions";
 export * as Calendar from "./calendar";
 export * as Search from "./search";

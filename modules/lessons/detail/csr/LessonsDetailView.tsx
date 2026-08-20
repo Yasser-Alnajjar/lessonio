@@ -32,8 +32,10 @@ import type { LessonNote } from "@/lib/types/lesson-note";
 import type { LessonWithRelations } from "@/lib/types/lesson";
 import type { Subject } from "@/lib/types/subject";
 import type { Tag } from "@/lib/types/tag";
+import type { FlashcardWithRelations } from "@/lib/types/flashcard";
 import { AttachmentsPanel } from "../../components/attachments/AttachmentsPanel";
 import { DeleteLessonDialog } from "../../components/DeleteLessonDialog";
+import { FlashcardsPanel } from "../../components/flashcards/FlashcardsPanel";
 import { LessonFormDialog } from "../../components/LessonFormDialog";
 import { LessonStatusControls } from "../../components/LessonStatusControls";
 import { NotesPanel } from "../../components/notes/NotesPanel";
@@ -45,6 +47,7 @@ interface LessonsDetailViewProps {
   tags: Tag[];
   notes: LessonNote[];
   attachments: Attachment[];
+  flashcards: FlashcardWithRelations[];
 }
 
 export const LessonsDetailView = ({
@@ -53,6 +56,7 @@ export const LessonsDetailView = ({
   tags: initialTags,
   notes,
   attachments,
+  flashcards,
 }: LessonsDetailViewProps) => {
   const t = useTranslations("lessons.detail");
   const locale = useLocale();
@@ -205,12 +209,19 @@ export const LessonsDetailView = ({
             {t("attachmentsTab")}{" "}
             {attachments.length > 0 && `(${attachments.length})`}
           </TabsTrigger>
+          <TabsTrigger value="flashcards">
+            {t("flashcardsTab")}{" "}
+            {flashcards.length > 0 && `(${flashcards.length})`}
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="notes">
           <NotesPanel lessonId={data.id} notes={notes} />
         </TabsContent>
         <TabsContent value="attachments">
           <AttachmentsPanel lessonId={data.id} attachments={attachments} />
+        </TabsContent>
+        <TabsContent value="flashcards">
+          <FlashcardsPanel lessonId={data.id} flashcards={flashcards} />
         </TabsContent>
       </Tabs>
 

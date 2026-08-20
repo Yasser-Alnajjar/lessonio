@@ -19,6 +19,8 @@ export interface Subject extends AuditFields {
   color: string; // hex, e.g. "#6366F1"
   icon: SubjectIcon;
   isArchived: boolean;
+  /** GPA weight — see src/lib/grades/scale.ts weightedGpa(). */
+  creditHours: number;
 }
 
 /** Aggregated, derived stats — computed server-side, not stored directly. */
@@ -39,6 +41,7 @@ export interface CreateSubjectInput {
   name: string;
   color: string;
   icon: SubjectIcon;
+  creditHours: number;
 }
 
 export type UpdateSubjectInput = Partial<CreateSubjectInput> & {

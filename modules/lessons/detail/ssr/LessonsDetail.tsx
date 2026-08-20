@@ -8,14 +8,21 @@ interface LessonsDetailProps {
 export const LessonsDetail = async ({ params }: LessonsDetailProps) => {
   const { lessonId } = await params;
 
-  const [{ data: lesson }, { data: subjects }, { data: tags }, { data: notes }, { data: attachments }] =
-    await Promise.all([
-      Actions.Lessons.getById(lessonId),
-      Actions.Subjects.getAll(),
-      Actions.Tags.getAll(),
-      Actions.Notes.getAllForLesson(lessonId),
-      Actions.Attachments.getAllForLesson(lessonId),
-    ]);
+  const [
+    { data: lesson },
+    { data: subjects },
+    { data: tags },
+    { data: notes },
+    { data: attachments },
+    { data: flashcards },
+  ] = await Promise.all([
+    Actions.Lessons.getById(lessonId),
+    Actions.Subjects.getAll(),
+    Actions.Tags.getAll(),
+    Actions.Notes.getAllForLesson(lessonId),
+    Actions.Attachments.getAllForLesson(lessonId),
+    Actions.Flashcards.getByLesson(lessonId),
+  ]);
 
   return (
     <LessonsDetailView
@@ -25,6 +32,7 @@ export const LessonsDetail = async ({ params }: LessonsDetailProps) => {
       tags={tags ?? []}
       notes={notes ?? []}
       attachments={attachments ?? []}
+      flashcards={flashcards ?? []}
     />
   );
 };

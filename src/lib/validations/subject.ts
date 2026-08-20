@@ -24,5 +24,9 @@ export function createSubjectSchema(t: Translator) {
       .string()
       .regex(/^#[0-9A-Fa-f]{6}$/, t("errors.colorInvalid")),
     icon: z.enum(iconOptions, { message: t("errors.iconRequired") }),
+    creditHours: z
+      .number(t("errors.creditHoursInvalid"))
+      .positive(t("errors.creditHoursInvalid"))
+      .max(20, t("errors.creditHoursMax")),
   });
 }

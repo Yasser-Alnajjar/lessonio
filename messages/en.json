@@ -28,7 +28,6 @@
     "dashboard": "Dashboard",
     "subjects": "Subjects",
     "classes": "Classes",
-    "schedule": "Schedule",
     "lessons": "Lessons",
     "flashcards": "Flashcards",
     "studySessions": "Study sessions",
@@ -417,101 +416,39 @@
       "minutesSuffix": "min"
     }
   },
-  "classSchedules": {
-    "list": {
-      "title": "Schedule",
-      "subtitle": "Track the recurring classes you attend each week.",
-      "newClass": "Add schedule",
-      "emptyTitle": "No classes found",
-      "emptyDescription": "Add your first recurring class to start tracking when and where you attend.",
-      "emptyAction": "Add schedule",
-      "noSubjectsTitle": "No subjects yet",
-      "noSubjectsDescription": "Create a subject first, then add a class schedule for it."
-    },
-    "card": {
-      "actionsLabel": "Class actions",
-      "edit": "Edit",
-      "activate": "Activate",
-      "deactivate": "Deactivate",
-      "delete": "Delete",
-      "active": "Active",
-      "inactive": "Inactive",
-      "hoursSuffix": "h",
-      "minutesSuffix": "m"
-    },
-    "form": {
-      "createTitle": "Add schedule",
-      "editTitle": "Edit schedule",
-      "createDescription": "Add a recurring class schedule for a subject.",
-      "editDescription": "Update the schedule, teacher, or location for this class.",
-      "subjectLabel": "Subject",
-      "subjectPlaceholder": "Select a subject",
-      "scheduleLabel": "Class Schedule",
-      "dayLabel": "Day",
-      "addDay": "Add another day",
-      "removeDay": "Remove day",
-      "startTimeLabel": "Start Time",
-      "durationLabel": "Duration (minutes)",
-      "teacherLabel": "Teacher",
-      "teacherPlaceholder": "e.g. Ahmed",
-      "locationLabel": "Location",
-      "locationPlaceholder": "e.g. ABC Center",
-      "startsOnLabel": "Starts On",
-      "endsOnLabel": "Ends On",
-      "activeLabel": "Active",
-      "cancel": "Cancel",
-      "submitting": "Saving...",
-      "submitCreate": "Create schedule",
-      "submitEdit": "Save changes",
-      "errors": {
-        "subjectRequired": "Choose a subject",
-        "teacherMax": "Teacher must be 120 characters or fewer",
-        "locationMax": "Location must be 120 characters or fewer",
-        "daysRequired": "Add at least one schedule entry",
-        "startTimeRequired": "Start time is required",
-        "durationInvalid": "Duration must be a positive number",
-        "startsOnRequired": "Start date is required",
-        "endsOnInvalid": "End date must be on or after the start date",
-        "duplicateDay": "Each day can only appear once in this class"
-      }
-    },
-    "delete": {
-      "title": "Delete schedule?",
-      "description": "This permanently deletes the \"{name}\" class schedule. This cannot be undone.",
-      "confirm": "Delete schedule",
-      "cancel": "Cancel",
-      "genericError": "Something went wrong. Please try again."
-    },
-    "days": {
-      "sunday": "Sunday",
-      "monday": "Monday",
-      "tuesday": "Tuesday",
-      "wednesday": "Wednesday",
-      "thursday": "Thursday",
-      "friday": "Friday",
-      "saturday": "Saturday"
-    }
-  },
   "classes": {
     "list": {
       "title": "Classes",
-      "subtitle": "Your scheduled classes, from attendance to exam status.",
+      "subtitle": "Your recurring weekly classes, and the attendance you record for each one.",
       "newClass": "New class",
       "noSubjectsHint": "Create a subject first — classes need one to belong to.",
       "searchPlaceholder": "Search classes...",
       "filterStatus": "Attendance",
       "filterSubject": "Subject",
       "filterDateRange": "Date range",
+      "today": "Today's classes",
+      "upcoming": "Upcoming classes",
+      "weeklySchedule": "Weekly schedule",
       "emptyTitle": "No classes yet",
-      "emptyDescription": "Add your first class, or add a recurring schedule to generate them automatically.",
+      "emptyDescription": "Add your first weekly class — say Math every Monday at 4:00 PM — and it repeats automatically from then on.",
       "emptyAction": "New class",
+      "todayEmptyTitle": "Nothing scheduled today",
+      "todayEmptyDescription": "None of your classes meet today.",
+      "upcomingEmptyTitle": "Nothing coming up",
+      "upcomingEmptyDescription": "Your next classes will appear here as their dates approach.",
       "noResultsTitle": "No matching classes",
       "noResultsDescription": "Try a different search term or clear your filters."
     },
     "card": {
       "actionsLabel": "Class actions",
       "edit": "Edit",
-      "delete": "Delete"
+      "activate": "Resume",
+      "deactivate": "Pause",
+      "delete": "Delete",
+      "active": "Active",
+      "inactive": "Paused",
+      "hoursSuffix": "h",
+      "minutesSuffix": "m"
     },
     "status": {
       "attendance": {
@@ -532,36 +469,38 @@
     "form": {
       "createTitle": "New class",
       "editTitle": "Edit class",
-      "createDescription": "Add a class occurrence — standalone, or generated from a schedule.",
-      "editDescription": "Update the date, time, or details for this class.",
+      "createDescription": "Add a weekly class. It repeats every week until you pause or delete it.",
+      "editDescription": "Update when this class meets, or its teacher and location.",
       "subjectLabel": "Subject",
-      "subjectPlaceholder": "Choose a subject",
-      "dateLabel": "Date",
-      "timeLabel": "Time",
-      "durationLabel": "Duration (min)",
+      "subjectPlaceholder": "Select a subject",
+      "meetingsLabel": "Meets on",
+      "dayLabel": "Day",
+      "addDay": "Add another day",
+      "removeDay": "Remove day",
+      "startTimeLabel": "Start time",
+      "durationLabel": "Duration (minutes)",
       "teacherLabel": "Teacher",
-      "teacherPlaceholder": "e.g. Dr. Smith",
+      "teacherPlaceholder": "e.g. Ahmed",
       "locationLabel": "Location",
-      "locationPlaceholder": "e.g. Room 204",
-      "classLabel": "Class",
-      "classPlaceholder": "Link a class (optional)",
-      "classNone": "No linked class",
+      "locationPlaceholder": "e.g. ABC Center",
+      "activeLabel": "Active",
       "cancel": "Cancel",
       "submitting": "Saving...",
       "submitCreate": "Create class",
       "submitEdit": "Save changes",
       "errors": {
         "subjectRequired": "Choose a subject",
-        "dateRequired": "Date is required",
-        "timeRequired": "Time is required",
-        "durationInvalid": "Duration must be a positive number",
         "teacherMax": "Teacher must be 120 characters or fewer",
-        "locationMax": "Location must be 120 characters or fewer"
+        "locationMax": "Location must be 120 characters or fewer",
+        "daysRequired": "Add at least one day this class meets",
+        "startTimeRequired": "Start time is required",
+        "durationInvalid": "Duration must be a positive number",
+        "duplicateDay": "Each day can only appear once in this class"
       }
     },
     "delete": {
       "title": "Delete class?",
-      "description": "This permanently deletes the {subject} class on {date}. This cannot be undone.",
+      "description": "This permanently deletes the \"{name}\" class along with every occurrence of it and the attendance recorded against them. This cannot be undone.",
       "confirm": "Delete class",
       "cancel": "Cancel",
       "genericError": "Something went wrong. Please try again."
@@ -573,7 +512,20 @@
       "edit": "Edit",
       "delete": "Delete",
       "minutesSuffix": "min",
-      "statusTitle": "Status"
+      "scheduleTitle": "Weekly schedule",
+      "occurrencesTitle": "Occurrences",
+      "occurrencesDescription": "Attendance and exam status belong to a single date — recording one week never changes another.",
+      "occurrencesEmptyTitle": "No occurrences yet",
+      "occurrencesEmptyDescription": "Occurrences are generated automatically from this class's weekly schedule."
+    },
+    "days": {
+      "sunday": "Sunday",
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday"
     }
   },
   "lessons": {

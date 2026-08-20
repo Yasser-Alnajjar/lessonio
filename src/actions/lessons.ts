@@ -40,7 +40,7 @@ function mapLessonRow(
     id: row.id,
     userId: row.user_id,
     subjectId: row.subject_id,
-    classId: row.class_id,
+    classOccurrenceId: row.class_occurrence_id,
     title: row.title,
     date: row.date,
     studyStatus: row.study_status as Lesson["studyStatus"],

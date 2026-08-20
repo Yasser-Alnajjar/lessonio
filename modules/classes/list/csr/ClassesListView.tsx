@@ -3,8 +3,9 @@
 import { useMemo, useState } from "react";
 import { Plus } from "lucide-react";
 
+import { toggleActiveClass } from "@/actions/classes.mutations";
 import { Button } from "@/components/ui/button";
-import { ClassCard } from "@/components/ui-system/class-card";
+import { ClassOccurrenceCard } from "@/components/ui-system/class-occurrence-card";
 import { EmptyState } from "@/components/ui-system/empty-state";
 import {
   EMPTY_FILTER_VALUE,
@@ -14,24 +15,34 @@ import {
 import { SearchInput } from "@/components/ui-system/search-input";
 import { useRouter } from "@/i18n/navigation";
 import useTranslate from "@/hooks/useTranslate";
-import { ATTENDANCE_STATUSES } from "@/lib/types/class";
-import type { ClassWithRelations } from "@/lib/types/class";
+import { ATTENDANCE_STATUSES } from "@/lib/types/class-occurrence";
+import type { ClassOccurrenceWithRelations } from "@/lib/types/class-occurrence";
+import type { ClassWithSubject } from "@/lib/types/class";
 import type { Subject } from "@/lib/types/subject";
 import { ClassActionsMenu } from "../../components/ClassActionsMenu";
 import { ClassFormDialog } from "../../components/ClassFormDialog";
+import { ClassOccurrenceStatusControls } from "../../components/ClassOccurrenceStatusControls";
 import { DeleteClassDialog } from "../../components/DeleteClassDialog";
+import { RecurringClassCard } from "../../components/RecurringClassCard";
 
 interface ClassesListViewProps {
-  data: ClassWithRelations[];
+  today: ClassOccurrenceWithRelations[];
+  upcoming: ClassOccurrenceWithRelations[];
+  classes: ClassWithSubject[];
   subjects: Subject[];
 }
 
 interface FormState {
   open: boolean;
-  klass: ClassWithRelations | null;
+  klass: ClassWithSubject | null;
 }
 
-export const ClassesListView = ({ data, subjects }: ClassesListViewProps) => {
+export const ClassesListView = ({
+  today,
+  upcoming,
+  classes,
+  subjects,
+}: ClassesListViewProps) => {
   const t = useTranslate("classes");
   const router = useRouter();
 
@@ -41,9 +52,7 @@ export const ClassesListView = ({ data, subjects }: ClassesListViewProps) => {
     open: false,
     klass: null,
   });
-  const [deleteTarget, setDeleteTarget] = useState<ClassWithRelations | null>(
-    null,
-  );
+  const [deleteTarget, setDeleteTarget] = useState<ClassWithSubject | null>(null);
 
   const statusOptions = ATTENDANCE_STATUSES.map((status) => ({
     value: status,
@@ -56,33 +65,54 @@ export const ClassesListView = ({ data, subjects }: ClassesListViewProps) => {
     color: subject.color,
   }));
 
-  const filtered = useMemo(() => {
+  // Search and filters apply to the occurrence sections; the weekly schedule
+  // below is the full list of classes, which is what the filters are drawn
+  // from in the first place.
+  const filterOccurrences = useMemo(() => {
     const query = search.trim().toLowerCase();
-    return data.filter((klass) => {
-      if (query && !(klass.teacher ?? "").toLowerCase().includes(query) &&
-        !(klass.location ?? "").toLowerCase().includes(query)) {
-        return false;
-      }
-      if (
-        filter.statuses.length > 0 &&
-        !(klass.attendanceStatus && filter.statuses.includes(klass.attendanceStatus))
-      ) {
-        return false;
-      }
-      if (
-        filter.subjectIds.length > 0 &&
-        !filter.subjectIds.includes(klass.subjectId)
-      ) {
-        return false;
-      }
-      if (filter.dateFrom && klass.date < filter.dateFrom) return false;
-      if (filter.dateTo && klass.date > filter.dateTo) return false;
-      return true;
-    });
-  }, [data, search, filter]);
+    return (occurrences: ClassOccurrenceWithRelations[]) =>
+      occurrences.filter((occurrence) => {
+        if (
+          query &&
+          !occurrence.subjectName.toLowerCase().includes(query) &&
+          !(occurrence.teacher ?? "").toLowerCase().includes(query) &&
+          !(occurrence.location ?? "").toLowerCase().includes(query)
+        ) {
+          return false;
+        }
+        if (
+          filter.statuses.length > 0 &&
+          !(
+            occurrence.attendanceStatus &&
+            filter.statuses.includes(occurrence.attendanceStatus)
+          )
+        ) {
+          return false;
+        }
+        if (
+          filter.subjectIds.length > 0 &&
+          !filter.subjectIds.includes(occurrence.subjectId)
+        ) {
+          return false;
+        }
+        if (filter.dateFrom && occurrence.date < filter.dateFrom) return false;
+        if (filter.dateTo && occurrence.date > filter.dateTo) return false;
+        return true;
+      });
+  }, [search, filter]);
+
+  const visibleToday = filterOccurrences(today);
+  const visibleUpcoming = filterOccurrences(upcoming);
+
+  const handleToggleActive = async (klass: ClassWithSubject) => {
+    await toggleActiveClass(klass.id);
+    router.refresh();
+  };
+
+  const openCreate = () => setFormState({ open: true, klass: null });
 
   return (
-    <div className="flex flex-col gap-6 p-4">
+    <div className="flex flex-col gap-8 p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold text-foreground">
@@ -90,10 +120,7 @@ export const ClassesListView = ({ data, subjects }: ClassesListViewProps) => {
           </h1>
           <p className="text-sm text-muted-foreground">{t("list.subtitle")}</p>
         </div>
-        <Button
-          onClick={() => setFormState({ open: true, klass: null })}
-          disabled={subjects.length === 0}
-        >
+        <Button onClick={openCreate} disabled={subjects.length === 0}>
           <Plus />
           {t("list.newClass")}
         </Button>
@@ -105,57 +132,128 @@ export const ClassesListView = ({ data, subjects }: ClassesListViewProps) => {
         </p>
       )}
 
-      <div className="flex flex-wrap items-center gap-3">
-        <SearchInput
-          onSearch={setSearch}
-          placeholder={t("list.searchPlaceholder")}
-          containerClassName="min-w-[16rem] flex-1"
-        />
-        <FilterSidebar
-          value={filter}
-          onChange={setFilter}
-          statusOptions={statusOptions}
-          subjectOptions={subjectOptions}
-          statusLabel={t("list.filterStatus")}
-          subjectLabel={t("list.filterSubject")}
-          dateRangeLabel={t("list.filterDateRange")}
-        />
-      </div>
-
-      {filtered.length === 0 ? (
+      {classes.length === 0 ? (
         <EmptyState
-          variant={data.length === 0 ? "no-data" : "no-results"}
-          title={data.length === 0 ? t("list.emptyTitle") : t("list.noResultsTitle")}
-          description={
-            data.length === 0
-              ? t("list.emptyDescription")
-              : t("list.noResultsDescription")
-          }
+          variant="no-data"
+          title={t("list.emptyTitle")}
+          description={t("list.emptyDescription")}
           action={
-            data.length === 0 && subjects.length > 0
-              ? {
-                  label: t("list.emptyAction"),
-                  onClick: () => setFormState({ open: true, klass: null }),
-                }
+            subjects.length > 0
+              ? { label: t("list.emptyAction"), onClick: openCreate }
               : undefined
           }
         />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {filtered.map((klass) => (
-            <ClassCard
-              key={klass.id}
-              klass={klass}
-              href={`/classes/detail/${klass.id}`}
-              actions={
-                <ClassActionsMenu
-                  onEdit={() => setFormState({ open: true, klass })}
-                  onDelete={() => setDeleteTarget(klass)}
-                />
-              }
+        <>
+          <div className="flex flex-wrap items-center gap-3">
+            <SearchInput
+              onSearch={setSearch}
+              placeholder={t("list.searchPlaceholder")}
+              containerClassName="min-w-[16rem] flex-1"
             />
-          ))}
-        </div>
+            <FilterSidebar
+              value={filter}
+              onChange={setFilter}
+              statusOptions={statusOptions}
+              subjectOptions={subjectOptions}
+              statusLabel={t("list.filterStatus")}
+              subjectLabel={t("list.filterSubject")}
+              dateRangeLabel={t("list.filterDateRange")}
+            />
+          </div>
+
+          <section className="flex flex-col gap-3">
+            <h2 className="text-sm font-medium text-foreground">
+              {t("list.today")}
+            </h2>
+            {visibleToday.length === 0 ? (
+              <EmptyState
+                variant={today.length === 0 ? "no-data" : "no-results"}
+                title={
+                  today.length === 0
+                    ? t("list.todayEmptyTitle")
+                    : t("list.noResultsTitle")
+                }
+                description={
+                  today.length === 0
+                    ? t("list.todayEmptyDescription")
+                    : t("list.noResultsDescription")
+                }
+              />
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {visibleToday.map((occurrence) => (
+                  <ClassOccurrenceCard
+                    key={occurrence.id}
+                    occurrence={occurrence}
+                    // Attendance and exam are editable inline for today's
+                    // classes — the write is scoped to this date's id, so
+                    // next week's occurrence keeps its own state.
+                    footer={
+                      <ClassOccurrenceStatusControls
+                        occurrence={occurrence}
+                        onUpdated={() => router.refresh()}
+                      />
+                    }
+                  />
+                ))}
+              </div>
+            )}
+          </section>
+
+          <section className="flex flex-col gap-3">
+            <h2 className="text-sm font-medium text-foreground">
+              {t("list.upcoming")}
+            </h2>
+            {visibleUpcoming.length === 0 ? (
+              <EmptyState
+                variant={upcoming.length === 0 ? "no-data" : "no-results"}
+                title={
+                  upcoming.length === 0
+                    ? t("list.upcomingEmptyTitle")
+                    : t("list.noResultsTitle")
+                }
+                description={
+                  upcoming.length === 0
+                    ? t("list.upcomingEmptyDescription")
+                    : t("list.noResultsDescription")
+                }
+              />
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {visibleUpcoming.map((occurrence) => (
+                  <ClassOccurrenceCard
+                    key={occurrence.id}
+                    occurrence={occurrence}
+                    href={`/classes/detail/${occurrence.classId}`}
+                  />
+                ))}
+              </div>
+            )}
+          </section>
+
+          <section className="flex flex-col gap-3">
+            <h2 className="text-sm font-medium text-foreground">
+              {t("list.weeklySchedule")}
+            </h2>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {classes.map((klass) => (
+                <RecurringClassCard
+                  key={klass.id}
+                  klass={klass}
+                  actions={
+                    <ClassActionsMenu
+                      klass={klass}
+                      onEdit={() => setFormState({ open: true, klass })}
+                      onToggleActive={() => handleToggleActive(klass)}
+                      onDelete={() => setDeleteTarget(klass)}
+                    />
+                  }
+                />
+              ))}
+            </div>
+          </section>
+        </>
       )}
 
       <ClassFormDialog

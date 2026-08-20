@@ -1,11 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useFieldArray, useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { useLocale, useTranslations } from "next-intl";
-import { Loader2 } from "lucide-react";
+import { Loader2, Plus, Trash2 } from "lucide-react";
 
 import { createClass, updateClass } from "@/actions/classes.mutations";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -33,26 +34,39 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { WEEKDAY_LABEL_KEYS, WEEKDAYS } from "@/lib/constants/classes";
 import { createClassSchema } from "@/lib/validations/class";
-import type { ClassWithRelations, CreateClassInput } from "@/lib/types/class";
+import type {
+  ClassWithSubject,
+  CreateClassInput,
+  CreateClassMeetingInput,
+} from "@/lib/types/class";
 import type { Subject } from "@/lib/types/subject";
 
 export interface ClassFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  klass?: ClassWithRelations | null;
+  klass?: ClassWithSubject | null;
   subjects: Subject[];
   onSaved?: () => void;
 }
 
+function defaultMeeting(): CreateClassMeetingInput {
+  return { dayOfWeek: WEEKDAYS[0], startTime: "16:00", durationMinutes: 60 };
+}
+
+/**
+ * A class recurs weekly for as long as it exists, so there is no start or end
+ * date to collect here — `isActive` is what pauses it.
+ */
 function defaultValues(subjects: Subject[]): CreateClassInput {
   return {
     subjectId: subjects[0]?.id ?? "",
-    date: new Date().toISOString().slice(0, 10),
-    startTime: "09:00",
-    durationMinutes: 60,
     teacher: "",
     location: "",
+    meetings: [defaultMeeting()],
+    isActive: true,
   };
 }
 
@@ -64,6 +78,7 @@ export function ClassFormDialog({
   onSaved,
 }: ClassFormDialogProps) {
   const t = useTranslations("classes.form");
+  const tDays = useTranslations("classes.days");
   const locale = useLocale();
   const isArabic = locale === "ar";
   const isEdit = Boolean(klass);
@@ -76,6 +91,11 @@ export function ClassFormDialog({
     defaultValues: defaultValues(subjects),
   });
 
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "meetings",
+  });
+
   const [wasOpen, setWasOpen] = useState(open);
   if (open !== wasOpen) {
     setWasOpen(open);
@@ -85,11 +105,14 @@ export function ClassFormDialog({
         klass
           ? {
               subjectId: klass.subjectId,
-              date: klass.date,
-              startTime: klass.startTime.slice(0, 5),
-              durationMinutes: klass.durationMinutes,
               teacher: klass.teacher ?? "",
               location: klass.location ?? "",
+              meetings: klass.meetings.map((meeting) => ({
+                dayOfWeek: meeting.dayOfWeek,
+                startTime: meeting.startTime,
+                durationMinutes: meeting.durationMinutes,
+              })),
+              isActive: klass.isActive,
             }
           : defaultValues(subjects),
       );
@@ -113,6 +136,10 @@ export function ClassFormDialog({
     setFormError(null);
     mutation.mutate(values);
   });
+
+  const meetingsError =
+    form.formState.errors.meetings?.root?.message ??
+    form.formState.errors.meetings?.message;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -164,53 +191,119 @@ export function ClassFormDialog({
               )}
             />
 
-            <div className="grid grid-cols-3 gap-4">
-              <FormField
-                control={form.control}
-                name="date"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("dateLabel")}</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="startTime"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("timeLabel")}</FormLabel>
-                    <FormControl>
-                      <Input type="time" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="durationMinutes"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("durationLabel")}</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min={1}
-                        value={field.value}
-                        onChange={(event) =>
-                          field.onChange(event.target.valueAsNumber)
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <div className="flex flex-col gap-3">
+              <Label>{t("meetingsLabel")}</Label>
+
+              {fields.map((entryField, index) => (
+                <div
+                  key={entryField.id}
+                  className="flex flex-col gap-3 rounded-md border border-input p-3 sm:flex-row sm:items-start"
+                >
+                  <FormField
+                    control={form.control}
+                    name={`meetings.${index}.dayOfWeek`}
+                    render={({ field }) => (
+                      <FormItem className="sm:flex-1">
+                        <FormLabel className="text-xs font-normal text-muted-foreground">
+                          {t("dayLabel")}
+                        </FormLabel>
+                        <Select
+                          value={String(field.value)}
+                          onValueChange={(value) =>
+                            field.onChange(Number(value))
+                          }
+                          dir={isArabic ? "rtl" : "ltr"}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="w-full">
+                              <SelectValue />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {WEEKDAYS.map((day) => (
+                              <SelectItem key={day} value={String(day)}>
+                                {tDays(WEEKDAY_LABEL_KEYS[day])}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name={`meetings.${index}.startTime`}
+                    render={({ field }) => (
+                      <FormItem className="sm:flex-1">
+                        <FormLabel className="text-xs font-normal text-muted-foreground">
+                          {t("startTimeLabel")}
+                        </FormLabel>
+                        <FormControl>
+                          <Input type="time" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name={`meetings.${index}.durationMinutes`}
+                    render={({ field }) => (
+                      <FormItem className="sm:flex-1">
+                        <FormLabel className="text-xs font-normal text-muted-foreground">
+                          {t("durationLabel")}
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            min={1}
+                            value={field.value}
+                            onChange={(event) =>
+                              field.onChange(event.target.valueAsNumber)
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    aria-label={t("removeDay")}
+                    disabled={fields.length === 1}
+                    className="mt-1 shrink-0 self-end sm:self-start"
+                    onClick={() => remove(index)}
+                  >
+                    <Trash2 className="size-4" />
+                  </Button>
+                </div>
+              ))}
+
+              {meetingsError && (
+                <p
+                  role="alert"
+                  className="text-sm font-medium text-destructive"
+                >
+                  {meetingsError}
+                </p>
+              )}
+
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="w-fit"
+                onClick={() => append(defaultMeeting())}
+              >
+                <Plus />
+                {t("addDay")}
+              </Button>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -244,6 +337,24 @@ export function ClassFormDialog({
                 )}
               />
             </div>
+
+            <FormField
+              control={form.control}
+              name="isActive"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-md border border-input px-3 py-2">
+                  <FormLabel className="cursor-pointer">
+                    {t("activeLabel")}
+                  </FormLabel>
+                  <FormControl>
+                    <Switch
+                      checked={field.value ?? true}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
 
             {formError && (
               <p role="alert" className="text-sm font-medium text-destructive">

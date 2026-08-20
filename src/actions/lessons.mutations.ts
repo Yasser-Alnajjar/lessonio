@@ -59,7 +59,7 @@ export async function createLesson(input: CreateLessonInput): Promise<MutationRe
     .insert({
       user_id: auth.userId,
       subject_id: input.subjectId,
-      class_id: input.classId || null,
+      class_occurrence_id: input.classOccurrenceId || null,
       title: input.title,
       date: input.date,
     })
@@ -89,7 +89,8 @@ export async function updateLesson(
 
   const patch: LessonUpdate = {};
   if (input.subjectId !== undefined) patch.subject_id = input.subjectId;
-  if (input.classId !== undefined) patch.class_id = input.classId || null;
+  if (input.classOccurrenceId !== undefined)
+    patch.class_occurrence_id = input.classOccurrenceId || null;
   if (input.title !== undefined) patch.title = input.title;
   if (input.date !== undefined) patch.date = input.date;
   if (input.studyStatus !== undefined) patch.study_status = input.studyStatus;
@@ -140,7 +141,7 @@ export async function duplicateLesson(id: string): Promise<MutationResult> {
     .insert({
       user_id: auth.userId,
       subject_id: original.subject_id,
-      class_id: original.class_id,
+      class_occurrence_id: original.class_occurrence_id,
       title: `${original.title} (Copy)`,
       date: original.date,
     })

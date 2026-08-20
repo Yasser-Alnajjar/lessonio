@@ -8,7 +8,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { rescheduleLesson } from "@/actions/calendar.mutations";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ClassCard } from "@/components/ui-system/class-card";
+import { ClassOccurrenceCard } from "@/components/ui-system/class-occurrence-card";
 import { LessonCard } from "@/components/ui-system/lesson-card";
 import { useRouter } from "@/i18n/navigation";
 import useTranslate from "@/hooks/useTranslate";
@@ -246,8 +246,12 @@ export const CalendarMonthView = ({ data, subjects, year, month }: CalendarMonth
               selectedDay.classes.length === 0 && (
                 <p className="text-sm text-muted-foreground">{t("month.dayEmpty")}</p>
               )}
-            {selectedDay?.classes.map((klass) => (
-              <ClassCard key={klass.id} klass={klass} href={`/classes/detail/${klass.id}`} />
+            {selectedDay?.classes.map((occurrence) => (
+              <ClassOccurrenceCard
+                key={occurrence.id}
+                occurrence={occurrence}
+                href={`/classes/detail/${occurrence.classId}`}
+              />
             ))}
             {selectedDay?.lessons.map((lesson) => (
               <LessonCard

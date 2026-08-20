@@ -15,7 +15,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import type { ActionResult } from "@/lib/types/common";
 import { calculateExamPercentage } from "@/lib/types/exam";
-import type { AttendanceStatus } from "@/lib/types/class";
+import type { AttendanceStatus } from "@/lib/types/class-occurrence";
 import type {
   ChartPoint,
   HeatMapCell,
@@ -37,7 +37,7 @@ interface RawLessonRow {
   study_status: string;
 }
 
-interface RawClassRow {
+interface RawClassOccurrenceRow {
   date: string;
   duration_minutes: number;
   subject_id: string;
@@ -71,7 +71,7 @@ async function fetchRawData(supabase: SupabaseServerClient, userId: string) {
       .eq("is_archived", false)
       .gte("date", windowStart),
     supabase
-      .from("classes")
+      .from("class_occurrences")
       .select("date, duration_minutes, subject_id, attendance_status")
       .eq("user_id", userId)
       .gte("date", windowStart),
@@ -95,7 +95,7 @@ async function fetchRawData(supabase: SupabaseServerClient, userId: string) {
 
   return {
     lessons: (lessonRows ?? []) as RawLessonRow[],
-    classes: (classRows ?? []) as RawClassRow[],
+    classes: (classRows ?? []) as RawClassOccurrenceRow[],
     sessions: (sessionRows ?? []) as RawSessionRow[],
     homework: homeworkRows ?? [],
     exams: examRows ?? [],
@@ -117,7 +117,7 @@ function computeStreak(sessionDates: string[]): number {
 
 async function buildStatCards(
   lessons: RawLessonRow[],
-  classes: RawClassRow[],
+  classes: RawClassOccurrenceRow[],
   sessions: RawSessionRow[],
   homework: Array<{ completed: boolean }>,
   exams: Array<{ score: number | null; total_score: number }>,
@@ -302,7 +302,7 @@ function buildMonthlyGrowth(
 }
 
 async function buildAttendanceBreakdown(
-  classes: RawClassRow[],
+  classes: RawClassOccurrenceRow[],
 ): Promise<ChartPoint[]> {
   const t = await getTranslations("statistics.attendance");
   const statuses: AttendanceStatus[] = [
@@ -323,7 +323,7 @@ async function buildAttendanceBreakdown(
 }
 
 function buildSubjectDistribution(
-  classes: RawClassRow[],
+  classes: RawClassOccurrenceRow[],
   subjects: Array<{ id: string; name: string; color: string }>,
 ): SubjectDistributionPoint[] {
   const subjectMap = new Map(subjects.map((subject) => [subject.id, subject]));

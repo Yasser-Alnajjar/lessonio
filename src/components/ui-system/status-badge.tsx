@@ -2,7 +2,10 @@
 
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import type { AttendanceStatus, ClassExamStatus } from "@/lib/types/class";
+import type {
+  AttendanceStatus,
+  ClassExamStatus,
+} from "@/lib/types/class-occurrence";
 import type {
   LessonHomeworkStatus,
   ReviewStatus,

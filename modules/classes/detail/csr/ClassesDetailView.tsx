@@ -2,28 +2,37 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { format, parseISO } from "date-fns";
-import { ArrowLeft, Clock, MapPin, Pencil, Trash2, User } from "lucide-react";
+import { format, parse } from "date-fns";
+import { ArrowLeft, MapPin, Pencil, Trash2, User } from "lucide-react";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { ClassOccurrenceCard } from "@/components/ui-system/class-occurrence-card";
 import { EmptyState } from "@/components/ui-system/empty-state";
-import { StatusBadge } from "@/components/ui-system/status-badge";
 import { Link, useRouter } from "@/i18n/navigation";
-import type { ClassWithRelations } from "@/lib/types/class";
+import { WEEKDAY_LABEL_KEYS } from "@/lib/constants/classes";
+import type { ClassWithSubject } from "@/lib/types/class";
+import type { ClassOccurrenceWithRelations } from "@/lib/types/class-occurrence";
 import type { Subject } from "@/lib/types/subject";
 import { ClassFormDialog } from "../../components/ClassFormDialog";
-import { ClassStatusControls } from "../../components/ClassStatusControls";
+import { ClassOccurrenceStatusControls } from "../../components/ClassOccurrenceStatusControls";
 import { DeleteClassDialog } from "../../components/DeleteClassDialog";
 
 interface ClassesDetailViewProps {
-  data: ClassWithRelations | null;
-  classId: string;
+  data: ClassWithSubject | null;
+  occurrences: ClassOccurrenceWithRelations[];
   subjects: Subject[];
 }
 
-export const ClassesDetailView = ({ data, subjects }: ClassesDetailViewProps) => {
+export const ClassesDetailView = ({
+  data,
+  occurrences,
+  subjects,
+}: ClassesDetailViewProps) => {
   const t = useTranslations("classes.detail");
+  const tDays = useTranslations("classes.days");
+  const tCard = useTranslations("classes.card");
   const router = useRouter();
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -42,6 +51,10 @@ export const ClassesDetailView = ({ data, subjects }: ClassesDetailViewProps) =>
       </div>
     );
   }
+
+  const sortedMeetings = [...data.meetings].sort(
+    (a, b) => a.dayOfWeek - b.dayOfWeek,
+  );
 
   return (
     <div className="flex flex-col gap-6 p-4">
@@ -65,9 +78,14 @@ export const ClassesDetailView = ({ data, subjects }: ClassesDetailViewProps) =>
             />
             {data.subjectName}
           </span>
-          <h1 className="text-xl font-semibold text-foreground">
-            {format(parseISO(data.date), "MMM d, yyyy")}
-          </h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-semibold text-foreground">
+              {data.subjectName}
+            </h1>
+            <Badge variant={data.isActive ? "default" : "secondary"}>
+              {data.isActive ? tCard("active") : tCard("inactive")}
+            </Badge>
+          </div>
         </div>
 
         <div className="flex items-center gap-2">
@@ -87,35 +105,70 @@ export const ClassesDetailView = ({ data, subjects }: ClassesDetailViewProps) =>
       </div>
 
       <Card className="flex flex-col gap-3 p-4">
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
-          <span className="inline-flex items-center gap-1.5">
-            <Clock className="size-4" />
-            {data.startTime.slice(0, 5)} · {data.durationMinutes} {t("minutesSuffix")}
-          </span>
-          {data.teacher && (
-            <span className="inline-flex items-center gap-1.5">
-              <User className="size-4" />
-              {data.teacher}
-            </span>
-          )}
-          {data.location && (
-            <span className="inline-flex items-center gap-1.5">
-              <MapPin className="size-4" />
-              {data.location}
-            </span>
-          )}
-        </div>
-        <div className="flex flex-wrap items-center gap-1.5">
-          <StatusBadge kind="attendance" status={data.attendanceStatus} />
-          {data.examStatus !== "none" && (
-            <StatusBadge kind="exam" status={data.examStatus} />
-          )}
-        </div>
+        <h2 className="text-sm font-medium text-foreground">
+          {t("scheduleTitle")}
+        </h2>
+        <ul className="flex flex-col gap-1.5 text-sm text-muted-foreground">
+          {sortedMeetings.map((meeting, index) => (
+            <li key={`${meeting.dayOfWeek}-${index}`}>
+              <span className="font-medium text-foreground">
+                {tDays(WEEKDAY_LABEL_KEYS[meeting.dayOfWeek])}
+              </span>{" "}
+              ·{" "}
+              {format(parse(meeting.startTime, "HH:mm", new Date()), "h:mm a")} ·{" "}
+              {meeting.durationMinutes} {t("minutesSuffix")}
+            </li>
+          ))}
+        </ul>
+        {(data.teacher || data.location) && (
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
+            {data.teacher && (
+              <span className="inline-flex items-center gap-1.5">
+                <User className="size-4" />
+                {data.teacher}
+              </span>
+            )}
+            {data.location && (
+              <span className="inline-flex items-center gap-1.5">
+                <MapPin className="size-4" />
+                {data.location}
+              </span>
+            )}
+          </div>
+        )}
       </Card>
 
-      <div className="flex flex-col gap-2">
-        <h2 className="text-sm font-medium text-foreground">{t("statusTitle")}</h2>
-        <ClassStatusControls klass={data} onUpdated={() => router.refresh()} />
+      <div className="flex flex-col gap-3">
+        <h2 className="text-sm font-medium text-foreground">
+          {t("occurrencesTitle")}
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          {t("occurrencesDescription")}
+        </p>
+        {occurrences.length === 0 ? (
+          <EmptyState
+            variant="no-data"
+            title={t("occurrencesEmptyTitle")}
+            description={t("occurrencesEmptyDescription")}
+          />
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {occurrences.map((occurrence) => (
+              <ClassOccurrenceCard
+                key={occurrence.id}
+                occurrence={occurrence}
+                // Every date gets its own controls: recording attendance here
+                // never touches any other week's occurrence.
+                footer={
+                  <ClassOccurrenceStatusControls
+                    occurrence={occurrence}
+                    onUpdated={() => router.refresh()}
+                  />
+                }
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       <ClassFormDialog

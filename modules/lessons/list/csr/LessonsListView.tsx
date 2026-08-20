@@ -20,7 +20,7 @@ import { useRouter } from "@/i18n/navigation";
 import useTranslate from "@/hooks/useTranslate";
 import { STUDY_STATUSES } from "@/lib/types/lesson";
 import type { LessonWithRelations } from "@/lib/types/lesson";
-import type { ClassWithRelations } from "@/lib/types/class";
+import type { ClassOccurrenceWithRelations } from "@/lib/types/class-occurrence";
 import type { Subject } from "@/lib/types/subject";
 import type { Tag } from "@/lib/types/tag";
 import { DeleteLessonDialog } from "../../components/DeleteLessonDialog";
@@ -31,7 +31,7 @@ interface LessonsListViewProps {
   data: LessonWithRelations[];
   subjects: Subject[];
   tags: Tag[];
-  classes: ClassWithRelations[];
+  classes: ClassOccurrenceWithRelations[];
 }
 
 interface FormState {

@@ -21,7 +21,7 @@ import type { Database } from "@/lib/types/database";
 import type { NotificationType } from "@/lib/types/notification";
 import type { NotificationPreferences } from "@/lib/types/settings";
 import type { AppLocale } from "@/i18n/routing";
-import { ensureClassesForUser } from "./classes.generate";
+import { ensureClassOccurrencesForUser } from "./class-occurrences.generate";
 
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
 type NotificationInsert = Database["public"]["Tables"]["notifications"]["Insert"];
@@ -180,7 +180,7 @@ async function generateNotifications(
   // Materialization runs here too (not just on the classes/dashboard/calendar
   // read paths): a user whose bell polls before they ever open the classes
   // list or dashboard would otherwise see no upcoming_class notices.
-  await ensureClassesForUser(supabase, userId);
+  await ensureClassOccurrencesForUser(supabase, userId);
 
   const [
     { data: subjectRows },
@@ -212,9 +212,12 @@ async function generateNotifications(
       .lte("date", addDays(today, -REVIEW_AGE_DAYS))
       .order("date", { ascending: false })
       .limit(REVIEW_REMINDERS_PER_RUN),
+    // Today's occurrences of the user's recurring classes. Teacher and
+    // location are embedded from `classes` rather than stored per date —
+    // the occurrence only owns what varies week to week.
     supabase
-      .from("classes")
-      .select("id, subject_id, teacher, location, start_time")
+      .from("class_occurrences")
+      .select("id, subject_id, start_time, classes (teacher, location)")
       .eq("user_id", userId)
       .eq("date", today),
   ]);
@@ -277,18 +280,18 @@ async function generateNotifications(
 
   const clock = localClock(now, claim.timezone);
 
-  for (const classRow of classRows ?? []) {
-    const [hours = 0, minutes = 0] = classRow.start_time.split(":").map(Number);
+  for (const occurrence of classRows ?? []) {
+    const [hours = 0, minutes = 0] = occurrence.start_time.split(":").map(Number);
     const minutesUntil = hours * 60 + minutes - clock.minutesOfDay;
     if (minutesUntil < 0 || minutesUntil > UPCOMING_CLASS_LEAD_MINUTES) continue;
 
     add(
       "upcoming_class",
-      `upcoming_class:${classRow.id}:${today}`,
+      `upcoming_class:${occurrence.id}:${today}`,
       upcomingClassCopy(locale, {
-        subjectName: subjectNameOf(classRow.subject_id),
-        teacher: classRow.teacher,
-        location: classRow.location,
+        subjectName: subjectNameOf(occurrence.subject_id),
+        teacher: occurrence.classes?.teacher ?? null,
+        location: occurrence.classes?.location ?? null,
         minutesUntil,
       }),
     );

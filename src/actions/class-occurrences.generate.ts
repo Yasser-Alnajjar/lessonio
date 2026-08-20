@@ -2,29 +2,34 @@ import "server-only";
 
 import { addDays, localIsoDate } from "@/lib/notifications/dates";
 import type { createClient } from "@/lib/supabase/server";
-import type { ClassScheduleEntry } from "@/lib/types/class-schedule";
+import type { ClassMeeting } from "@/lib/types/class";
 import type { Database } from "@/lib/types/database";
 
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
-type ClassInsert = Database["public"]["Tables"]["classes"]["Insert"];
+type ClassOccurrenceInsert =
+  Database["public"]["Tables"]["class_occurrences"]["Insert"];
 
 /** Occurrences are materialized this many days into the past and future of "today". */
 const WINDOW_DAYS = 30;
-/** How stale a user's materialized classes may get before the next read regenerates them. */
+/** How stale a user's materialized occurrences may get before the next read regenerates them. */
 const REFRESH_INTERVAL_MS = 15 * 60 * 1000;
 
 /**
- * Materializes `classes` occurrence rows for the signed-in user from their
- * active `class_schedules` templates, for a window of `today` +/- WINDOW_DAYS.
+ * Materializes `class_occurrences` rows for the signed-in user from their
+ * active `classes`, for a window of `today` +/- WINDOW_DAYS.
+ *
+ * A class recurs every week for as long as it exists, so the window is the
+ * only bound here — the student never creates next week's occurrence by
+ * hand, and there is no start or end date to clamp against.
  *
  * Mirrors `ensureNotificationsForUser()` in `src/actions/notifications.generate.ts`:
  * every read path calls this first, so a user who opens the app gets
- * occurrences materialized from their own schedules, and a user who never
+ * occurrences materialized from their own classes, and a user who never
  * opens it costs nothing. The compare-and-set claim on
- * `settings.classes_materialized_at` keeps repeat calls (e.g. dashboard +
- * calendar + classes list, all on one page load) cheap.
+ * `settings.class_occurrences_materialized_at` keeps repeat calls (e.g.
+ * dashboard + calendar + classes list, all on one page load) cheap.
  */
-export async function ensureClassesForUser(
+export async function ensureClassOccurrencesForUser(
   supabase: SupabaseServerClient,
   userId: string,
 ): Promise<void> {
@@ -32,7 +37,7 @@ export async function ensureClassesForUser(
     const claim = await claimRun(supabase, userId);
     if (!claim) return;
 
-    await materializeClasses(supabase, userId, claim.timezone);
+    await materializeOccurrences(supabase, userId, claim.timezone);
   } catch {
     // Deliberately swallowed, same as ensureNotificationsForUser(): the
     // stamp is already set, so the next attempt is one refresh interval
@@ -55,13 +60,13 @@ async function claimRun(
 
   const { data: settings } = await supabase
     .from("settings")
-    .select("classes_materialized_at")
+    .select("class_occurrences_materialized_at")
     .eq("user_id", userId)
     .maybeSingle();
 
   if (!settings) return null;
 
-  const lastRun = settings.classes_materialized_at;
+  const lastRun = settings.class_occurrences_materialized_at;
 
   // Compared as instants rather than strings — see claimRun() in
   // notifications.generate.ts for why toISOString() can't be compared
@@ -70,9 +75,11 @@ async function claimRun(
 
   const { data: claimed } = await supabase
     .from("settings")
-    .update({ classes_materialized_at: new Date().toISOString() })
+    .update({ class_occurrences_materialized_at: new Date().toISOString() })
     .eq("user_id", userId)
-    .or(`classes_materialized_at.is.null,classes_materialized_at.lt.${cutoff}`)
+    .or(
+      `class_occurrences_materialized_at.is.null,class_occurrences_materialized_at.lt.${cutoff}`,
+    )
     .select("user_id")
     .maybeSingle();
 
@@ -88,13 +95,14 @@ async function claimRun(
 }
 
 /**
- * Walks every active schedule's per-day entries over the window and upserts
- * one `classes` row per matching (schedule, date). `attendance_status` is
- * left NULL; teacher/location/duration/start_time are copied from the
- * template at materialization time so a later template edit doesn't
- * silently rewrite history for occurrences that already exist.
+ * Walks every active class's weekly meetings over the window and upserts one
+ * occurrence per matching (class, date). `attendance_status` is left NULL, so
+ * every new occurrence starts unrecorded rather than inheriting last week's.
+ * `start_time`/`duration_minutes` are copied from the meeting at
+ * materialization time so a later edit to the class doesn't silently rewrite
+ * the timing of occurrences that already exist.
  */
-async function materializeClasses(
+async function materializeOccurrences(
   supabase: SupabaseServerClient,
   userId: string,
   timezone: string | null,
@@ -103,45 +111,37 @@ async function materializeClasses(
   const windowStart = addDays(today, -WINDOW_DAYS);
   const windowEnd = addDays(today, WINDOW_DAYS);
 
-  const { data: scheduleRows } = await supabase
-    .from("class_schedules")
-    .select("id, subject_id, teacher, location, schedules, starts_on, ends_on")
+  const { data: classRows } = await supabase
+    .from("classes")
+    .select("id, subject_id, meetings")
     .eq("user_id", userId)
-    .eq("is_active", true)
-    .lte("starts_on", windowEnd);
+    .eq("is_active", true);
 
-  const schedules = scheduleRows ?? [];
-  if (schedules.length === 0) return;
+  const classes = classRows ?? [];
+  if (classes.length === 0) return;
 
-  const rows: ClassInsert[] = [];
+  const rows: ClassOccurrenceInsert[] = [];
 
-  for (const schedule of schedules) {
-    const rangeStart = schedule.starts_on > windowStart ? schedule.starts_on : windowStart;
-    const rangeEnd =
-      schedule.ends_on && schedule.ends_on < windowEnd ? schedule.ends_on : windowEnd;
-    if (rangeStart > rangeEnd) continue;
-
-    // The `class_schedules_schedules_valid` DB constraint guarantees this
-    // JSONB column already holds well-formed ClassScheduleEntry objects —
-    // same cast as mapClassScheduleRow() in class-schedules.ts.
-    const entries = schedule.schedules as unknown as ClassScheduleEntry[];
+  for (const klass of classes) {
+    // The `classes_meetings_valid` DB constraint guarantees this JSONB
+    // column already holds well-formed ClassMeeting objects — same cast as
+    // mapClassRow() in classes.ts.
+    const meetings = klass.meetings as unknown as ClassMeeting[];
 
     // ISO `yyyy-mm-dd` strings sort and compare lexicographically like the
     // dates they represent, so this loop can walk the range as strings.
-    for (let date = rangeStart; date <= rangeEnd; date = addDays(date, 1)) {
+    for (let date = windowStart; date <= windowEnd; date = addDays(date, 1)) {
       const weekday = new Date(`${date}T00:00:00Z`).getUTCDay();
-      const entry = entries.find((candidate) => candidate.dayOfWeek === weekday);
-      if (!entry) continue;
+      const meeting = meetings.find((candidate) => candidate.dayOfWeek === weekday);
+      if (!meeting) continue;
 
       rows.push({
         user_id: userId,
-        subject_id: schedule.subject_id,
-        class_schedule_id: schedule.id,
+        subject_id: klass.subject_id,
+        class_id: klass.id,
         date,
-        start_time: entry.startTime,
-        duration_minutes: entry.durationMinutes,
-        teacher: schedule.teacher,
-        location: schedule.location,
+        start_time: meeting.startTime,
+        duration_minutes: meeting.durationMinutes,
       });
     }
   }
@@ -149,34 +149,36 @@ async function materializeClasses(
   if (rows.length === 0) return;
 
   // `ignoreDuplicates` turns this into ON CONFLICT DO NOTHING against
-  // idx_classes_schedule_occurrence, so re-running over unchanged schedules
+  // idx_class_occurrences_class_date, so re-running over unchanged classes
   // creates nothing — existing occurrences (including recorded attendance)
   // are left untouched.
   await supabase
-    .from("classes")
-    .upsert(rows, { onConflict: "class_schedule_id,date", ignoreDuplicates: true });
+    .from("class_occurrences")
+    .upsert(rows, { onConflict: "class_id,date", ignoreDuplicates: true });
 }
 
 /**
- * Called after a `class_schedules` template is edited or deactivated (and
- * before it's deleted): removes the *future, untouched* occurrences that
- * template generated, so the next `ensureClassesForUser()` re-materializes
- * them from the new template shape. An occurrence counts as untouched only
- * when nothing has been recorded against it — attendance still unset, no
- * exam status, and no lesson linked back to it — so a class the student
- * already marked attended (or tied a lesson to) is never silently deleted.
- * Past occurrences are never touched, recorded or not.
+ * Called after a class is edited or deactivated: removes the *future,
+ * untouched* occurrences it generated, so the next
+ * `ensureClassOccurrencesForUser()` re-materializes them from the new shape.
+ * An occurrence counts as untouched only when nothing has been recorded
+ * against it — attendance still unset, no exam status, and no lesson linked
+ * back to it — so a class the student already marked attended (or tied a
+ * lesson to) is never silently deleted. Past occurrences are never touched,
+ * recorded or not.
+ *
+ * Deleting a class needs no call here: the occurrences cascade with it.
  */
 export async function deleteFutureUntouchedOccurrences(
   supabase: SupabaseServerClient,
-  scheduleId: string,
+  classId: string,
 ): Promise<void> {
   const todayIso = new Date().toISOString().slice(0, 10);
 
   const { data: candidates } = await supabase
-    .from("classes")
+    .from("class_occurrences")
     .select("id")
-    .eq("class_schedule_id", scheduleId)
+    .eq("class_id", classId)
     .gt("date", todayIso)
     .is("attendance_status", null)
     .eq("exam_status", "none");
@@ -186,12 +188,12 @@ export async function deleteFutureUntouchedOccurrences(
 
   const { data: linkedRows } = await supabase
     .from("lessons")
-    .select("class_id")
-    .in("class_id", candidateIds);
+    .select("class_occurrence_id")
+    .in("class_occurrence_id", candidateIds);
 
-  const linkedIds = new Set((linkedRows ?? []).map((row) => row.class_id));
+  const linkedIds = new Set((linkedRows ?? []).map((row) => row.class_occurrence_id));
   const deletableIds = candidateIds.filter((id) => !linkedIds.has(id));
   if (deletableIds.length === 0) return;
 
-  await supabase.from("classes").delete().in("id", deletableIds);
+  await supabase.from("class_occurrences").delete().in("id", deletableIds);
 }

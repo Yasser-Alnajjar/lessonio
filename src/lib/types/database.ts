@@ -88,49 +88,56 @@ export type Database = {
           },
         ]
       }
-      class_schedules: {
+      class_occurrences: {
         Row: {
+          attendance_status: string | null
+          class_id: string
           created_at: string
-          ends_on: string | null
+          date: string
+          duration_minutes: number
+          exam_status: string
           id: string
-          is_active: boolean
-          location: string | null
-          schedules: Json
-          starts_on: string
+          start_time: string
           subject_id: string
-          teacher: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          attendance_status?: string | null
+          class_id: string
           created_at?: string
-          ends_on?: string | null
+          date: string
+          duration_minutes: number
+          exam_status?: string
           id?: string
-          is_active?: boolean
-          location?: string | null
-          schedules: Json
-          starts_on: string
+          start_time: string
           subject_id: string
-          teacher?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          attendance_status?: string | null
+          class_id?: string
           created_at?: string
-          ends_on?: string | null
+          date?: string
+          duration_minutes?: number
+          exam_status?: string
           id?: string
-          is_active?: boolean
-          location?: string | null
-          schedules?: Json
-          starts_on?: string
+          start_time?: string
           subject_id?: string
-          teacher?: string | null
           updated_at?: string
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "class_schedules_subject_id_fkey"
+            foreignKeyName: "class_occurrences_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "class_occurrences_subject_id_fkey"
             columns: ["subject_id"]
             isOneToOne: false
             referencedRelation: "subjects"
@@ -140,58 +147,39 @@ export type Database = {
       }
       classes: {
         Row: {
-          attendance_status: string | null
-          class_schedule_id: string | null
           created_at: string
-          date: string
-          duration_minutes: number
-          exam_status: string
           id: string
+          is_active: boolean
           location: string | null
-          start_time: string
+          meetings: Json
           subject_id: string
           teacher: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
-          attendance_status?: string | null
-          class_schedule_id?: string | null
           created_at?: string
-          date: string
-          duration_minutes: number
-          exam_status?: string
           id?: string
+          is_active?: boolean
           location?: string | null
-          start_time: string
+          meetings: Json
           subject_id: string
           teacher?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
-          attendance_status?: string | null
-          class_schedule_id?: string | null
           created_at?: string
-          date?: string
-          duration_minutes?: number
-          exam_status?: string
           id?: string
+          is_active?: boolean
           location?: string | null
-          start_time?: string
+          meetings?: Json
           subject_id?: string
           teacher?: string | null
           updated_at?: string
           user_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "classes_class_schedule_id_fkey"
-            columns: ["class_schedule_id"]
-            isOneToOne: false
-            referencedRelation: "class_schedules"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "classes_subject_id_fkey"
             columns: ["subject_id"]
@@ -516,7 +504,7 @@ export type Database = {
       }
       lessons: {
         Row: {
-          class_id: string | null
+          class_occurrence_id: string | null
           created_at: string
           date: string
           homework_status: string
@@ -531,7 +519,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          class_id?: string | null
+          class_occurrence_id?: string | null
           created_at?: string
           date: string
           homework_status?: string
@@ -546,7 +534,7 @@ export type Database = {
           user_id: string
         }
         Update: {
-          class_id?: string | null
+          class_occurrence_id?: string | null
           created_at?: string
           date?: string
           homework_status?: string
@@ -562,10 +550,10 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "lessons_class_id_fkey"
-            columns: ["class_id"]
+            foreignKeyName: "lessons_class_occurrence_id_fkey"
+            columns: ["class_occurrence_id"]
             isOneToOne: false
-            referencedRelation: "classes"
+            referencedRelation: "class_occurrences"
             referencedColumns: ["id"]
           },
           {
@@ -648,7 +636,7 @@ export type Database = {
       }
       settings: {
         Row: {
-          classes_materialized_at: string | null
+          class_occurrences_materialized_at: string | null
           created_at: string
           grade_scale: Json
           locale: string
@@ -659,7 +647,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          classes_materialized_at?: string | null
+          class_occurrences_materialized_at?: string | null
           created_at?: string
           grade_scale?: Json
           locale?: string
@@ -670,7 +658,7 @@ export type Database = {
           user_id: string
         }
         Update: {
-          classes_materialized_at?: string | null
+          class_occurrences_materialized_at?: string | null
           created_at?: string
           grade_scale?: Json
           locale?: string

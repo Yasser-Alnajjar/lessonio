@@ -1,6 +1,6 @@
 "use client";
 
-import { MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { MoreVertical, Pencil, Power, PowerOff, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
@@ -10,13 +10,21 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import type { ClassWithSubject } from "@/lib/types/class";
 
 export interface ClassActionsMenuProps {
+  klass: ClassWithSubject;
   onEdit: () => void;
+  onToggleActive: () => void;
   onDelete: () => void;
 }
 
-export function ClassActionsMenu({ onEdit, onDelete }: ClassActionsMenuProps) {
+export function ClassActionsMenu({
+  klass,
+  onEdit,
+  onToggleActive,
+  onDelete,
+}: ClassActionsMenuProps) {
   const t = useTranslations("classes.card");
 
   return (
@@ -36,6 +44,10 @@ export function ClassActionsMenu({ onEdit, onDelete }: ClassActionsMenuProps) {
         <DropdownMenuItem onSelect={onEdit}>
           <Pencil />
           {t("edit")}
+        </DropdownMenuItem>
+        <DropdownMenuItem onSelect={onToggleActive}>
+          {klass.isActive ? <PowerOff /> : <Power />}
+          {klass.isActive ? t("deactivate") : t("activate")}
         </DropdownMenuItem>
         <DropdownMenuItem variant="destructive" onSelect={onDelete}>
           <Trash2 />

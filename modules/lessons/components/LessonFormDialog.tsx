@@ -39,12 +39,12 @@ import type {
   CreateLessonInput,
   LessonWithRelations,
 } from "@/lib/types/lesson";
-import type { ClassWithRelations } from "@/lib/types/class";
+import type { ClassOccurrenceWithRelations } from "@/lib/types/class-occurrence";
 import type { Subject } from "@/lib/types/subject";
 import type { Tag } from "@/lib/types/tag";
 import { TagPicker } from "./TagPicker";
 
-/** Select value standing in for `classId: undefined` — "no linked class". */
+/** Select value standing in for `classOccurrenceId: undefined` — "no linked class". */
 const CLASS_UNSET_VALUE = "unset";
 
 export interface LessonFormDialogProps {
@@ -53,7 +53,7 @@ export interface LessonFormDialogProps {
   lesson?: LessonWithRelations | null;
   subjects: Subject[];
   tags: Tag[];
-  classes: ClassWithRelations[];
+  classes: ClassOccurrenceWithRelations[];
   onTagCreated?: (tag: Tag) => void;
   onSaved?: () => void;
 }
@@ -67,8 +67,8 @@ function defaultValues(subjects: Subject[]): CreateLessonInput {
   };
 }
 
-function classLabel(klass: ClassWithRelations): string {
-  return `${klass.subjectName} · ${format(parseISO(klass.date), "MMM d, yyyy")} ${klass.startTime.slice(0, 5)}`;
+function classLabel(occurrence: ClassOccurrenceWithRelations): string {
+  return `${occurrence.subjectName} · ${format(parseISO(occurrence.date), "MMM d, yyyy")} ${occurrence.startTime.slice(0, 5)}`;
 }
 
 export function LessonFormDialog({
@@ -103,7 +103,7 @@ export function LessonFormDialog({
         lesson
           ? {
               subjectId: lesson.subjectId,
-              classId: lesson.classId ?? undefined,
+              classOccurrenceId: lesson.classOccurrenceId ?? undefined,
               title: lesson.title,
               date: lesson.date,
               tagIds: lesson.tagIds,
@@ -216,7 +216,7 @@ export function LessonFormDialog({
             {classes.length > 0 && (
               <FormField
                 control={form.control}
-                name="classId"
+                name="classOccurrenceId"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t("classLabel")}</FormLabel>

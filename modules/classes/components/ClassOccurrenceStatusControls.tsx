@@ -3,7 +3,7 @@
 import { useTransition } from "react";
 import { useTranslations } from "next-intl";
 
-import { updateClass } from "@/actions/classes.mutations";
+import { updateClassOccurrenceStatus } from "@/actions/class-occurrences.mutations";
 import {
   Select,
   SelectContent,
@@ -11,25 +11,33 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ATTENDANCE_STATUSES, CLASS_EXAM_STATUSES } from "@/lib/types/class";
+import {
+  ATTENDANCE_STATUSES,
+  CLASS_EXAM_STATUSES,
+} from "@/lib/types/class-occurrence";
 import type {
   AttendanceStatus,
   ClassExamStatus,
-  ClassWithRelations,
-} from "@/lib/types/class";
+  ClassOccurrenceWithRelations,
+} from "@/lib/types/class-occurrence";
 
 /** Select value standing in for `attendanceStatus: null` — "not recorded yet". */
 const ATTENDANCE_UNSET_VALUE = "unset";
 
-export interface ClassStatusControlsProps {
-  klass: ClassWithRelations;
+export interface ClassOccurrenceStatusControlsProps {
+  occurrence: ClassOccurrenceWithRelations;
   onUpdated?: () => void;
 }
 
-export function ClassStatusControls({
-  klass,
+/**
+ * Records attendance and exam state against one specific date. The write is
+ * scoped to this occurrence's id, so next week's occurrence of the same class
+ * keeps its own independent state.
+ */
+export function ClassOccurrenceStatusControls({
+  occurrence,
   onUpdated,
-}: ClassStatusControlsProps) {
+}: ClassOccurrenceStatusControlsProps) {
   const t = useTranslations("classes.status");
   const [isPending, startTransition] = useTransition();
 
@@ -48,7 +56,7 @@ export function ClassStatusControls({
 
   const onAttendanceChange = (value: string) =>
     startTransition(async () => {
-      await updateClass(klass.id, {
+      await updateClassOccurrenceStatus(occurrence.id, {
         attendanceStatus:
           value === ATTENDANCE_UNSET_VALUE ? null : (value as AttendanceStatus),
       });
@@ -57,7 +65,9 @@ export function ClassStatusControls({
 
   const onExamChange = (value: string) =>
     startTransition(async () => {
-      await updateClass(klass.id, { examStatus: value as ClassExamStatus });
+      await updateClassOccurrenceStatus(occurrence.id, {
+        examStatus: value as ClassExamStatus,
+      });
       onUpdated?.();
     });
 
@@ -68,7 +78,7 @@ export function ClassStatusControls({
           {t("attendance.label")}
         </label>
         <Select
-          value={klass.attendanceStatus ?? ATTENDANCE_UNSET_VALUE}
+          value={occurrence.attendanceStatus ?? ATTENDANCE_UNSET_VALUE}
           onValueChange={onAttendanceChange}
           disabled={isPending}
         >
@@ -88,7 +98,7 @@ export function ClassStatusControls({
         <label className="text-xs font-medium text-muted-foreground">
           {t("exam.label")}
         </label>
-        <Select value={klass.examStatus} onValueChange={onExamChange} disabled={isPending}>
+        <Select value={occurrence.examStatus} onValueChange={onExamChange} disabled={isPending}>
           <SelectTrigger className="w-full">
             <SelectValue />
           </SelectTrigger>

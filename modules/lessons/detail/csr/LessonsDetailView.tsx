@@ -28,7 +28,7 @@ import { Link, useRouter } from "@/i18n/navigation";
 import type { Attachment } from "@/lib/types/attachment";
 import type { LessonNote } from "@/lib/types/lesson-note";
 import type { LessonWithRelations } from "@/lib/types/lesson";
-import type { ClassWithRelations } from "@/lib/types/class";
+import type { ClassOccurrenceWithRelations } from "@/lib/types/class-occurrence";
 import type { Subject } from "@/lib/types/subject";
 import type { Tag } from "@/lib/types/tag";
 import type { FlashcardWithRelations } from "@/lib/types/flashcard";
@@ -47,7 +47,7 @@ interface LessonsDetailViewProps {
   notes: LessonNote[];
   attachments: Attachment[];
   flashcards: FlashcardWithRelations[];
-  classes: ClassWithRelations[];
+  classes: ClassOccurrenceWithRelations[];
 }
 
 export const LessonsDetailView = ({
@@ -91,6 +91,14 @@ export const LessonsDetailView = ({
     await toggleArchiveLesson(data.id);
     router.refresh();
   };
+
+
+  // `classes` here is the occurrence list the picker is drawn from; the
+  // linked-class route addresses the *recurring* class, so resolve through it.
+  const linkedClassId = data.classOccurrenceId
+    ? (classes.find((occurrence) => occurrence.id === data.classOccurrenceId)
+        ?.classId ?? null)
+    : null;
 
   return (
     <div className="flex flex-col gap-6 p-4">
@@ -162,9 +170,9 @@ export const LessonsDetailView = ({
             <CalendarDays className="size-4" />
             {format(parseISO(data.date), "MMM d, yyyy")}
           </span>
-          {data.classId && (
+          {linkedClassId && (
             <Link
-              href={`/classes/detail/${data.classId}`}
+              href={`/classes/detail/${linkedClassId}`}
               className="inline-flex items-center gap-1.5 hover:text-foreground hover:underline"
             >
               <CalendarClock className="size-4" />

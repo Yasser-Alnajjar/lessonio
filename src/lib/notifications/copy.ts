@@ -167,7 +167,7 @@ export function upcomingClassCopy(
     body: details
       ? `${subjectName} starts ${when} — ${details}.`
       : `${subjectName} starts ${when}.`,
-    linkPath: "/class-schedules/list",
+    linkPath: "/classes/list",
   };
 }
 

@@ -7,13 +7,13 @@ import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { WEEKDAY_LABEL_KEYS } from "@/lib/constants/class-schedules";
+import { WEEKDAY_LABEL_KEYS } from "@/lib/constants/classes";
 import { SUBJECT_ICON_COMPONENTS } from "@/lib/constants/subjects";
 import { cn } from "@/lib/utils";
-import type { ClassScheduleWithSubject } from "@/lib/types/class-schedule";
+import type { ClassWithSubject } from "@/lib/types/class";
 
-export interface ClassScheduleCardProps extends React.ComponentProps<"div"> {
-  classSchedule: ClassScheduleWithSubject;
+export interface RecurringClassCardProps extends React.ComponentProps<"div"> {
+  klass: ClassWithSubject;
   actions?: React.ReactNode;
 }
 
@@ -25,27 +25,32 @@ function formatDuration(minutes: number, hLabel: string, mLabel: string): string
   return `${hours}${hLabel} ${remaining}${mLabel}`;
 }
 
-export function ClassScheduleCard({
-  classSchedule,
+/**
+ * The recurring class itself — its weekly meetings, teacher and location.
+ * The dated instances that carry attendance/exam state render as
+ * `ClassOccurrenceCard`.
+ */
+export function RecurringClassCard({
+  klass,
   actions,
   className,
   ...props
-}: ClassScheduleCardProps) {
-  const t = useTranslations("classSchedules.card");
-  const tDays = useTranslations("classSchedules.days");
+}: RecurringClassCardProps) {
+  const t = useTranslations("classes.card");
+  const tDays = useTranslations("classes.days");
 
-  const Icon = SUBJECT_ICON_COMPONENTS[classSchedule.subjectIcon];
-  const sortedSchedules = [...classSchedule.schedules].sort(
+  const Icon = SUBJECT_ICON_COMPONENTS[klass.subjectIcon];
+  const sortedMeetings = [...klass.meetings].sort(
     (a, b) => a.dayOfWeek - b.dayOfWeek,
   );
 
   return (
     <div className="relative h-full">
       <Card
-        data-slot="class-schedule-card"
+        data-slot="recurring-class-card"
         className={cn(
           "h-full gap-3 transition-shadow",
-          !classSchedule.isActive && "opacity-60",
+          !klass.isActive && "opacity-60",
           className,
         )}
         {...props}
@@ -54,8 +59,8 @@ export function ClassScheduleCard({
           <span
             className="flex size-10 shrink-0 items-center justify-center rounded-xl"
             style={{
-              backgroundColor: `color-mix(in oklch, ${classSchedule.subjectColor} 16%, transparent)`,
-              color: classSchedule.subjectColor,
+              backgroundColor: `color-mix(in oklch, ${klass.subjectColor} 16%, transparent)`,
+              color: klass.subjectColor,
             }}
           >
             <Icon className="size-5" />
@@ -63,20 +68,20 @@ export function ClassScheduleCard({
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <h3 className="truncate text-sm font-medium text-foreground">
-                {classSchedule.subjectName}
+                {klass.subjectName}
               </h3>
               <Badge
-                variant={classSchedule.isActive ? "default" : "secondary"}
+                variant={klass.isActive ? "default" : "secondary"}
                 className="shrink-0 text-[10px]"
               >
-                {classSchedule.isActive ? t("active") : t("inactive")}
+                {klass.isActive ? t("active") : t("inactive")}
               </Badge>
             </div>
           </div>
           {actions && <div className="w-8 shrink-0" aria-hidden />}
         </CardHeader>
         <CardContent className="flex flex-col gap-1.5 text-xs text-muted-foreground">
-          {sortedSchedules.map((entry, index) => {
+          {sortedMeetings.map((entry, index) => {
             const timeLabel = format(
               parse(entry.startTime, "HH:mm", new Date()),
               "h:mm a",
@@ -95,18 +100,18 @@ export function ClassScheduleCard({
               </span>
             );
           })}
-          {(classSchedule.teacher || classSchedule.location) && (
+          {(klass.teacher || klass.location) && (
             <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
-              {classSchedule.teacher && (
+              {klass.teacher && (
                 <span className="inline-flex items-center gap-1">
                   <User className="size-3.5" />
-                  {classSchedule.teacher}
+                  {klass.teacher}
                 </span>
               )}
-              {classSchedule.location && (
+              {klass.location && (
                 <span className="inline-flex items-center gap-1">
                   <MapPin className="size-3.5" />
-                  {classSchedule.location}
+                  {klass.location}
                 </span>
               )}
             </div>
@@ -118,13 +123,13 @@ export function ClassScheduleCard({
   );
 }
 
-export function ClassScheduleCardSkeleton({
+export function RecurringClassCardSkeleton({
   className,
   ...props
 }: React.ComponentProps<"div">) {
   return (
     <Card
-      data-slot="class-schedule-card-skeleton"
+      data-slot="recurring-class-card-skeleton"
       className={cn("h-full gap-3", className)}
       {...props}
     >

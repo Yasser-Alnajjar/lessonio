@@ -1,10 +1,10 @@
-import type { ClassWithRelations } from "./class";
+import type { ClassOccurrenceWithRelations } from "./class-occurrence";
 import type { LessonWithRelations } from "./lesson";
 
 export interface CalendarDay {
   date: string; // ISO date
   lessons: LessonWithRelations[];
-  classes: ClassWithRelations[];
+  classes: ClassOccurrenceWithRelations[];
 }
 
 export interface CalendarMonthData {

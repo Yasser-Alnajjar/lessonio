@@ -46,6 +46,8 @@ export interface UserDataExport {
   profile: Tables["profiles"]["Row"] | null;
   settings: Tables["settings"]["Row"] | null;
   subjects: Tables["subjects"]["Row"][];
+  classes: Tables["classes"]["Row"][];
+  classOccurrences: Tables["class_occurrences"]["Row"][];
   lessons: Tables["lessons"]["Row"][];
   lessonNotes: Tables["lesson_notes"]["Row"][];
   attachments: Tables["attachments"]["Row"][];

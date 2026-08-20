@@ -65,12 +65,10 @@ export function ClassOccurrenceStatusControls({
     {
       label: t("attendance.not_recorded"),
       value: ATTENDANCE_UNSET_VALUE,
-      disabled: false,
     },
     ...ATTENDANCE_STATUSES.map((status) => ({
       label: t(`attendance.${status}`),
       value: status,
-      disabled: status === "cancelled" && !controlsDisabled,
     })),
   ];
 
@@ -108,6 +106,7 @@ export function ClassOccurrenceStatusControls({
         <Select
           value={occurrence.attendanceStatus ?? ATTENDANCE_UNSET_VALUE}
           onValueChange={onAttendanceChange}
+          disabled={controlsDisabled}
         >
           <SelectTrigger className="w-full">
             <SelectValue />
@@ -115,11 +114,7 @@ export function ClassOccurrenceStatusControls({
 
           <SelectContent>
             {attendanceOptions.map((option) => (
-              <SelectItem
-                key={option.value}
-                value={option.value}
-                disabled={option.disabled}
-              >
+              <SelectItem key={option.value} value={option.value}>
                 {option.label}
               </SelectItem>
             ))}

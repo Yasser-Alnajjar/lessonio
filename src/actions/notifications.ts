@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { ActionResult } from "@/lib/types/common";
 import type { Notification } from "@/lib/types/notification";
 import { ensureNotificationsForUser } from "./notifications.generate";
+import { runScheduledNotificationsJob } from "./notifications.jobs";
 import {
   getRecentNotifications,
   markAllNotificationsAsRead,
@@ -68,4 +69,7 @@ export const notificationsActions = {
   markAsRead: markNotificationAsRead,
   markAllAsRead: markAllNotificationsAsRead,
   sendToEmail: sendNotificationToEmail,
+
+  /** Invoked only by the cron-secret-protected `/api/cron/notifications` route. */
+  runScheduledJob: runScheduledNotificationsJob,
 };

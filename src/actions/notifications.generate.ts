@@ -30,10 +30,10 @@ type NotificationInsert = Database["public"]["Tables"]["notifications"]["Insert"
 const UPCOMING_LESSON_DAYS = 1;
 /**
  * A class produces an upcoming-class notice once its start time is within
- * this many minutes. Because generation only runs when a signed-in user's
- * session triggers it — at most once per REFRESH_INTERVAL_MS, and never at
- * all if they don't open the app — this is a best-effort lead time, not a
- * guaranteed push a fixed number of minutes before start.
+ * this many minutes. This path only fires while a signed-in user's session
+ * is active; the Supabase Cron sweep in notifications.jobs.ts covers users
+ * who never open the app, running every 5 minutes so it always lands inside
+ * this window before a class starts.
  */
 const UPCOMING_CLASS_LEAD_MINUTES = 10;
 /** Homework due within this many days of the user's local "today" is "due soon". */
@@ -44,8 +44,15 @@ const REVIEW_AGE_DAYS = 7;
 const REVIEW_MAX_AGE_DAYS = 60;
 /** Cap review reminders per run — the point is a nudge, not an inbox flood. */
 const REVIEW_REMINDERS_PER_RUN = 3;
-/** How stale a user's notifications may get before the next read regenerates them. */
-const REFRESH_INTERVAL_MS = 15 * 60 * 1000;
+/**
+ * How stale a user's notifications may get before the next read regenerates
+ * them. Shared with the Supabase Cron sweep in notifications.jobs.ts, which
+ * claims the same `notifications_generated_at` stamp on the same cadence —
+ * kept at 5 minutes (rather than a longer interval) so the two paths agree
+ * on staleness, and so the sweep's own 5-minute schedule always lands inside
+ * UPCOMING_CLASS_LEAD_MINUTES' 10-minute window for every class start.
+ */
+const REFRESH_INTERVAL_MS = 5 * 60 * 1000;
 
 interface CreatedNotification {
   id: string;
@@ -65,12 +72,14 @@ interface GenerationClaim {
 /**
  * Brings the signed-in user's notifications up to date, then returns.
  *
- * This is the whole scheduler: every path that reads notifications calls it
- * first, so a user who opens the app gets notifications generated from their
- * own lessons and homework, and a user who never opens it costs nothing. That
- * replaces the previous design — a Vercel Cron hitting a secret-protected
- * route hourly, which swept *every* user through the service-role client
- * whether or not they were ever coming back.
+ * This is the fast path: every read of notifications calls it first, so a
+ * user with the app open gets their notifications regenerated the moment
+ * they go stale, without waiting on the next cron tick. It shares the
+ * `notifications_generated_at` throttle with the Supabase Cron sweep in
+ * notifications.jobs.ts — the sweep is what actually guarantees delivery for
+ * a user who isn't in the app (e.g. "class starts in 10 minutes" while
+ * they're away); this function is a same-session shortcut on top of it, not
+ * a replacement for it.
  *
  * Consequences worth knowing:
  * - Everything here runs under the caller's session, so RLS scopes each query

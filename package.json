@@ -2,9 +2,6 @@
   "name": "study-line",
   "version": "0.1.0",
   "private": true,
-  "engines": {
-    "node": ">=20"
-  },
   "scripts": {
     "build": "rm -rf .next && next build",
     "build:windows": "bun run next build && xcopy \".\\public\" \".\\.next\\standalone\\public\" /e /i /y && xcopy \".\\.next\\static\" \".\\.next\\standalone\\.next\\static\" /e /i /y",

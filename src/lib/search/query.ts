@@ -4,6 +4,7 @@ import type { SearchResultItem } from "@/lib/types/search";
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
 
 const LESSONS_LIST_PATH = "/lessons/list";
+const CLASSES_LIST_PATH = "/classes/list";
 
 /**
  * Shared core query, imported by both `search.ts` ("server-only", used by
@@ -43,7 +44,7 @@ export async function runSearchQuery(
       .limit(limit),
     supabase
       .from("lessons")
-      .select("id, title, teacher, location")
+      .select("id, title")
       .eq("user_id", userId)
       .textSearch("search_vector", trimmed, { type: "websearch", config: "english" })
       .limit(limit),
@@ -54,7 +55,7 @@ export async function runSearchQuery(
       .textSearch("search_vector", trimmed, { type: "websearch", config: "english" })
       .limit(limit),
     supabase
-      .from("lessons")
+      .from("classes")
       .select("teacher")
       .eq("user_id", userId)
       .not("teacher", "is", null)
@@ -91,7 +92,7 @@ export async function runSearchQuery(
       id: row.id,
       kind: "lesson" as const,
       title: row.title,
-      subtitle: row.teacher ?? row.location,
+      subtitle: null,
       path: `/lessons/detail/${row.id}`,
     })),
     ...notes.map((row) => ({
@@ -106,7 +107,7 @@ export async function runSearchQuery(
       kind: "teacher" as const,
       title: teacher,
       subtitle: null,
-      path: LESSONS_LIST_PATH,
+      path: CLASSES_LIST_PATH,
     })),
     ...(tagRows ?? []).map((row) => ({
       id: row.id,

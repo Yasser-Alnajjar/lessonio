@@ -17,11 +17,11 @@ import { addDays, daysBetween, localClock, localIsoDate } from "@/lib/notificati
 import { renderNotificationEmail } from "@/lib/notifications/email-template";
 import { parseNotificationPreferences } from "@/lib/notifications/preferences";
 import type { createClient } from "@/lib/supabase/server";
-import type { ClassScheduleEntry } from "@/lib/types/class-schedule";
 import type { Database } from "@/lib/types/database";
 import type { NotificationType } from "@/lib/types/notification";
 import type { NotificationPreferences } from "@/lib/types/settings";
 import type { AppLocale } from "@/i18n/routing";
+import { ensureClassesForUser } from "./classes.generate";
 
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
 type NotificationInsert = Database["public"]["Tables"]["notifications"]["Insert"];
@@ -177,17 +177,22 @@ async function generateNotifications(
   const now = new Date();
   const today = localIsoDate(now, claim.timezone);
 
+  // Materialization runs here too (not just on the classes/dashboard/calendar
+  // read paths): a user whose bell polls before they ever open the classes
+  // list or dashboard would otherwise see no upcoming_class notices.
+  await ensureClassesForUser(supabase, userId);
+
   const [
     { data: subjectRows },
     { data: lessonRows },
     { data: homeworkRows },
     { data: reviewRows },
-    { data: classScheduleRows },
+    { data: classRows },
   ] = await Promise.all([
     supabase.from("subjects").select("id, name").eq("user_id", userId),
     supabase
       .from("lessons")
-      .select("id, subject_id, title, date, time")
+      .select("id, subject_id, title, date")
       .eq("user_id", userId)
       .gte("date", today)
       .lte("date", addDays(today, UPCOMING_LESSON_DAYS)),
@@ -208,11 +213,10 @@ async function generateNotifications(
       .order("date", { ascending: false })
       .limit(REVIEW_REMINDERS_PER_RUN),
     supabase
-      .from("class_schedules")
-      .select("id, subject_id, teacher, location, schedules, starts_on, ends_on")
+      .from("classes")
+      .select("id, subject_id, teacher, location, start_time")
       .eq("user_id", userId)
-      .eq("is_active", true)
-      .lte("starts_on", today),
+      .eq("date", today),
   ]);
 
   const subjectNames = new Map((subjectRows ?? []).map((row) => [row.id, row.name]));
@@ -243,7 +247,6 @@ async function generateNotifications(
       upcomingLessonCopy(locale, {
         lessonTitle: lesson.title,
         subjectName: subjectNameOf(lesson.subject_id),
-        time: lesson.time,
         isToday: lesson.date === today,
       }),
     );
@@ -274,28 +277,21 @@ async function generateNotifications(
 
   const clock = localClock(now, claim.timezone);
 
-  for (const classSchedule of classScheduleRows ?? []) {
-    if (classSchedule.ends_on && classSchedule.ends_on < today) continue;
+  for (const classRow of classRows ?? []) {
+    const [hours = 0, minutes = 0] = classRow.start_time.split(":").map(Number);
+    const minutesUntil = hours * 60 + minutes - clock.minutesOfDay;
+    if (minutesUntil < 0 || minutesUntil > UPCOMING_CLASS_LEAD_MINUTES) continue;
 
-    const entries = classSchedule.schedules as unknown as ClassScheduleEntry[];
-    for (const entry of entries) {
-      if (entry.dayOfWeek !== clock.weekday) continue;
-
-      const [hours = 0, minutes = 0] = entry.startTime.split(":").map(Number);
-      const minutesUntil = hours * 60 + minutes - clock.minutesOfDay;
-      if (minutesUntil < 0 || minutesUntil > UPCOMING_CLASS_LEAD_MINUTES) continue;
-
-      add(
-        "upcoming_class",
-        `upcoming_class:${classSchedule.id}:${entry.dayOfWeek}:${today}`,
-        upcomingClassCopy(locale, {
-          subjectName: subjectNameOf(classSchedule.subject_id),
-          teacher: classSchedule.teacher,
-          location: classSchedule.location,
-          minutesUntil,
-        }),
-      );
-    }
+    add(
+      "upcoming_class",
+      `upcoming_class:${classRow.id}:${today}`,
+      upcomingClassCopy(locale, {
+        subjectName: subjectNameOf(classRow.subject_id),
+        teacher: classRow.teacher,
+        location: classRow.location,
+        minutesUntil,
+      }),
+    );
   }
 
   add(

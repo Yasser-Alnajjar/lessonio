@@ -4,7 +4,7 @@ import type { DashboardOverviewData } from "@/lib/types/dashboard";
 import { GreetingCard } from "./greeting-card";
 import { StreakCard } from "./streak-card";
 import { ProgressCard } from "./progress-card";
-import { LessonListCard } from "./lesson-list-card";
+import { ClassListCard } from "./class-list-card";
 import { RecentActivityCard } from "./recent-activity-card";
 import { WeeklySummaryCard } from "./weekly-summary-card";
 import { QuickActionsCard } from "./quick-actions-card";
@@ -26,8 +26,8 @@ export const DashboardOverviewView = ({ data }: DashboardOverviewViewProps) => {
     longestStreakDays: 0,
   };
   const overallProgressPercent = data?.overallProgressPercent ?? 0;
-  const todayLessons = data?.todayLessons ?? [];
-  const upcomingLessons = data?.upcomingLessons ?? [];
+  const todayClasses = data?.todayClasses ?? [];
+  const upcomingClasses = data?.upcomingClasses ?? [];
   const recentActivity = data?.recentActivity ?? [];
   const weeklySummary = data?.weeklySummary ?? {
     totalMinutes: 0,
@@ -53,15 +53,15 @@ export const DashboardOverviewView = ({ data }: DashboardOverviewViewProps) => {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <LessonListCard
-          title={t("todayLessons.title")}
-          lessons={todayLessons}
-          emptyMessage={t("todayLessons.empty")}
+        <ClassListCard
+          title={t("todayClasses.title")}
+          classes={todayClasses}
+          emptyMessage={t("todayClasses.empty")}
         />
-        <LessonListCard
-          title={t("upcomingLessons.title")}
-          lessons={upcomingLessons}
-          emptyMessage={t("upcomingLessons.empty")}
+        <ClassListCard
+          title={t("upcomingClasses.title")}
+          classes={upcomingClasses}
+          emptyMessage={t("upcomingClasses.empty")}
         />
       </div>
 

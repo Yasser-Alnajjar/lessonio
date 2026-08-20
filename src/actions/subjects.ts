@@ -45,7 +45,8 @@ function percentage(numerator: number, denominator: number): number {
 }
 
 interface StatsInputRows {
-  lessons: Array<{ subject_id: string; attendance_status: string; study_status: string }>;
+  lessons: Array<{ subject_id: string; study_status: string }>;
+  classes: Array<{ subject_id: string; attendance_status: string | null }>;
   homework: Array<{ subject_id: string; completed: boolean }>;
   sessions: Array<{ subject_id: string | null; duration_minutes: number | null }>;
 }
@@ -59,12 +60,17 @@ function computeStatsBySubject(
 
   for (const subjectId of subjectIds) {
     const lessons = rows.lessons.filter((row) => row.subject_id === subjectId);
+    const recordedClasses = rows.classes.filter(
+      (row) => row.subject_id === subjectId && row.attendance_status !== null,
+    );
     const homework = rows.homework.filter((row) => row.subject_id === subjectId);
     const totalStudyMinutes = rows.sessions
       .filter((row) => row.subject_id === subjectId)
       .reduce((sum, row) => sum + (row.duration_minutes ?? 0), 0);
 
-    const attended = lessons.filter((row) => row.attendance_status === "attended").length;
+    const attended = recordedClasses.filter(
+      (row) => row.attendance_status === "attended",
+    ).length;
     const studied = lessons.filter(
       (row) => row.study_status === "completed" || row.study_status === "reviewed",
     ).length;
@@ -73,7 +79,7 @@ function computeStatsBySubject(
     statsById.set(subjectId, {
       subjectId,
       totalLessons: lessons.length,
-      attendanceRate: percentage(attended, lessons.length),
+      attendanceRate: percentage(attended, recordedClasses.length),
       studyRate: percentage(studied, lessons.length),
       homeworkProgress: percentage(completedHomework, homework.length),
       totalStudyMinutes,
@@ -89,30 +95,37 @@ async function fetchStatsRows(
   subjectIds: string[],
 ): Promise<StatsInputRows> {
   if (subjectIds.length === 0) {
-    return { lessons: [], homework: [], sessions: [] };
+    return { lessons: [], classes: [], homework: [], sessions: [] };
   }
 
-  const [{ data: lessonRows }, { data: homeworkRows }, { data: sessionRows }] = await Promise.all([
-    supabase
-      .from("lessons")
-      .select("subject_id, attendance_status, study_status")
-      .eq("user_id", userId)
-      .eq("is_archived", false)
-      .in("subject_id", subjectIds),
-    supabase
-      .from("homework")
-      .select("subject_id, completed")
-      .eq("user_id", userId)
-      .in("subject_id", subjectIds),
-    supabase
-      .from("study_sessions")
-      .select("subject_id, duration_minutes")
-      .eq("user_id", userId)
-      .in("subject_id", subjectIds),
-  ]);
+  const [{ data: lessonRows }, { data: classRows }, { data: homeworkRows }, { data: sessionRows }] =
+    await Promise.all([
+      supabase
+        .from("lessons")
+        .select("subject_id, study_status")
+        .eq("user_id", userId)
+        .eq("is_archived", false)
+        .in("subject_id", subjectIds),
+      supabase
+        .from("classes")
+        .select("subject_id, attendance_status")
+        .eq("user_id", userId)
+        .in("subject_id", subjectIds),
+      supabase
+        .from("homework")
+        .select("subject_id, completed")
+        .eq("user_id", userId)
+        .in("subject_id", subjectIds),
+      supabase
+        .from("study_sessions")
+        .select("subject_id, duration_minutes")
+        .eq("user_id", userId)
+        .in("subject_id", subjectIds),
+    ]);
 
   return {
     lessons: lessonRows ?? [],
+    classes: classRows ?? [],
     homework: homeworkRows ?? [],
     sessions: sessionRows ?? [],
   };

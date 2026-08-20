@@ -11,130 +11,92 @@ import type {
   WeeklyStudySummary,
 } from "@/lib/types/dashboard";
 import type { GamificationProgress } from "@/lib/types/gamification";
-import type { Lesson, LessonWithRelations } from "@/lib/types/lesson";
+import type { Class, ClassWithRelations } from "@/lib/types/class";
+import type { SubjectIcon } from "@/lib/types/subject";
 import type { Database } from "@/lib/types/database";
+import { ensureClassesForUser } from "./classes.generate";
 import { syncAndFetchUserAchievements } from "./gamification";
 
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
-type LessonRow = Database["public"]["Tables"]["lessons"]["Row"];
+type ClassRow = Database["public"]["Tables"]["classes"]["Row"];
 
-const TODAY_LESSON_WINDOW = 30;
-const UPCOMING_LESSON_LIMIT = 5;
+const TODAY_CLASS_WINDOW = 30;
+const UPCOMING_CLASS_LIMIT = 5;
 const RECENT_ACTIVITY_LIMIT = 8;
 const WEEK_LENGTH_DAYS = 7;
 
-function mapLessonRow(
-  row: LessonRow,
-  subjects: Map<string, { name: string; color: string }>,
-  tagsByLesson: Map<string, string[]>,
-  noteCounts: Map<string, number>,
-  attachmentCounts: Map<string, number>,
-): LessonWithRelations {
+function mapClassRow(
+  row: ClassRow,
+  subjects: Map<string, { name: string; color: string; icon: SubjectIcon }>,
+): ClassWithRelations {
   const subject = subjects.get(row.subject_id);
 
-  const lesson: Lesson = {
+  const klass: Class = {
     id: row.id,
     userId: row.user_id,
     subjectId: row.subject_id,
-    title: row.title,
+    classScheduleId: row.class_schedule_id,
+    date: row.date,
+    startTime: row.start_time,
+    durationMinutes: row.duration_minutes,
     teacher: row.teacher,
     location: row.location,
-    date: row.date,
-    time: row.time,
-    durationMinutes: row.duration_minutes,
-    attendanceStatus: row.attendance_status as Lesson["attendanceStatus"],
-    studyStatus: row.study_status as Lesson["studyStatus"],
-    reviewStatus: row.review_status as Lesson["reviewStatus"],
-    homeworkStatus: row.homework_status as Lesson["homeworkStatus"],
-    examStatus: row.exam_status as Lesson["examStatus"],
-    isArchived: row.is_archived,
-    tagIds: [],
+    attendanceStatus: row.attendance_status as Class["attendanceStatus"],
+    examStatus: row.exam_status as Class["examStatus"],
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
 
   return {
-    ...lesson,
+    ...klass,
     subjectName: subject?.name ?? "Unknown subject",
     subjectColor: subject?.color ?? "#94a3b8",
-    tags: tagsByLesson.get(row.id) ?? [],
-    noteCount: noteCounts.get(row.id) ?? 0,
-    attachmentCount: attachmentCounts.get(row.id) ?? 0,
+    subjectIcon: subject?.icon ?? "book-open",
   };
 }
 
-function countByKey(rows: Array<{ lesson_id: string }>): Map<string, number> {
-  const counts = new Map<string, number>();
-  for (const row of rows) {
-    counts.set(row.lesson_id, (counts.get(row.lesson_id) ?? 0) + 1);
-  }
-  return counts;
-}
-
-async function fetchLessonsWithRelations(
+async function fetchClassesWithRelations(
   supabase: SupabaseServerClient,
   userId: string,
-): Promise<{ today: LessonWithRelations[]; upcoming: LessonWithRelations[] }> {
+): Promise<{ today: ClassWithRelations[]; upcoming: ClassWithRelations[] }> {
   const todayIso = format(new Date(), "yyyy-MM-dd");
 
-  const { data: lessonRows } = await supabase
-    .from("lessons")
+  await ensureClassesForUser(supabase, userId);
+
+  const { data: classRows } = await supabase
+    .from("classes")
     .select("*")
     .eq("user_id", userId)
-    .eq("is_archived", false)
     .gte("date", todayIso)
     .order("date", { ascending: true })
-    .order("time", { ascending: true })
-    .limit(TODAY_LESSON_WINDOW);
+    .order("start_time", { ascending: true })
+    .limit(TODAY_CLASS_WINDOW);
 
-  const rows = lessonRows ?? [];
+  const rows = classRows ?? [];
   if (rows.length === 0) {
     return { today: [], upcoming: [] };
   }
 
   const subjectIds = [...new Set(rows.map((row) => row.subject_id))];
-  const lessonIds = rows.map((row) => row.id);
-
-  const [{ data: subjectRows }, { data: lessonTagRows }, { data: noteRows }, { data: attachmentRows }] =
-    await Promise.all([
-      supabase.from("subjects").select("id, name, color").in("id", subjectIds),
-      supabase.from("lesson_tags").select("lesson_id, tag_id").in("lesson_id", lessonIds),
-      supabase.from("lesson_notes").select("lesson_id").in("lesson_id", lessonIds),
-      supabase.from("attachments").select("lesson_id").in("lesson_id", lessonIds),
-    ]);
+  const { data: subjectRows } = await supabase
+    .from("subjects")
+    .select("id, name, color, icon")
+    .in("id", subjectIds);
 
   const subjects = new Map(
-    (subjectRows ?? []).map((row) => [row.id, { name: row.name, color: row.color }]),
+    (subjectRows ?? []).map((row) => [
+      row.id,
+      { name: row.name, color: row.color, icon: row.icon as SubjectIcon },
+    ]),
   );
 
-  const tagIds = [...new Set((lessonTagRows ?? []).map((row) => row.tag_id))];
-  const { data: tagRows } =
-    tagIds.length > 0
-      ? await supabase.from("tags").select("id, name").in("id", tagIds)
-      : { data: [] as Array<{ id: string; name: string }> };
-  const tagNamesById = new Map((tagRows ?? []).map((row) => [row.id, row.name]));
-
-  const tagsByLesson = new Map<string, string[]>();
-  for (const link of lessonTagRows ?? []) {
-    const tagName = tagNamesById.get(link.tag_id);
-    if (!tagName) continue;
-    const existing = tagsByLesson.get(link.lesson_id) ?? [];
-    existing.push(tagName);
-    tagsByLesson.set(link.lesson_id, existing);
-  }
-
-  const noteCounts = countByKey(noteRows ?? []);
-  const attachmentCounts = countByKey(attachmentRows ?? []);
-
-  const withRelations = rows.map((row) =>
-    mapLessonRow(row, subjects, tagsByLesson, noteCounts, attachmentCounts),
-  );
+  const withRelations = rows.map((row) => mapClassRow(row, subjects));
 
   return {
-    today: withRelations.filter((lesson) => lesson.date === todayIso),
+    today: withRelations.filter((klass) => klass.date === todayIso),
     upcoming: withRelations
-      .filter((lesson) => lesson.date > todayIso)
-      .slice(0, UPCOMING_LESSON_LIMIT),
+      .filter((klass) => klass.date > todayIso)
+      .slice(0, UPCOMING_CLASS_LIMIT),
   };
 }
 
@@ -378,7 +340,7 @@ export const dashboardActions = {
     const [greetingName, { today, upcoming }, recentActivity, weeklySummary, progress] =
       await Promise.all([
         fetchGreetingName(supabase, userId, authFullName, authData.user.email ?? ""),
-        fetchLessonsWithRelations(supabase, userId),
+        fetchClassesWithRelations(supabase, userId),
         fetchRecentActivity(supabase, userId),
         fetchWeeklySummary(supabase, userId),
         fetchProgress(supabase, userId),
@@ -394,8 +356,8 @@ export const dashboardActions = {
         greetingName,
         progress,
         overallProgressPercent,
-        todayLessons: today,
-        upcomingLessons: upcoming,
+        todayClasses: today,
+        upcomingClasses: upcoming,
         recentActivity,
         weeklySummary,
       },

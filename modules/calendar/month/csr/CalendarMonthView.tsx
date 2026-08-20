@@ -8,6 +8,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { rescheduleLesson } from "@/actions/calendar.mutations";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ClassCard } from "@/components/ui-system/class-card";
 import { LessonCard } from "@/components/ui-system/lesson-card";
 import { useRouter } from "@/i18n/navigation";
 import useTranslate from "@/hooks/useTranslate";
@@ -143,8 +144,12 @@ export const CalendarMonthView = ({ data, subjects, year, month }: CalendarMonth
         {days.map((day) => {
           const isToday = day.date === todayIso;
           const isDragOver = dragOverDate === day.date;
-          const visibleLessons = day.lessons.slice(0, 3);
-          const overflowCount = day.lessons.length - visibleLessons.length;
+          const dayItems = [
+            ...day.classes.map((klass) => ({ kind: "class" as const, klass })),
+            ...day.lessons.map((lesson) => ({ kind: "lesson" as const, lesson })),
+          ];
+          const visibleItems = dayItems.slice(0, 3);
+          const overflowCount = dayItems.length - visibleItems.length;
           const dayNumber = Number(day.date.slice(-2));
 
           return (
@@ -180,25 +185,40 @@ export const CalendarMonthView = ({ data, subjects, year, month }: CalendarMonth
                 {dayNumber}
               </span>
               <div className="flex flex-col gap-1">
-                {visibleLessons.map((lesson) => (
-                  <div
-                    key={lesson.id}
-                    draggable
-                    onDragStart={(event) => {
-                      event.dataTransfer.setData("text/plain", lesson.id);
-                      event.dataTransfer.effectAllowed = "move";
-                    }}
-                    onClick={(event) => event.stopPropagation()}
-                    className="flex cursor-grab items-center gap-1 truncate rounded px-1 py-0.5 text-[0.65rem] text-foreground active:cursor-grabbing"
-                    style={{ backgroundColor: `${lesson.subjectColor}22` }}
-                  >
-                    <span
-                      className="size-1.5 shrink-0 rounded-full"
-                      style={{ backgroundColor: lesson.subjectColor }}
-                    />
-                    <span className="truncate">{lesson.title}</span>
-                  </div>
-                ))}
+                {visibleItems.map((item) =>
+                  item.kind === "lesson" ? (
+                    <div
+                      key={`lesson-${item.lesson.id}`}
+                      draggable
+                      onDragStart={(event) => {
+                        event.dataTransfer.setData("text/plain", item.lesson.id);
+                        event.dataTransfer.effectAllowed = "move";
+                      }}
+                      onClick={(event) => event.stopPropagation()}
+                      className="flex cursor-grab items-center gap-1 truncate rounded px-1 py-0.5 text-[0.65rem] text-foreground active:cursor-grabbing"
+                      style={{ backgroundColor: `${item.lesson.subjectColor}22` }}
+                    >
+                      <span
+                        className="size-1.5 shrink-0 rounded-full"
+                        style={{ backgroundColor: item.lesson.subjectColor }}
+                      />
+                      <span className="truncate">{item.lesson.title}</span>
+                    </div>
+                  ) : (
+                    <div
+                      key={`class-${item.klass.id}`}
+                      onClick={(event) => event.stopPropagation()}
+                      className="flex items-center gap-1 truncate rounded px-1 py-0.5 text-[0.65rem] text-foreground"
+                      style={{ backgroundColor: `${item.klass.subjectColor}22` }}
+                    >
+                      <span
+                        className="size-1.5 shrink-0 rounded-full"
+                        style={{ backgroundColor: item.klass.subjectColor }}
+                      />
+                      <span className="truncate">{item.klass.subjectName}</span>
+                    </div>
+                  ),
+                )}
                 {overflowCount > 0 && (
                   <span className="text-[0.65rem] text-muted-foreground">
                     {t("month.more", { count: overflowCount })}
@@ -221,9 +241,14 @@ export const CalendarMonthView = ({ data, subjects, year, month }: CalendarMonth
             </DialogTitle>
           </DialogHeader>
           <div className="flex flex-col gap-3">
-            {selectedDay && selectedDay.lessons.length === 0 && (
-              <p className="text-sm text-muted-foreground">{t("month.dayEmpty")}</p>
-            )}
+            {selectedDay &&
+              selectedDay.lessons.length === 0 &&
+              selectedDay.classes.length === 0 && (
+                <p className="text-sm text-muted-foreground">{t("month.dayEmpty")}</p>
+              )}
+            {selectedDay?.classes.map((klass) => (
+              <ClassCard key={klass.id} klass={klass} href={`/classes/detail/${klass.id}`} />
+            ))}
             {selectedDay?.lessons.map((lesson) => (
               <LessonCard
                 key={lesson.id}

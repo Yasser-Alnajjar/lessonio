@@ -2,6 +2,7 @@ import { attachmentsActions } from "./attachments";
 import { authActions } from "./auth";
 import { calendarActions } from "./calendar";
 import { classSchedulesActions } from "./class-schedules";
+import { classesActions } from "./classes";
 import { dashboardActions } from "./dashboard";
 import { examsActions } from "./exams";
 import { flashcardsActions } from "./flashcards";
@@ -27,6 +28,7 @@ export const Actions = {
   Dashboard: dashboardActions,
   Subjects: subjectsActions,
   ClassSchedules: classSchedulesActions,
+  Classes: classesActions,
   Lessons: lessonsActions,
   Notes: notesActions,
   Attachments: attachmentsActions,

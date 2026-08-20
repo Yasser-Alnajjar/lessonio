@@ -138,6 +138,69 @@ export type Database = {
           },
         ]
       }
+      classes: {
+        Row: {
+          attendance_status: string | null
+          class_schedule_id: string | null
+          created_at: string
+          date: string
+          duration_minutes: number
+          exam_status: string
+          id: string
+          location: string | null
+          start_time: string
+          subject_id: string
+          teacher: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          attendance_status?: string | null
+          class_schedule_id?: string | null
+          created_at?: string
+          date: string
+          duration_minutes: number
+          exam_status?: string
+          id?: string
+          location?: string | null
+          start_time: string
+          subject_id: string
+          teacher?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          attendance_status?: string | null
+          class_schedule_id?: string | null
+          created_at?: string
+          date?: string
+          duration_minutes?: number
+          exam_status?: string
+          id?: string
+          location?: string | null
+          start_time?: string
+          subject_id?: string
+          teacher?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "classes_class_schedule_id_fkey"
+            columns: ["class_schedule_id"]
+            isOneToOne: false
+            referencedRelation: "class_schedules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "classes_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       exams: {
         Row: {
           created_at: string
@@ -453,66 +516,58 @@ export type Database = {
       }
       lessons: {
         Row: {
-          attendance_status: string
+          class_id: string | null
           created_at: string
           date: string
-          duration_minutes: number
-          exam_status: string
           homework_status: string
           id: string
           is_archived: boolean
-          location: string | null
           review_status: string
           search_vector: unknown
           study_status: string
           subject_id: string
-          teacher: string | null
-          time: string
           title: string
           updated_at: string
           user_id: string
         }
         Insert: {
-          attendance_status?: string
+          class_id?: string | null
           created_at?: string
           date: string
-          duration_minutes: number
-          exam_status?: string
           homework_status?: string
           id?: string
           is_archived?: boolean
-          location?: string | null
           review_status?: string
           search_vector?: unknown
           study_status?: string
           subject_id: string
-          teacher?: string | null
-          time: string
           title: string
           updated_at?: string
           user_id: string
         }
         Update: {
-          attendance_status?: string
+          class_id?: string | null
           created_at?: string
           date?: string
-          duration_minutes?: number
-          exam_status?: string
           homework_status?: string
           id?: string
           is_archived?: boolean
-          location?: string | null
           review_status?: string
           search_vector?: unknown
           study_status?: string
           subject_id?: string
-          teacher?: string | null
-          time?: string
           title?: string
           updated_at?: string
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "lessons_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "lessons_subject_id_fkey"
             columns: ["subject_id"]
@@ -593,6 +648,7 @@ export type Database = {
       }
       settings: {
         Row: {
+          classes_materialized_at: string | null
           created_at: string
           grade_scale: Json
           locale: string
@@ -603,6 +659,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          classes_materialized_at?: string | null
           created_at?: string
           grade_scale?: Json
           locale?: string
@@ -613,6 +670,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          classes_materialized_at?: string | null
           created_at?: string
           grade_scale?: Json
           locale?: string

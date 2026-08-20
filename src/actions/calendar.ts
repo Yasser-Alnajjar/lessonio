@@ -4,15 +4,16 @@ import { eachDayOfInterval, endOfMonth, format, startOfMonth } from "date-fns";
 
 import type { ActionResult } from "@/lib/types/common";
 import type { CalendarMonthData } from "@/lib/types/calendar";
+import { classesActions } from "./classes";
 import { lessonsActions } from "./lessons";
 import { rescheduleLesson } from "./calendar.mutations";
 
 /** SSR-facing surface for `Actions.Calendar.*`. Mutations re-export the real Server Actions. */
 export const calendarActions = {
   /**
-   * Buckets the month's lessons by date. Reuses `lessonsActions.getAll` (which
-   * already supports `dateFrom`/`dateTo`) instead of duplicating the
-   * subject/tag/note/attachment join logic from `lessons.ts`.
+   * Buckets the month's lessons and classes by date. Reuses `lessonsActions.getAll`
+   * and `classesActions.getAll` (which both support `dateFrom`/`dateTo`) instead of
+   * duplicating their join logic here.
    */
   async getMonth(year: number, month: number): Promise<ActionResult<CalendarMonthData>> {
     const monthStart = startOfMonth(new Date(year, month - 1, 1));
@@ -20,9 +21,16 @@ export const calendarActions = {
     const dateFrom = format(monthStart, "yyyy-MM-dd");
     const dateTo = format(monthEnd, "yyyy-MM-dd");
 
-    const { data: lessons, error } = await lessonsActions.getAll({ dateFrom, dateTo });
-    if (error) {
-      return { data: null, error };
+    const [{ data: lessons, error: lessonsError }, { data: classes, error: classesError }] =
+      await Promise.all([
+        lessonsActions.getAll({ dateFrom, dateTo }),
+        classesActions.getAll({ dateFrom, dateTo }),
+      ]);
+    if (lessonsError) {
+      return { data: null, error: lessonsError };
+    }
+    if (classesError) {
+      return { data: null, error: classesError };
     }
 
     const days = eachDayOfInterval({ start: monthStart, end: monthEnd }).map((date) => {
@@ -30,6 +38,7 @@ export const calendarActions = {
       return {
         date: iso,
         lessons: (lessons ?? []).filter((lesson) => lesson.date === iso),
+        classes: (classes ?? []).filter((klass) => klass.date === iso),
       };
     });
 

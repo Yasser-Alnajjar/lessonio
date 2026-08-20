@@ -59,12 +59,9 @@ export async function createLesson(input: CreateLessonInput): Promise<MutationRe
     .insert({
       user_id: auth.userId,
       subject_id: input.subjectId,
+      class_id: input.classId || null,
       title: input.title,
-      teacher: input.teacher || null,
-      location: input.location || null,
       date: input.date,
-      time: input.time,
-      duration_minutes: input.durationMinutes,
     })
     .select("id")
     .single();
@@ -92,17 +89,12 @@ export async function updateLesson(
 
   const patch: LessonUpdate = {};
   if (input.subjectId !== undefined) patch.subject_id = input.subjectId;
+  if (input.classId !== undefined) patch.class_id = input.classId || null;
   if (input.title !== undefined) patch.title = input.title;
-  if (input.teacher !== undefined) patch.teacher = input.teacher || null;
-  if (input.location !== undefined) patch.location = input.location || null;
   if (input.date !== undefined) patch.date = input.date;
-  if (input.time !== undefined) patch.time = input.time;
-  if (input.durationMinutes !== undefined) patch.duration_minutes = input.durationMinutes;
-  if (input.attendanceStatus !== undefined) patch.attendance_status = input.attendanceStatus;
   if (input.studyStatus !== undefined) patch.study_status = input.studyStatus;
   if (input.reviewStatus !== undefined) patch.review_status = input.reviewStatus;
   if (input.homeworkStatus !== undefined) patch.homework_status = input.homeworkStatus;
-  if (input.examStatus !== undefined) patch.exam_status = input.examStatus;
   if (input.isArchived !== undefined) patch.is_archived = input.isArchived;
 
   if (Object.keys(patch).length > 0) {
@@ -148,12 +140,9 @@ export async function duplicateLesson(id: string): Promise<MutationResult> {
     .insert({
       user_id: auth.userId,
       subject_id: original.subject_id,
+      class_id: original.class_id,
       title: `${original.title} (Copy)`,
-      teacher: original.teacher,
-      location: original.location,
       date: original.date,
-      time: original.time,
-      duration_minutes: original.duration_minutes,
     })
     .select("id")
     .single();

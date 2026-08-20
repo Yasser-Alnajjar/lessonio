@@ -1,5 +1,5 @@
 import { format, parseISO } from "date-fns";
-import { CalendarDays, Clock, MapPin, User } from "lucide-react";
+import { CalendarDays } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -69,31 +69,10 @@ export function LessonCard({
             <CalendarDays className="size-3.5" />
             {format(parseISO(lesson.date), "MMM d, yyyy")}
           </span>
-          <span className="inline-flex items-center gap-1">
-            <Clock className="size-3.5" />
-            {lesson.time}
-          </span>
-          {lesson.teacher && (
-            <span className="inline-flex items-center gap-1">
-              <User className="size-3.5" />
-              {lesson.teacher}
-            </span>
-          )}
-          {lesson.location && (
-            <span className="inline-flex items-center gap-1">
-              <MapPin className="size-3.5" />
-              {lesson.location}
-            </span>
-          )}
         </div>
-        {(lesson.homeworkStatus !== "none" || lesson.examStatus !== "none") && (
+        {lesson.homeworkStatus !== "none" && (
           <div className="mt-1 flex flex-wrap items-center gap-1.5">
-            {lesson.homeworkStatus !== "none" && (
-              <StatusBadge kind="homework" status={lesson.homeworkStatus} />
-            )}
-            {lesson.examStatus !== "none" && (
-              <StatusBadge kind="exam" status={lesson.examStatus} />
-            )}
+            <StatusBadge kind="homework" status={lesson.homeworkStatus} />
           </div>
         )}
       </CardContent>

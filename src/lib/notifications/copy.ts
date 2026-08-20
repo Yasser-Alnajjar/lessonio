@@ -22,7 +22,6 @@ export interface NotificationCopy {
 interface UpcomingLessonParams {
   lessonTitle: string;
   subjectName: string;
-  time: string;
   isToday: boolean;
 }
 
@@ -50,32 +49,25 @@ interface UpcomingClassParams {
   minutesUntil: number;
 }
 
-/** Trims a `HH:MM:SS` Postgres time down to `HH:MM` for display. */
-export function formatTime(time: string): string {
-  return time.slice(0, 5);
-}
-
 export function resolveLocale(value: string | null | undefined): AppLocale {
   return locales.includes(value as AppLocale) ? (value as AppLocale) : defaultLocale;
 }
 
 export function upcomingLessonCopy(
   locale: AppLocale,
-  { lessonTitle, subjectName, time, isToday }: UpcomingLessonParams,
+  { lessonTitle, subjectName, isToday }: UpcomingLessonParams,
 ): NotificationCopy {
-  const at = formatTime(time);
-
   if (locale === "ar") {
     return {
       title: isToday ? "درس اليوم" : "درس غدًا",
-      body: `${lessonTitle} (${subjectName}) الساعة ${at}.`,
+      body: `${lessonTitle} (${subjectName}).`,
       linkPath: "/calendar/month",
     };
   }
 
   return {
     title: isToday ? "Lesson today" : "Lesson tomorrow",
-    body: `${lessonTitle} (${subjectName}) at ${at}.`,
+    body: `${lessonTitle} (${subjectName}).`,
     linkPath: "/calendar/month",
   };
 }
@@ -165,7 +157,7 @@ export function upcomingClassCopy(
     return {
       title: "حصة قادمة",
       body: details ? `${subjectName} تبدأ ${when} — ${details}.` : `${subjectName} تبدأ ${when}.`,
-      linkPath: "/class-schedules/list",
+      linkPath: "/classes/list",
     };
   }
 

@@ -40,17 +40,12 @@ function mapLessonRow(
     id: row.id,
     userId: row.user_id,
     subjectId: row.subject_id,
+    classId: row.class_id,
     title: row.title,
-    teacher: row.teacher,
-    location: row.location,
     date: row.date,
-    time: row.time,
-    durationMinutes: row.duration_minutes,
-    attendanceStatus: row.attendance_status as Lesson["attendanceStatus"],
     studyStatus: row.study_status as Lesson["studyStatus"],
     reviewStatus: row.review_status as Lesson["reviewStatus"],
     homeworkStatus: row.homework_status as Lesson["homeworkStatus"],
-    examStatus: row.exam_status as Lesson["examStatus"],
     isArchived: row.is_archived,
     tagIds: [],
     createdAt: row.created_at,
@@ -146,16 +141,12 @@ export const lessonsActions = {
     let query = supabase.from("lessons").select("*").eq("user_id", authData.user.id);
 
     if (filters?.subjectId) query = query.eq("subject_id", filters.subjectId);
-    if (filters?.attendanceStatus) query = query.eq("attendance_status", filters.attendanceStatus);
     if (filters?.studyStatus) query = query.eq("study_status", filters.studyStatus);
     if (filters?.reviewStatus) query = query.eq("review_status", filters.reviewStatus);
-    if (filters?.teacher) query = query.ilike("teacher", `%${filters.teacher}%`);
     if (filters?.dateFrom) query = query.gte("date", filters.dateFrom);
     if (filters?.dateTo) query = query.lte("date", filters.dateTo);
 
-    const { data: lessonRows, error } = await query
-      .order("date", { ascending: false })
-      .order("time", { ascending: false });
+    const { data: lessonRows, error } = await query.order("date", { ascending: false });
 
     if (error) {
       return { data: null, error: error.message };

@@ -20,6 +20,7 @@ import { useRouter } from "@/i18n/navigation";
 import useTranslate from "@/hooks/useTranslate";
 import { STUDY_STATUSES } from "@/lib/types/lesson";
 import type { LessonWithRelations } from "@/lib/types/lesson";
+import type { ClassWithRelations } from "@/lib/types/class";
 import type { Subject } from "@/lib/types/subject";
 import type { Tag } from "@/lib/types/tag";
 import { DeleteLessonDialog } from "../../components/DeleteLessonDialog";
@@ -30,6 +31,7 @@ interface LessonsListViewProps {
   data: LessonWithRelations[];
   subjects: Subject[];
   tags: Tag[];
+  classes: ClassWithRelations[];
 }
 
 interface FormState {
@@ -41,6 +43,7 @@ export const LessonsListView = ({
   data,
   subjects,
   tags: initialTags,
+  classes,
 }: LessonsListViewProps) => {
   const t = useTranslate("lessons");
   const router = useRouter();
@@ -71,12 +74,7 @@ export const LessonsListView = ({
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
     return data.filter((lesson) => {
-      if (
-        query &&
-        !lesson.title.toLowerCase().includes(query) &&
-        !(lesson.teacher ?? "").toLowerCase().includes(query) &&
-        !(lesson.location ?? "").toLowerCase().includes(query)
-      ) {
+      if (query && !lesson.title.toLowerCase().includes(query)) {
         return false;
       }
       if (
@@ -222,6 +220,7 @@ export const LessonsListView = ({
         lesson={formState.lesson}
         subjects={subjects}
         tags={tags}
+        classes={classes}
         onTagCreated={(tag) => setTags((prev) => [...prev, tag])}
         onSaved={() => router.refresh()}
       />

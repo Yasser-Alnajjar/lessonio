@@ -5,8 +5,6 @@ import { useTranslations } from "next-intl";
 
 import { updateLesson } from "@/actions/lessons.mutations";
 import {
-  ATTENDANCE_STATUS_META,
-  EXAM_STATUS_META,
   HOMEWORK_STATUS_META,
   REVIEW_STATUS_META,
   STUDY_STATUS_META,
@@ -19,15 +17,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  ATTENDANCE_STATUSES,
-  LESSON_EXAM_STATUSES,
   LESSON_HOMEWORK_STATUSES,
   REVIEW_STATUSES,
   STUDY_STATUSES,
 } from "@/lib/types/lesson";
 import type {
-  AttendanceStatus,
-  LessonExamStatus,
   LessonHomeworkStatus,
   LessonWithRelations,
   ReviewStatus,
@@ -54,23 +48,6 @@ export function LessonStatusControls({
     meta: Record<string, { label: string }>;
     onChange: (value: string) => void;
   }> = [
-    {
-      key: "attendance",
-      label: t("attendance.label"),
-      value: lesson.attendanceStatus,
-      options: ATTENDANCE_STATUSES.map((a) => ({
-        label: t(`attendance.${a}`),
-        value: a,
-      })),
-      meta: ATTENDANCE_STATUS_META,
-      onChange: (value) =>
-        startTransition(async () => {
-          await updateLesson(lesson.id, {
-            attendanceStatus: value as AttendanceStatus,
-          });
-          onUpdated?.();
-        }),
-    },
     {
       key: "study",
       label: t("study.label"),
@@ -120,27 +97,10 @@ export function LessonStatusControls({
           onUpdated?.();
         }),
     },
-    {
-      key: "exam",
-      label: t("exam.label"),
-      value: lesson.examStatus,
-      options: LESSON_EXAM_STATUSES.map((e) => ({
-        label: t(`exam.${e}`),
-        value: e,
-      })),
-      meta: EXAM_STATUS_META,
-      onChange: (value) =>
-        startTransition(async () => {
-          await updateLesson(lesson.id, {
-            examStatus: value as LessonExamStatus,
-          });
-          onUpdated?.();
-        }),
-    },
   ];
 
   return (
-    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
       {fields.map((field) => (
         <div key={field.key} className="flex flex-col gap-1.5">
           <label className="text-xs font-medium text-muted-foreground">

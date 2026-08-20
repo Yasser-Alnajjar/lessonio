@@ -15,7 +15,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import type { ActionResult } from "@/lib/types/common";
 import { calculateExamPercentage } from "@/lib/types/exam";
-import type { AttendanceStatus } from "@/lib/types/lesson";
+import type { AttendanceStatus } from "@/lib/types/class";
 import type {
   ChartPoint,
   HeatMapCell,
@@ -33,10 +33,15 @@ const STUDY_PROGRESS_WEEKS = 8;
 
 interface RawLessonRow {
   date: string;
+  subject_id: string;
+  study_status: string;
+}
+
+interface RawClassRow {
+  date: string;
   duration_minutes: number;
   subject_id: string;
-  attendance_status: string;
-  study_status: string;
+  attendance_status: string | null;
 }
 
 interface RawSessionRow {
@@ -53,6 +58,7 @@ async function fetchRawData(supabase: SupabaseServerClient, userId: string) {
 
   const [
     { data: lessonRows },
+    { data: classRows },
     { data: sessionRows },
     { data: homeworkRows },
     { data: examRows },
@@ -60,11 +66,14 @@ async function fetchRawData(supabase: SupabaseServerClient, userId: string) {
   ] = await Promise.all([
     supabase
       .from("lessons")
-      .select(
-        "date, duration_minutes, subject_id, attendance_status, study_status",
-      )
+      .select("date, subject_id, study_status")
       .eq("user_id", userId)
       .eq("is_archived", false)
+      .gte("date", windowStart),
+    supabase
+      .from("classes")
+      .select("date, duration_minutes, subject_id, attendance_status")
+      .eq("user_id", userId)
       .gte("date", windowStart),
     supabase
       .from("study_sessions")
@@ -86,6 +95,7 @@ async function fetchRawData(supabase: SupabaseServerClient, userId: string) {
 
   return {
     lessons: (lessonRows ?? []) as RawLessonRow[],
+    classes: (classRows ?? []) as RawClassRow[],
     sessions: (sessionRows ?? []) as RawSessionRow[],
     homework: homeworkRows ?? [],
     exams: examRows ?? [],
@@ -107,6 +117,7 @@ function computeStreak(sessionDates: string[]): number {
 
 async function buildStatCards(
   lessons: RawLessonRow[],
+  classes: RawClassRow[],
   sessions: RawSessionRow[],
   homework: Array<{ completed: boolean }>,
   exams: Array<{ score: number | null; total_score: number }>,
@@ -120,16 +131,16 @@ async function buildStatCards(
     .filter((session) => session.started_at >= monthStartIso)
     .reduce((sum, session) => sum + (session.duration_minutes ?? 0), 0);
 
-  const pastLessons = lessons.filter(
-    (lesson) => lesson.date <= format(new Date(), "yyyy-MM-dd"),
+  const recordedClasses = classes.filter(
+    (klass) => klass.attendance_status !== null,
   );
   const attendanceRate =
-    pastLessons.length > 0
+    recordedClasses.length > 0
       ? Math.round(
-          (pastLessons.filter(
-            (lesson) => lesson.attendance_status === "attended",
+          (recordedClasses.filter(
+            (klass) => klass.attendance_status === "attended",
           ).length /
-            pastLessons.length) *
+            recordedClasses.length) *
             100,
         )
       : 0;
@@ -291,7 +302,7 @@ function buildMonthlyGrowth(
 }
 
 async function buildAttendanceBreakdown(
-  lessons: RawLessonRow[],
+  classes: RawClassRow[],
 ): Promise<ChartPoint[]> {
   const t = await getTranslations("statistics.attendance");
   const statuses: AttendanceStatus[] = [
@@ -300,27 +311,28 @@ async function buildAttendanceBreakdown(
     "late",
     "cancelled",
   ];
-  const todayIso = format(new Date(), "yyyy-MM-dd");
-  const pastLessons = lessons.filter((lesson) => lesson.date <= todayIso);
+  const recordedClasses = classes.filter(
+    (klass) => klass.attendance_status !== null,
+  );
 
   return statuses.map((status) => ({
     label: t(status),
-    value: pastLessons.filter((lesson) => lesson.attendance_status === status)
+    value: recordedClasses.filter((klass) => klass.attendance_status === status)
       .length,
   }));
 }
 
 function buildSubjectDistribution(
-  lessons: RawLessonRow[],
+  classes: RawClassRow[],
   subjects: Array<{ id: string; name: string; color: string }>,
 ): SubjectDistributionPoint[] {
   const subjectMap = new Map(subjects.map((subject) => [subject.id, subject]));
   const minutesBySubject = new Map<string, number>();
 
-  for (const lesson of lessons) {
+  for (const klass of classes) {
     minutesBySubject.set(
-      lesson.subject_id,
-      (minutesBySubject.get(lesson.subject_id) ?? 0) + lesson.duration_minutes,
+      klass.subject_id,
+      (minutesBySubject.get(klass.subject_id) ?? 0) + klass.duration_minutes,
     );
   }
 
@@ -449,14 +461,12 @@ export const statisticsActions = {
 
     const userId = authData.user.id;
     const locale = await getLocale();
-    const { lessons, sessions, homework, exams, subjects } = await fetchRawData(
-      supabase,
-      userId,
-    );
+    const { lessons, classes, sessions, homework, exams, subjects } =
+      await fetchRawData(supabase, userId);
 
     const [cards, attendanceBreakdown] = await Promise.all([
-      buildStatCards(lessons, sessions, homework, exams),
-      buildAttendanceBreakdown(lessons),
+      buildStatCards(lessons, classes, sessions, homework, exams),
+      buildAttendanceBreakdown(classes),
     ]);
 
     return {
@@ -465,7 +475,7 @@ export const statisticsActions = {
         weeklyStudyTime: buildWeeklyStudyTime(sessions, locale),
         monthlyLessons: buildMonthlyLessons(lessons, locale),
         attendanceBreakdown,
-        subjectDistribution: buildSubjectDistribution(lessons, subjects),
+        subjectDistribution: buildSubjectDistribution(classes, subjects),
         studyProgress: buildStudyProgress(sessions, locale),
         heatMap: buildHeatMap(sessions),
         dailyActivity: buildDailyActivity(sessions, locale),

@@ -31,7 +31,8 @@ export interface NavItem {
 export const NAV_ITEMS = [
   { href: "/dashboard/overview", key: "dashboard", icon: LayoutDashboard },
   { href: "/subjects/list", key: "subjects", icon: BookOpen },
-  { href: "/class-schedules/list", key: "classes", icon: CalendarClock },
+  { href: "/classes/list", key: "classes", icon: CalendarClock },
+  { href: "/class-schedules/list", key: "schedule", icon: CalendarClock },
   { href: "/lessons/list", key: "lessons", icon: NotebookText },
   { href: "/flashcards/deck", key: "flashcards", icon: Layers },
   { href: "/study-sessions/focus", key: "studySessions", icon: Timer },

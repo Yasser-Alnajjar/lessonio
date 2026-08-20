@@ -1,6 +1,6 @@
 import type { UUID } from "./common";
+import type { ClassWithRelations } from "./class";
 import type { GamificationProgress } from "./gamification";
-import type { LessonWithRelations } from "./lesson";
 
 export interface RecentActivityItem {
   id: UUID;
@@ -19,8 +19,8 @@ export interface DashboardOverviewData {
   greetingName: string;
   progress: GamificationProgress;
   overallProgressPercent: number;
-  todayLessons: LessonWithRelations[];
-  upcomingLessons: LessonWithRelations[];
+  todayClasses: ClassWithRelations[];
+  upcomingClasses: ClassWithRelations[];
   recentActivity: RecentActivityItem[];
   weeklySummary: WeeklyStudySummary;
 }

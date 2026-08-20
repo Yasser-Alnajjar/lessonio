@@ -20,6 +20,7 @@ import type {
   UpdateClassScheduleInput,
 } from "@/lib/types/class-schedule";
 import type { Database, Json } from "@/lib/types/database";
+import { deleteFutureUntouchedOccurrences } from "./classes.generate";
 
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
 type ClassScheduleUpdate =
@@ -96,6 +97,11 @@ export async function updateClassSchedule(
     return { success: false, error: error.message };
   }
 
+  // The schedule's shape may have changed (days, times, teacher, location),
+  // so future occurrences nobody has touched yet are cleared and left for
+  // the next ensureClassesForUser() to re-materialize from the new template.
+  await deleteFutureUntouchedOccurrences(supabase, id);
+
   revalidatePath("/", "layout");
   return { success: true, error: null };
 }
@@ -126,6 +132,14 @@ export async function toggleActiveClassSchedule(
 
   if (error) return { success: false, error: error.message };
 
+  // Deactivating stops future materialization, so untouched future
+  // occurrences are cleared too — see deleteFutureUntouchedOccurrences().
+  // Reactivating needs no cleanup: the next ensureClassesForUser() just
+  // resumes materializing forward from today.
+  if (current.is_active) {
+    await deleteFutureUntouchedOccurrences(supabase, id);
+  }
+
   revalidatePath("/", "layout");
   return { success: true, error: null };
 }
@@ -135,6 +149,10 @@ export async function deleteClassSchedule(id: string): Promise<MutationResult> {
   const supabase = await createClient();
   const auth = await getAuthedUserId(supabase);
   if ("error" in auth) return { success: false, error: auth.error };
+
+  // No template survives to re-materialize from, so future untouched
+  // occurrences are cleared here rather than left to `on delete set null`.
+  await deleteFutureUntouchedOccurrences(supabase, id);
 
   const { error } = await supabase
     .from("class_schedules")

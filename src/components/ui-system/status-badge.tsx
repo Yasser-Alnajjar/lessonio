@@ -2,9 +2,8 @@
 
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import type { AttendanceStatus, ClassExamStatus } from "@/lib/types/class";
 import type {
-  AttendanceStatus,
-  LessonExamStatus,
   LessonHomeworkStatus,
   ReviewStatus,
   StudyStatus,
@@ -20,7 +19,7 @@ interface StatusMeta {
 }
 
 /**
- * Single source of truth for how each lesson-related status renders.
+ * Single source of truth for how each lesson/class-related status renders.
  * Labels are resolved through next-intl.
  */
 export const ATTENDANCE_STATUS_META: Record<AttendanceStatus, StatusMeta> = {
@@ -28,6 +27,12 @@ export const ATTENDANCE_STATUS_META: Record<AttendanceStatus, StatusMeta> = {
   absent: { label: "absent", variant: "destructive" },
   late: { label: "late", variant: "outline" },
   cancelled: { label: "cancelled", variant: "secondary" },
+};
+
+/** Shown for a class occurrence nobody has marked attendance for yet. */
+const ATTENDANCE_NOT_RECORDED_META: StatusMeta = {
+  label: "not_recorded",
+  variant: "secondary",
 };
 
 export const STUDY_STATUS_META: Record<StudyStatus, StatusMeta> = {
@@ -50,7 +55,7 @@ export const HOMEWORK_STATUS_META: Record<LessonHomeworkStatus, StatusMeta> = {
   completed: { label: "completed", variant: "default" },
 };
 
-export const EXAM_STATUS_META: Record<LessonExamStatus, StatusMeta> = {
+export const EXAM_STATUS_META: Record<ClassExamStatus, StatusMeta> = {
   none: { label: "none", variant: "secondary" },
   upcoming: { label: "upcoming", variant: "outline" },
   completed: { label: "completed", variant: "default" },
@@ -58,17 +63,19 @@ export const EXAM_STATUS_META: Record<LessonExamStatus, StatusMeta> = {
 
 type StatusBadgeProps = React.ComponentProps<typeof Badge> &
   (
-    | { kind: "attendance"; status: AttendanceStatus }
+    | { kind: "attendance"; status: AttendanceStatus | null }
     | { kind: "study"; status: StudyStatus }
     | { kind: "review"; status: ReviewStatus }
     | { kind: "homework"; status: LessonHomeworkStatus }
-    | { kind: "exam"; status: LessonExamStatus }
+    | { kind: "exam"; status: ClassExamStatus }
   );
 
 function getStatusMeta(props: StatusBadgeProps): StatusMeta {
   switch (props.kind) {
     case "attendance":
-      return ATTENDANCE_STATUS_META[props.status];
+      return props.status === null
+        ? ATTENDANCE_NOT_RECORDED_META
+        : ATTENDANCE_STATUS_META[props.status];
 
     case "study":
       return STUDY_STATUS_META[props.status];
@@ -84,8 +91,13 @@ function getStatusMeta(props: StatusBadgeProps): StatusMeta {
   }
 }
 
+/** attendance/exam moved to the `classes.status` namespace; the rest stay under `lessons.status`. */
+const CLASS_STATUS_KINDS = new Set(["attendance", "exam"]);
+
 export function StatusBadge(props: StatusBadgeProps) {
-  const t = useTranslate("lessons.status");
+  const tLessons = useTranslate("lessons.status");
+  const tClasses = useTranslate("classes.status");
+  const t = CLASS_STATUS_KINDS.has(props.kind) ? tClasses : tLessons;
 
   const { className, kind, variant: _variant, ...rest } = props;
 

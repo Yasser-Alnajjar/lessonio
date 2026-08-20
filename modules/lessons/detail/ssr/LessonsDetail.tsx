@@ -15,6 +15,7 @@ export const LessonsDetail = async ({ params }: LessonsDetailProps) => {
     { data: notes },
     { data: attachments },
     { data: flashcards },
+    { data: classes },
   ] = await Promise.all([
     Actions.Lessons.getById(lessonId),
     Actions.Subjects.getAll(),
@@ -22,6 +23,7 @@ export const LessonsDetail = async ({ params }: LessonsDetailProps) => {
     Actions.Notes.getAllForLesson(lessonId),
     Actions.Attachments.getAllForLesson(lessonId),
     Actions.Flashcards.getByLesson(lessonId),
+    Actions.Classes.getAll(),
   ]);
 
   return (
@@ -33,6 +35,7 @@ export const LessonsDetail = async ({ params }: LessonsDetailProps) => {
       notes={notes ?? []}
       attachments={attachments ?? []}
       flashcards={flashcards ?? []}
+      classes={classes ?? []}
     />
   );
 };

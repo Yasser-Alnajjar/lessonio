@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { format, parseISO } from "date-fns";
 import { useLocale, useTranslations } from "next-intl";
 import { Loader2 } from "lucide-react";
 
@@ -38,9 +39,13 @@ import type {
   CreateLessonInput,
   LessonWithRelations,
 } from "@/lib/types/lesson";
+import type { ClassWithRelations } from "@/lib/types/class";
 import type { Subject } from "@/lib/types/subject";
 import type { Tag } from "@/lib/types/tag";
 import { TagPicker } from "./TagPicker";
+
+/** Select value standing in for `classId: undefined` — "no linked class". */
+const CLASS_UNSET_VALUE = "unset";
 
 export interface LessonFormDialogProps {
   open: boolean;
@@ -48,6 +53,7 @@ export interface LessonFormDialogProps {
   lesson?: LessonWithRelations | null;
   subjects: Subject[];
   tags: Tag[];
+  classes: ClassWithRelations[];
   onTagCreated?: (tag: Tag) => void;
   onSaved?: () => void;
 }
@@ -56,13 +62,13 @@ function defaultValues(subjects: Subject[]): CreateLessonInput {
   return {
     subjectId: subjects[0]?.id ?? "",
     title: "",
-    teacher: "",
-    location: "",
     date: new Date().toISOString().slice(0, 10),
-    time: "09:00",
-    durationMinutes: 60,
     tagIds: [],
   };
+}
+
+function classLabel(klass: ClassWithRelations): string {
+  return `${klass.subjectName} · ${format(parseISO(klass.date), "MMM d, yyyy")} ${klass.startTime.slice(0, 5)}`;
 }
 
 export function LessonFormDialog({
@@ -71,6 +77,7 @@ export function LessonFormDialog({
   lesson,
   subjects,
   tags,
+  classes,
   onTagCreated,
   onSaved,
 }: LessonFormDialogProps) {
@@ -96,12 +103,9 @@ export function LessonFormDialog({
         lesson
           ? {
               subjectId: lesson.subjectId,
+              classId: lesson.classId ?? undefined,
               title: lesson.title,
-              teacher: lesson.teacher ?? "",
-              location: lesson.location ?? "",
               date: lesson.date,
-              time: lesson.time,
-              durationMinutes: lesson.durationMinutes,
               tagIds: lesson.tagIds,
             }
           : defaultValues(subjects),
@@ -195,86 +199,55 @@ export function LessonFormDialog({
               )}
             />
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="teacher"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("teacherLabel")}</FormLabel>
-                    <FormControl>
-                      <Input placeholder={t("teacherPlaceholder")} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="location"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("locationLabel")}</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder={t("locationPlaceholder")}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <FormField
+              control={form.control}
+              name="date"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("dateLabel")}</FormLabel>
+                  <FormControl>
+                    <Input type="date" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-            <div className="grid grid-cols-3 gap-4">
+            {classes.length > 0 && (
               <FormField
                 control={form.control}
-                name="date"
+                name="classId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("dateLabel")}</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
+                    <FormLabel>{t("classLabel")}</FormLabel>
+                    <Select
+                      value={field.value ?? CLASS_UNSET_VALUE}
+                      onValueChange={(value) =>
+                        field.onChange(value === CLASS_UNSET_VALUE ? undefined : value)
+                      }
+                      dir={isArabic ? "rtl" : "ltr"}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder={t("classPlaceholder")} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value={CLASS_UNSET_VALUE}>
+                          {t("classNone")}
+                        </SelectItem>
+                        {classes.map((klass) => (
+                          <SelectItem key={klass.id} value={klass.id}>
+                            {classLabel(klass)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="time"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("timeLabel")}</FormLabel>
-                    <FormControl>
-                      <Input type="time" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="durationMinutes"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("durationLabel")}</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min={1}
-                        value={field.value}
-                        onChange={(event) =>
-                          field.onChange(event.target.valueAsNumber)
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            )}
 
             <FormField
               control={form.control}

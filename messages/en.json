@@ -28,6 +28,7 @@
     "dashboard": "Dashboard",
     "subjects": "Subjects",
     "classes": "Classes",
+    "schedule": "Schedule",
     "lessons": "Lessons",
     "flashcards": "Flashcards",
     "studySessions": "Study sessions",
@@ -316,12 +317,12 @@
       "level": "Level {level}",
       "xpToNext": "{xp}/{xpToNext} XP to next level"
     },
-    "todayLessons": {
-      "title": "Today's lessons",
-      "empty": "No lessons scheduled for today."
+    "todayClasses": {
+      "title": "Today's classes",
+      "empty": "No classes scheduled for today."
     },
-    "upcomingLessons": {
-      "title": "Upcoming lessons",
+    "upcomingClasses": {
+      "title": "Upcoming classes",
       "empty": "Nothing coming up yet."
     },
     "recentActivity": {
@@ -418,12 +419,12 @@
   },
   "classSchedules": {
     "list": {
-      "title": "Classes",
+      "title": "Schedule",
       "subtitle": "Track the recurring classes you attend each week.",
-      "newClass": "Add Class",
+      "newClass": "Add schedule",
       "emptyTitle": "No classes found",
       "emptyDescription": "Add your first recurring class to start tracking when and where you attend.",
-      "emptyAction": "Add Class",
+      "emptyAction": "Add schedule",
       "noSubjectsTitle": "No subjects yet",
       "noSubjectsDescription": "Create a subject first, then add a class schedule for it."
     },
@@ -439,8 +440,8 @@
       "minutesSuffix": "m"
     },
     "form": {
-      "createTitle": "Add Class",
-      "editTitle": "Edit Class",
+      "createTitle": "Add schedule",
+      "editTitle": "Edit schedule",
       "createDescription": "Add a recurring class schedule for a subject.",
       "editDescription": "Update the schedule, teacher, or location for this class.",
       "subjectLabel": "Subject",
@@ -460,7 +461,7 @@
       "activeLabel": "Active",
       "cancel": "Cancel",
       "submitting": "Saving...",
-      "submitCreate": "Create Class",
+      "submitCreate": "Create schedule",
       "submitEdit": "Save changes",
       "errors": {
         "subjectRequired": "Choose a subject",
@@ -475,9 +476,9 @@
       }
     },
     "delete": {
-      "title": "Delete class?",
+      "title": "Delete schedule?",
       "description": "This permanently deletes the \"{name}\" class schedule. This cannot be undone.",
-      "confirm": "Delete class",
+      "confirm": "Delete schedule",
       "cancel": "Cancel",
       "genericError": "Something went wrong. Please try again."
     },
@@ -489,6 +490,90 @@
       "thursday": "Thursday",
       "friday": "Friday",
       "saturday": "Saturday"
+    }
+  },
+  "classes": {
+    "list": {
+      "title": "Classes",
+      "subtitle": "Your scheduled classes, from attendance to exam status.",
+      "newClass": "New class",
+      "noSubjectsHint": "Create a subject first — classes need one to belong to.",
+      "searchPlaceholder": "Search classes...",
+      "filterStatus": "Attendance",
+      "filterSubject": "Subject",
+      "filterDateRange": "Date range",
+      "emptyTitle": "No classes yet",
+      "emptyDescription": "Add your first class, or add a recurring schedule to generate them automatically.",
+      "emptyAction": "New class",
+      "noResultsTitle": "No matching classes",
+      "noResultsDescription": "Try a different search term or clear your filters."
+    },
+    "card": {
+      "actionsLabel": "Class actions",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "status": {
+      "attendance": {
+        "label": "Attendance",
+        "not_recorded": "Not recorded",
+        "attended": "Attended",
+        "absent": "Absent",
+        "late": "Late",
+        "cancelled": "Cancelled"
+      },
+      "exam": {
+        "label": "Exam",
+        "none": "No exam",
+        "upcoming": "Upcoming",
+        "completed": "Completed"
+      }
+    },
+    "form": {
+      "createTitle": "New class",
+      "editTitle": "Edit class",
+      "createDescription": "Add a class occurrence — standalone, or generated from a schedule.",
+      "editDescription": "Update the date, time, or details for this class.",
+      "subjectLabel": "Subject",
+      "subjectPlaceholder": "Choose a subject",
+      "dateLabel": "Date",
+      "timeLabel": "Time",
+      "durationLabel": "Duration (min)",
+      "teacherLabel": "Teacher",
+      "teacherPlaceholder": "e.g. Dr. Smith",
+      "locationLabel": "Location",
+      "locationPlaceholder": "e.g. Room 204",
+      "classLabel": "Class",
+      "classPlaceholder": "Link a class (optional)",
+      "classNone": "No linked class",
+      "cancel": "Cancel",
+      "submitting": "Saving...",
+      "submitCreate": "Create class",
+      "submitEdit": "Save changes",
+      "errors": {
+        "subjectRequired": "Choose a subject",
+        "dateRequired": "Date is required",
+        "timeRequired": "Time is required",
+        "durationInvalid": "Duration must be a positive number",
+        "teacherMax": "Teacher must be 120 characters or fewer",
+        "locationMax": "Location must be 120 characters or fewer"
+      }
+    },
+    "delete": {
+      "title": "Delete class?",
+      "description": "This permanently deletes the {subject} class on {date}. This cannot be undone.",
+      "confirm": "Delete class",
+      "cancel": "Cancel",
+      "genericError": "Something went wrong. Please try again."
+    },
+    "detail": {
+      "backToList": "Back to classes",
+      "notFoundTitle": "Class not found",
+      "notFoundDescription": "This class may have been deleted.",
+      "edit": "Edit",
+      "delete": "Delete",
+      "minutesSuffix": "min",
+      "statusTitle": "Status"
     }
   },
   "lessons": {
@@ -522,13 +607,6 @@
       "reviewed": "Reviewed"
     },
     "status": {
-      "attendance": {
-        "label": "attendance",
-        "attended": "Attended",
-        "absent": "Absent",
-        "late": "Late",
-        "cancelled": "Cancelled"
-      },
       "study": {
         "label": "study",
         "not_started": "Not started",
@@ -548,12 +626,6 @@
         "pending": "Pending",
         "in_progress": "In progress",
         "completed": "Completed"
-      },
-      "exam": {
-        "label": "exam",
-        "none": "No exam",
-        "upcoming": "Upcoming",
-        "completed": "Completed"
       }
     },
     "form": {
@@ -565,13 +637,10 @@
       "subjectPlaceholder": "Choose a subject",
       "titleLabel": "Title",
       "titlePlaceholder": "e.g. Chapter 4: Integrals",
-      "teacherLabel": "Teacher",
-      "teacherPlaceholder": "e.g. Dr. Smith",
-      "locationLabel": "Location",
-      "locationPlaceholder": "e.g. Room 204",
       "dateLabel": "Date",
-      "timeLabel": "Time",
-      "durationLabel": "Duration (min)",
+      "classLabel": "Class",
+      "classPlaceholder": "Link a class (optional)",
+      "classNone": "No linked class",
       "tagsLabel": "Tags",
       "tagsTrigger": "Tags",
       "newTagPlaceholder": "New tag name",
@@ -584,11 +653,7 @@
         "subjectRequired": "Choose a subject",
         "titleRequired": "Title is required",
         "titleMax": "Title must be 160 characters or fewer",
-        "teacherMax": "Teacher must be 120 characters or fewer",
-        "locationMax": "Location must be 120 characters or fewer",
-        "dateRequired": "Date is required",
-        "timeRequired": "Time is required",
-        "durationInvalid": "Duration must be a positive number"
+        "dateRequired": "Date is required"
       }
     },
     "delete": {
@@ -603,12 +668,12 @@
       "notFoundTitle": "Lesson not found",
       "notFoundDescription": "This lesson may have been deleted.",
       "archivedNote": "Archived",
+      "linkedClass": "View linked class",
       "edit": "Edit",
       "duplicate": "Duplicate",
       "archive": "Archive",
       "unarchive": "Unarchive",
       "delete": "Delete",
-      "minutesSuffix": "min",
       "statusTitle": "Status",
       "notesTab": "Notes",
       "attachmentsTab": "Attachments",

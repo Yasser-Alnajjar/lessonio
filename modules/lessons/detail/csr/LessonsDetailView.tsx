@@ -9,12 +9,10 @@ import {
   ArrowLeft,
   Badge as BadgeIcon,
   CalendarDays,
-  Clock,
+  CalendarClock,
   Copy,
-  MapPin,
   Pencil,
   Trash2,
-  User,
 } from "lucide-react";
 
 import {
@@ -30,6 +28,7 @@ import { Link, useRouter } from "@/i18n/navigation";
 import type { Attachment } from "@/lib/types/attachment";
 import type { LessonNote } from "@/lib/types/lesson-note";
 import type { LessonWithRelations } from "@/lib/types/lesson";
+import type { ClassWithRelations } from "@/lib/types/class";
 import type { Subject } from "@/lib/types/subject";
 import type { Tag } from "@/lib/types/tag";
 import type { FlashcardWithRelations } from "@/lib/types/flashcard";
@@ -48,6 +47,7 @@ interface LessonsDetailViewProps {
   notes: LessonNote[];
   attachments: Attachment[];
   flashcards: FlashcardWithRelations[];
+  classes: ClassWithRelations[];
 }
 
 export const LessonsDetailView = ({
@@ -57,6 +57,7 @@ export const LessonsDetailView = ({
   notes,
   attachments,
   flashcards,
+  classes,
 }: LessonsDetailViewProps) => {
   const t = useTranslations("lessons.detail");
   const locale = useLocale();
@@ -161,21 +162,14 @@ export const LessonsDetailView = ({
             <CalendarDays className="size-4" />
             {format(parseISO(data.date), "MMM d, yyyy")}
           </span>
-          <span className="inline-flex items-center gap-1.5">
-            <Clock className="size-4" />
-            {data.time} · {data.durationMinutes} {t("minutesSuffix")}
-          </span>
-          {data.teacher && (
-            <span className="inline-flex items-center gap-1.5">
-              <User className="size-4" />
-              {data.teacher}
-            </span>
-          )}
-          {data.location && (
-            <span className="inline-flex items-center gap-1.5">
-              <MapPin className="size-4" />
-              {data.location}
-            </span>
+          {data.classId && (
+            <Link
+              href={`/classes/detail/${data.classId}`}
+              className="inline-flex items-center gap-1.5 hover:text-foreground hover:underline"
+            >
+              <CalendarClock className="size-4" />
+              {t("linkedClass")}
+            </Link>
           )}
         </div>
         {data.tags.length > 0 && (
@@ -231,6 +225,7 @@ export const LessonsDetailView = ({
         lesson={data}
         subjects={subjects}
         tags={tags}
+        classes={classes}
         onTagCreated={(tag) => setTags((prev) => [...prev, tag])}
         onSaved={() => router.refresh()}
       />

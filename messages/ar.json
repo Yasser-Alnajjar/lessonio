@@ -28,6 +28,7 @@
     "dashboard": "لوحة التحكم",
     "subjects": "المواد",
     "classes": "الحصص",
+    "schedule": "الجدول",
     "lessons": "الدروس",
     "flashcards": "البطاقات التعليمية",
     "studySessions": "جلسات المذاكرة",
@@ -316,12 +317,12 @@
       "level": "المستوى {level}",
       "xpToNext": "{xp}/{xpToNext} نقطة للمستوى التالي"
     },
-    "todayLessons": {
-      "title": "دروس اليوم",
-      "empty": "لا توجد دروس مجدولة اليوم."
+    "todayClasses": {
+      "title": "حصص اليوم",
+      "empty": "لا توجد حصص مجدولة اليوم."
     },
-    "upcomingLessons": {
-      "title": "الدروس القادمة",
+    "upcomingClasses": {
+      "title": "الحصص القادمة",
       "empty": "لا يوجد شيء قادم بعد."
     },
     "recentActivity": {
@@ -418,12 +419,12 @@
   },
   "classSchedules": {
     "list": {
-      "title": "الحصص",
+      "title": "الجدول",
       "subtitle": "تابع الحصص الأسبوعية المتكررة التي تحضرها.",
-      "newClass": "إضافة حصة",
+      "newClass": "إضافة جدول",
       "emptyTitle": "لا توجد حصص",
       "emptyDescription": "أضف أول حصة متكررة لتبدأ بمتابعة موعد ومكان حضورك.",
-      "emptyAction": "إضافة حصة",
+      "emptyAction": "إضافة جدول",
       "noSubjectsTitle": "لا توجد مواد بعد",
       "noSubjectsDescription": "أنشئ مادة أولاً، ثم أضف جدول حصص لها."
     },
@@ -439,8 +440,8 @@
       "minutesSuffix": "د"
     },
     "form": {
-      "createTitle": "إضافة حصة",
-      "editTitle": "تعديل الحصة",
+      "createTitle": "إضافة جدول",
+      "editTitle": "تعديل الجدول",
       "createDescription": "أضف جدول حصة متكررة لمادة.",
       "editDescription": "حدّث الجدول أو المعلم أو المكان لهذه الحصة.",
       "subjectLabel": "المادة",
@@ -460,7 +461,7 @@
       "activeLabel": "نشطة",
       "cancel": "إلغاء",
       "submitting": "جارٍ الحفظ...",
-      "submitCreate": "إنشاء الحصة",
+      "submitCreate": "إنشاء الجدول",
       "submitEdit": "حفظ التغييرات",
       "errors": {
         "subjectRequired": "اختر مادة",
@@ -475,9 +476,9 @@
       }
     },
     "delete": {
-      "title": "حذف الحصة؟",
+      "title": "حذف الجدول؟",
       "description": "سيؤدي هذا إلى حذف جدول حصة \"{name}\" نهائياً. لا يمكن التراجع عن هذا الإجراء.",
-      "confirm": "حذف الحصة",
+      "confirm": "حذف الجدول",
       "cancel": "إلغاء",
       "genericError": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
     },
@@ -489,6 +490,90 @@
       "thursday": "الخميس",
       "friday": "الجمعة",
       "saturday": "السبت"
+    }
+  },
+  "classes": {
+    "list": {
+      "title": "الحصص",
+      "subtitle": "حصصك المجدولة، من الحضور إلى حالة الاختبار.",
+      "newClass": "حصة جديدة",
+      "noSubjectsHint": "أنشئ مادة أولاً — تحتاج كل حصة إلى مادة تنتمي إليها.",
+      "searchPlaceholder": "البحث في الحصص...",
+      "filterStatus": "الحضور",
+      "filterSubject": "المادة",
+      "filterDateRange": "النطاق الزمني",
+      "emptyTitle": "لا توجد حصص بعد",
+      "emptyDescription": "أضف حصتك الأولى، أو أضف جدولًا متكررًا لإنشائها تلقائيًا.",
+      "emptyAction": "حصة جديدة",
+      "noResultsTitle": "لا توجد حصص مطابقة",
+      "noResultsDescription": "جرّب كلمة بحث مختلفة أو امسح عوامل التصفية."
+    },
+    "card": {
+      "actionsLabel": "إجراءات الحصة",
+      "edit": "تعديل",
+      "delete": "حذف"
+    },
+    "status": {
+      "attendance": {
+        "label": "الحضور",
+        "not_recorded": "لم يُسجَّل",
+        "attended": "حضر",
+        "absent": "غائب",
+        "late": "متأخر",
+        "cancelled": "ملغى"
+      },
+      "exam": {
+        "label": "الاختبار",
+        "none": "لا يوجد اختبار",
+        "upcoming": "قادم",
+        "completed": "مكتمل"
+      }
+    },
+    "form": {
+      "createTitle": "حصة جديدة",
+      "editTitle": "تعديل الحصة",
+      "createDescription": "أضف حصة — مستقلة، أو منشأة من جدول.",
+      "editDescription": "حدّث التاريخ أو الوقت أو تفاصيل هذه الحصة.",
+      "subjectLabel": "المادة",
+      "subjectPlaceholder": "اختر مادة",
+      "dateLabel": "التاريخ",
+      "timeLabel": "الوقت",
+      "durationLabel": "المدة (دقيقة)",
+      "teacherLabel": "المعلّم",
+      "teacherPlaceholder": "مثال: د. سميث",
+      "locationLabel": "المكان",
+      "locationPlaceholder": "مثال: قاعة 204",
+      "classLabel": "الحصة",
+      "classPlaceholder": "اربط بحصة (اختياري)",
+      "classNone": "بلا حصة مرتبطة",
+      "cancel": "إلغاء",
+      "submitting": "جارٍ الحفظ...",
+      "submitCreate": "إنشاء الحصة",
+      "submitEdit": "حفظ التغييرات",
+      "errors": {
+        "subjectRequired": "اختر مادة",
+        "dateRequired": "التاريخ مطلوب",
+        "timeRequired": "الوقت مطلوب",
+        "durationInvalid": "يجب أن تكون المدة رقمًا موجبًا",
+        "teacherMax": "يجب ألا يتجاوز اسم المعلّم 120 حرفًا",
+        "locationMax": "يجب ألا يتجاوز المكان 120 حرفًا"
+      }
+    },
+    "delete": {
+      "title": "حذف الحصة؟",
+      "description": "سيؤدي هذا إلى حذف حصة {subject} بتاريخ {date} نهائيًا. لا يمكن التراجع عن هذا.",
+      "confirm": "حذف الحصة",
+      "cancel": "إلغاء",
+      "genericError": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
+    },
+    "detail": {
+      "backToList": "العودة إلى الحصص",
+      "notFoundTitle": "الحصة غير موجودة",
+      "notFoundDescription": "ربما تم حذف هذه الحصة.",
+      "edit": "تعديل",
+      "delete": "حذف",
+      "minutesSuffix": "د",
+      "statusTitle": "الحالة"
     }
   },
   "lessons": {
@@ -530,13 +615,10 @@
       "subjectPlaceholder": "اختر مادة",
       "titleLabel": "العنوان",
       "titlePlaceholder": "مثال: الفصل 4: التكاملات",
-      "teacherLabel": "المعلّم",
-      "teacherPlaceholder": "مثال: د. سميث",
-      "locationLabel": "المكان",
-      "locationPlaceholder": "مثال: قاعة 204",
       "dateLabel": "التاريخ",
-      "timeLabel": "الوقت",
-      "durationLabel": "المدة (دقيقة)",
+      "classLabel": "الحصة",
+      "classPlaceholder": "اربط بحصة (اختياري)",
+      "classNone": "بلا حصة مرتبطة",
       "tagsLabel": "الوسوم",
       "tagsTrigger": "الوسوم",
       "newTagPlaceholder": "اسم وسم جديد",
@@ -549,11 +631,7 @@
         "subjectRequired": "اختر مادة",
         "titleRequired": "العنوان مطلوب",
         "titleMax": "يجب ألا يتجاوز العنوان 160 حرفًا",
-        "teacherMax": "يجب ألا يتجاوز اسم المعلّم 120 حرفًا",
-        "locationMax": "يجب ألا يتجاوز المكان 120 حرفًا",
-        "dateRequired": "التاريخ مطلوب",
-        "timeRequired": "الوقت مطلوب",
-        "durationInvalid": "يجب أن تكون المدة رقمًا موجبًا"
+        "dateRequired": "التاريخ مطلوب"
       }
     },
     "delete": {
@@ -568,25 +646,18 @@
       "notFoundTitle": "الدرس غير موجود",
       "notFoundDescription": "ربما تم حذف هذا الدرس.",
       "archivedNote": "مؤرشف",
+      "linkedClass": "عرض الحصة المرتبطة",
       "edit": "تعديل",
       "duplicate": "نسخ",
       "archive": "أرشفة",
       "unarchive": "إلغاء الأرشفة",
       "delete": "حذف",
-      "minutesSuffix": "د",
       "statusTitle": "الحالة",
       "notesTab": "الملاحظات",
       "attachmentsTab": "المرفقات",
       "flashcardsTab": "البطاقات التعليمية"
     },
     "status": {
-      "attendance": {
-        "label": "الحضور",
-        "attended": "حضر",
-        "absent": "غائب",
-        "late": "متأخر",
-        "cancelled": "ملغى"
-      },
       "study": {
         "label": "الدراسة",
         "not_started": "لم يبدأ",
@@ -605,12 +676,6 @@
         "none": "لا يوجد واجب",
         "pending": "قيد الانتظار",
         "in_progress": "قيد التنفيذ",
-        "completed": "مكتمل"
-      },
-      "exam": {
-        "label": "الاختبار",
-        "none": "لا يوجد اختبار",
-        "upcoming": "قادم",
         "completed": "مكتمل"
       }
     },

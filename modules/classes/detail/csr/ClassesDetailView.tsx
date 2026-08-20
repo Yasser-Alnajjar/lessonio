@@ -115,8 +115,8 @@ export const ClassesDetailView = ({
                 {tDays(WEEKDAY_LABEL_KEYS[meeting.dayOfWeek])}
               </span>{" "}
               ·{" "}
-              {format(parse(meeting.startTime, "HH:mm", new Date()), "h:mm a")} ·{" "}
-              {meeting.durationMinutes} {t("minutesSuffix")}
+              {format(parse(meeting.startTime, "HH:mm", new Date()), "h:mm a")}{" "}
+              · {meeting.durationMinutes} {t("minutesSuffix")}
             </li>
           ))}
         </ul>
@@ -174,7 +174,7 @@ export const ClassesDetailView = ({
       <ClassFormDialog
         open={editOpen}
         onOpenChange={setEditOpen}
-        klass={data}
+        item={data}
         subjects={subjects}
         onSaved={() => router.refresh()}
       />
@@ -182,7 +182,7 @@ export const ClassesDetailView = ({
       <DeleteClassDialog
         open={deleteOpen}
         onOpenChange={setDeleteOpen}
-        klass={data}
+        item={data}
         onDeleted={() => router.push("/classes/list")}
       />
     </div>

@@ -28,18 +28,20 @@ export function renderNotificationEmail({
   locale,
 }: NotificationEmailInput): string {
   const dir = localeDirections[locale];
-  const href = linkPath ? `${env.NEXT_PUBLIC_APP_URL}/${locale}${linkPath}` : null;
-  const ctaLabel = locale === "ar" ? "افتح Study Line" : "Open Study Line";
+  const href = linkPath
+    ? `${env.NEXT_PUBLIC_APP_URL}/${locale}${linkPath}`
+    : null;
+  const ctaLabel = locale === "ar" ? "افتح Lessonio" : "Open Lessonio";
   const footer =
     locale === "ar"
-      ? "أنت تتلقى هذه الرسالة لأن إشعارات البريد مفعّلة في إعدادات Study Line."
-      : "You're receiving this because email notifications are on in your Study Line settings.";
+      ? "أنت تتلقى هذه الرسالة لأن إشعارات البريد مفعّلة في إعدادات Lessonio."
+      : "You're receiving this because email notifications are on in your Lessonio settings.";
 
   return `<!doctype html>
 <html lang="${locale}" dir="${dir}">
   <body style="margin:0;padding:24px;background:#f6f6f5;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;color:#1c1917;">
     <div style="max-width:520px;margin:0 auto;background:#ffffff;border:1px solid #e7e5e4;border-radius:12px;padding:28px;">
-      <p style="margin:0 0 4px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#78716c;">Study Line</p>
+      <p style="margin:0 0 4px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#78716c;">Lessonio</p>
       <h1 style="margin:0 0 12px;font-size:20px;line-height:1.3;">${escapeHtml(title)}</h1>
       <p style="margin:0 0 24px;font-size:15px;line-height:1.6;color:#44403c;">${escapeHtml(body)}</p>
       ${

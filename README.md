@@ -1,4 +1,4 @@
-# Study Line
+# Lessonio
 
 > A personal study-management platform designed to help students organize what they study, track their progress, manage academic responsibilities, and build consistent study habits.
 
@@ -7,7 +7,7 @@
 ## Table of Contents
 
 - [Overview](#overview)
-- [What Study Line Does](#what-study-line-does)
+- [What Lessonio Does](#what-study-line-does)
 - [Getting Started](#getting-started)
 - [Core Concepts](#core-concepts)
 - [Dashboard](#dashboard)
@@ -42,9 +42,9 @@
 
 ## Overview
 
-**Study Line** is a study-management application that brings your academic activities into one place.
+**Lessonio** is a study-management application that brings your academic activities into one place.
 
-Instead of keeping your schedule, notes, homework, exams, study time, and progress in separate tools, Study Line connects them together.
+Instead of keeping your schedule, notes, homework, exams, study time, and progress in separate tools, Lessonio connects them together.
 
 The application is designed around a simple workflow:
 
@@ -78,9 +78,9 @@ The goal is to give you a clear picture of:
 
 ---
 
-# What Study Line Does
+# What Lessonio Does
 
-Study Line currently provides:
+Lessonio currently provides:
 
 | Area           | Purpose                                        |
 | -------------- | ---------------------------------------------- |
@@ -103,13 +103,13 @@ Study Line currently provides:
 
 # Getting Started
 
-When using Study Line for the first time, follow this order.
+When using Lessonio for the first time, follow this order.
 
 ## 1. Create your account
 
 Register using your email and password.
 
-After authentication, Study Line keeps your session persistent so you do not need to log in every time.
+After authentication, Lessonio keeps your session persistent so you do not need to log in every time.
 
 ---
 
@@ -124,7 +124,7 @@ For each subject you can define:
 - Icon
 - Other subject metadata
 
-Subjects are the primary organizational layer of Study Line.
+Subjects are the primary organizational layer of Lessonio.
 
 Example:
 
@@ -188,7 +188,7 @@ When you actively study, use the **Focus Timer**.
 
 The timer records your actual study session and connects the recorded time to your academic data.
 
-This is important because Study Line uses study-session data for:
+This is important because Lessonio uses study-session data for:
 
 - Weekly study statistics
 - Dashboard summaries
@@ -200,7 +200,7 @@ This is important because Study Line uses study-session data for:
 
 # Core Concepts
 
-Understanding the difference between the main entities makes Study Line much easier to use.
+Understanding the difference between the main entities makes Lessonio much easier to use.
 
 ## Subject
 
@@ -355,7 +355,7 @@ A lesson can contain academic metadata related to:
 
 ## Lesson Statuses
 
-Study Line separates different types of status rather than using one generic status.
+Lessonio separates different types of status rather than using one generic status.
 
 For example:
 
@@ -508,7 +508,7 @@ You can search and review your historical study activity.
 
 # Notes & Attachments
 
-Study Line allows you to keep study material directly connected to your lessons.
+Lessonio allows you to keep study material directly connected to your lessons.
 
 ## Notes
 
@@ -581,7 +581,7 @@ An exam can include:
 
 ## Exam Percentage
 
-When both score and total score are available, Study Line calculates the percentage automatically.
+When both score and total score are available, Lessonio calculates the percentage automatically.
 
 Example:
 
@@ -662,7 +662,7 @@ Use it to identify:
 
 # Notifications
 
-Study Line can provide notifications for important academic events.
+Lessonio can provide notifications for important academic events.
 
 Examples include:
 
@@ -675,13 +675,13 @@ Notification behavior can be configured from Settings.
 
 > Notifications depend on the application's notification configuration and available browser/device permissions.
 
-If browser notifications are disabled, Study Line cannot display browser notifications until permission is granted.
+If browser notifications are disabled, Lessonio cannot display browser notifications until permission is granted.
 
 ---
 
 # Gamification
 
-Study Line uses gamification to encourage consistent study behavior.
+Lessonio uses gamification to encourage consistent study behavior.
 
 The system can include:
 
@@ -729,7 +729,7 @@ Available settings include:
 
 ## Theme
 
-Study Line supports:
+Lessonio supports:
 
 - Light mode
 - Dark mode
@@ -763,7 +763,7 @@ The objective is to avoid manually navigating large datasets.
 
 # Offline Support
 
-Study Line includes offline-oriented behavior for previously loaded application data.
+Lessonio includes offline-oriented behavior for previously loaded application data.
 
 Cached server data can remain available when connectivity is temporarily unavailable.
 
@@ -775,7 +775,7 @@ The current implementation does not provide a complete service-worker-based offl
 
 # Recommended Daily Workflow
 
-A practical Study Line workflow looks like this:
+A practical Lessonio workflow looks like this:
 
 ## Morning
 
@@ -863,7 +863,7 @@ Improve
 
 # Understanding Your Data
 
-Study Line intentionally separates planning, academic content, and actual activity.
+Lessonio intentionally separates planning, academic content, and actual activity.
 
 | Entity        | Main Question                                   |
 | ------------- | ----------------------------------------------- |
@@ -909,7 +909,7 @@ After recording activity, refresh the relevant dashboard/statistics view.
 Check:
 
 1. Browser notification permission.
-2. Study Line notification settings.
+2. Lessonio notification settings.
 3. Browser/site permission settings.
 4. Whether the relevant notification preference is enabled.
 
@@ -938,7 +938,7 @@ Cancelled sessions are not treated as completed study time.
 
 # Privacy & Data
 
-Study Line uses Supabase for authentication, database storage, and file storage.
+Lessonio uses Supabase for authentication, database storage, and file storage.
 
 User data is protected through database-level Row Level Security (RLS).
 
@@ -958,7 +958,7 @@ Users should always verify their export before deleting an account.
 
 This section is primarily intended for developers and maintainers.
 
-Study Line follows a strict feature architecture:
+Lessonio follows a strict feature architecture:
 
 ```text
 src/app/[locale]/(app)/<domain>/<feature>/page.tsx
@@ -1027,7 +1027,7 @@ All forms should use:
 
 # Technology Stack
 
-Study Line is built with:
+Lessonio is built with:
 
 - **Next.js 16**
 - **React 19**
@@ -1132,7 +1132,7 @@ The database uses:
 
 # Localization
 
-Study Line supports:
+Lessonio supports:
 
 ```text
 English → LTR
@@ -1351,7 +1351,7 @@ The natural next testing targets are pure business-logic utilities such as:
 
 # Product Philosophy
 
-Study Line is built around one principle:
+Lessonio is built around one principle:
 
 > **Your study system should show what you planned, what you did, and what changed.**
 
@@ -1369,6 +1369,6 @@ Measurement
 Improvement
 ```
 
-The purpose of Study Line is not to make studying more complicated.
+The purpose of Lessonio is not to make studying more complicated.
 
 It is to make your academic activity **visible, measurable, and actionable**.

@@ -28,7 +28,7 @@ import type { User } from "@/lib/types/user";
 import { Link, usePathname } from "@/i18n/navigation";
 import { LanguageSwitch } from "./language-switch";
 import { LogoutButton } from "./logout-button";
-import { StudyLineMark } from "./study-line-mark";
+import { LessonioMark } from "./lessonio-mark";
 import { ThemeToggle } from "./theme-toggle";
 import { Settings } from "lucide-react";
 
@@ -67,7 +67,7 @@ export function AppSidebar({ user }: AppSidebarProps) {
           className="flex items-center gap-2 px-2 py-1"
           aria-label={t("dashboard")}
         >
-          <StudyLineMark className="h-6 w-auto shrink-0" />
+          <LessonioMark className="h-6 w-auto shrink-0" />
         </Link>
       </SidebarHeader>
 

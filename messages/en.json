@@ -1,10 +1,10 @@
 {
   "Index": {
-    "name": "Study Line",
+    "name": "Lessonio",
     "tagline": "Your study, on track."
   },
   "app": {
-    "name": "Study Line",
+    "name": "Lessonio",
     "tagline": "Your study, on track."
   },
   "common": {
@@ -55,9 +55,9 @@
       "getStarted": "Get started"
     },
     "hero": {
-      "eyebrow": "Study Line",
+      "eyebrow": "Lessonio",
       "headline": "Every study session, one continuous line.",
-      "subheading": "Study Line turns lessons, homework, exams, and study time into a single trend you can watch move forward.",
+      "subheading": "Lessonio turns lessons, homework, exams, and study time into a single trend you can watch move forward.",
       "ctaPrimary": "Get started free",
       "ctaSecondary": "Log in",
       "ctaDashboard": "Go to dashboard"
@@ -65,7 +65,7 @@
     "features": {
       "eyebrow": "Everything in one line",
       "title": "Built to track the whole picture",
-      "subtitle": "From the first lesson to the final exam, Study Line keeps every piece connected.",
+      "subtitle": "From the first lesson to the final exam, Lessonio keeps every piece connected.",
       "subjects": {
         "title": "Subjects & lessons",
         "description": "Organize every course, track attendance, and log lessons as you go."
@@ -91,12 +91,12 @@
   "docs": {
     "meta": {
       "title": "Docs",
-      "description": "Learn how Study Line helps you track subjects, lessons, homework, exams, and study time in one continuous line."
+      "description": "Learn how Lessonio helps you track subjects, lessons, homework, exams, and study time in one continuous line."
     },
     "backHome": "Back to home",
     "hero": {
       "eyebrow": "Documentation",
-      "title": "How Study Line works",
+      "title": "How Lessonio works",
       "subtitle": "A quick tour of everything you can track, plan, and celebrate — all folded into one continuous line."
     },
     "gettingStarted": {
@@ -105,7 +105,7 @@
       "steps": {
         "step1": {
           "title": "Create your account",
-          "description": "Sign up free — no credit card, just your study line waiting to start."
+          "description": "Sign up free — no credit card, just your Lessonio waiting to start."
         },
         "step2": {
           "title": "Add your subjects",
@@ -113,7 +113,7 @@
         },
         "step3": {
           "title": "Log as you go",
-          "description": "Track lessons, homework, exams, and study sessions — Study Line turns them into one trend you can watch move forward."
+          "description": "Track lessons, homework, exams, and study sessions — Lessonio turns them into one trend you can watch move forward."
         }
       }
     },
@@ -177,22 +177,22 @@
           "answer": "Yes. Your study data is yours — you can export it anytime from Settings."
         },
         "free": {
-          "question": "Is Study Line free to use?",
+          "question": "Is Lessonio free to use?",
           "answer": "Yes, creating an account and tracking your studies is free."
         },
         "offline": {
           "question": "Does it work without internet?",
-          "answer": "Yes. Study Line keeps working offline and syncs your changes automatically once you're reconnected."
+          "answer": "Yes. Lessonio keeps working offline and syncs your changes automatically once you're reconnected."
         },
         "languages": {
           "question": "What languages are supported?",
-          "answer": "Study Line is available in English and Arabic, including full right-to-left layout."
+          "answer": "Lessonio is available in English and Arabic, including full right-to-left layout."
         }
       }
     },
     "cta": {
       "title": "Ready to draw your line?",
-      "subtitle": "Join Study Line and turn every lesson into progress.",
+      "subtitle": "Join Lessonio and turn every lesson into progress.",
       "primary": "Get started free",
       "go_to_dashboard": "Go to dashboard",
       "secondary": "Log in"
@@ -200,8 +200,8 @@
   },
   "auth": {
     "shell": {
-      "brand": "Study Line",
-      "eyebrow": "Study Line",
+      "brand": "Lessonio",
+      "eyebrow": "Lessonio",
       "headline": "Pick up your line exactly where you left it.",
       "body": "Every lesson, every study session, every streak — tracked in one continuous line you can watch move forward.",
       "footnote": "Your data stays yours. Export it anytime from Settings."
@@ -213,7 +213,7 @@
     },
     "login": {
       "title": "Welcome back",
-      "subtitle": "Log in to pick up your study line where you left off.",
+      "subtitle": "Log in to pick up your Lessonio where you left off.",
       "emailLabel": "Email",
       "emailPlaceholder": "you@example.com",
       "passwordLabel": "Password",
@@ -305,7 +305,7 @@
       "morning": "Good morning, {name}",
       "afternoon": "Good afternoon, {name}",
       "evening": "Good evening, {name}",
-      "subtitle": "Here's where your study line stands today."
+      "subtitle": "Here's where your Lessonio stands today."
     },
     "streak": {
       "label": "Day streak",
@@ -1053,7 +1053,7 @@
       "subtitle": "Choose what you're reminded about, and where.",
       "channelsTitle": "Channels",
       "browserLabel": "Browser notifications",
-      "browserDescription": "Show a desktop popup while Study Line is open.",
+      "browserDescription": "Show a desktop popup while Lessonio is open.",
       "emailLabel": "Email notifications",
       "emailDescription": "Also send new notifications to your account's email address.",
       "typesTitle": "What to notify me about",
@@ -1080,7 +1080,7 @@
     },
     "profile": {
       "title": "Profile",
-      "subtitle": "Your name and timezone, used across Study Line.",
+      "subtitle": "Your name and timezone, used across Lessonio.",
       "emailLabel": "Email",
       "emailNote": "Your email can't be changed here.",
       "missingProfile": "We couldn't load your profile. Try reloading the page.",
@@ -1101,7 +1101,7 @@
     },
     "appearance": {
       "title": "Appearance",
-      "subtitle": "Choose how Study Line looks and which language it speaks.",
+      "subtitle": "Choose how Lessonio looks and which language it speaks.",
       "themeTitle": "Theme",
       "themeDescription": "Switch between light, dark, or match your system.",
       "languageTitle": "Language",
@@ -1148,7 +1148,7 @@
     },
     "palette": {
       "placeholder": "Search subjects, lessons, notes, teachers, tags...",
-      "prompt": "Start typing to search everything in Study Line.",
+      "prompt": "Start typing to search everything in Lessonio.",
       "empty": "No results for \"{query}\"",
       "viewAll": "View all results for \"{query}\""
     },
@@ -1248,14 +1248,14 @@
   "help": {
     "meta": {
       "title": "Help Center",
-      "description": "Learn how Study Line works, in plain language — what everything means, why it's there, and what to do next."
+      "description": "Learn how Lessonio works, in plain language — what everything means, why it's there, and what to do next."
     },
     "home": {
       "title": "Help Center",
-      "subtitle": "Everything you need to understand Study Line, explained the way you'd want a friend to explain it.",
+      "subtitle": "Everything you need to understand Lessonio, explained the way you'd want a friend to explain it.",
       "searchPlaceholder": "Search for a topic...",
       "flow": {
-        "title": "How Study Line Works",
+        "title": "How Lessonio Works",
         "steps": [
           "Your Subjects — the courses you're taking",
           "Your Classes — when each subject meets",
@@ -1267,14 +1267,14 @@
       },
       "continueSetup": {
         "title": "New here? Start with your first steps.",
-        "description": "You haven't added any subjects yet. A few minutes of setup now makes everything else in Study Line make sense.",
+        "description": "You haven't added any subjects yet. A few minutes of setup now makes everything else in Lessonio make sense.",
         "cta": "Start your first steps"
       }
     },
     "sections": {
       "gettingStarted": {
         "title": "Getting Started",
-        "description": "What Study Line is, and what to do first."
+        "description": "What Lessonio is, and what to do first."
       },
       "dailyUse": {
         "title": "Daily Use",
@@ -1282,7 +1282,7 @@
       },
       "progress": {
         "title": "Tracking Your Progress",
-        "description": "How Study Line turns your activity into numbers you can trust."
+        "description": "How Lessonio turns your activity into numbers you can trust."
       },
       "journeys": {
         "title": "Common Tasks",
@@ -1308,7 +1308,7 @@
     },
     "glossary": {
       "title": "Glossary",
-      "subtitle": "Every Study Line term, explained simply, with an example.",
+      "subtitle": "Every Lessonio term, explained simply, with an example.",
       "searchPlaceholder": "Search for a word...",
       "noResults": "No terms match your search.",
       "terms": {
@@ -1340,7 +1340,7 @@
         "focusTimer": {
           "name": "Focus Timer",
           "explanation": "The tool you start and stop to record a Study Session in real time, instead of typing the times in by hand afterward.",
-          "example": "You press Start before opening your textbook, and Stop when you're done — Study Line saves the session for you."
+          "example": "You press Start before opening your textbook, and Stop when you're done — Lessonio saves the session for you."
         },
         "homework": {
           "name": "Homework",
@@ -1615,7 +1615,7 @@
           },
           "daily_reminder": {
             "label": "Daily reminder",
-            "meaning": "A general once-a-day nudge to check in on Study Line.",
+            "meaning": "A general once-a-day nudge to check in on Lessonio.",
             "whenToUse": "Sent once per day if this type is turned on.",
             "effect": "Just a reminder.",
             "reversible": "Turn it off anytime in Settings."
@@ -1625,26 +1625,26 @@
     },
     "topics": {
       "welcome": {
-        "title": "Welcome to Study Line",
-        "summary": "What Study Line is, and how this Help Center works.",
+        "title": "Welcome to Lessonio",
+        "summary": "What Lessonio is, and how this Help Center works.",
         "intro": [
-          "Study Line brings everything about your studies into one place — the subjects you're taking, the classes you attend, the lessons you study, and the progress you're making.",
-          "Instead of juggling a planner, a notes app, and a mental list of deadlines, you keep it all here — and Study Line connects it together automatically.",
+          "Lessonio brings everything about your studies into one place — the subjects you're taking, the classes you attend, the lessons you study, and the progress you're making.",
+          "Instead of juggling a planner, a notes app, and a mental list of deadlines, you keep it all here — and Lessonio connects it together automatically.",
           "This Help Center is written for you, not for a developer. Every term you'll see in the app is explained here in plain language, with a real example."
         ]
       },
       "how-it-works": {
-        "title": "How Study Line Works",
+        "title": "How Lessonio Works",
         "summary": "The big picture — how Subjects, Classes, Lessons and Study Sessions all fit together.",
         "intro": [
-          "Study Line is built around one simple idea: what you plan, what actually happens, and what you achieve are three different things — and keeping them separate is what makes your progress trustworthy.",
+          "Lessonio is built around one simple idea: what you plan, what actually happens, and what you achieve are three different things — and keeping them separate is what makes your progress trustworthy.",
           "Here's the path most students follow, from top to bottom."
         ]
       },
       "first-steps": {
         "title": "Your First Steps",
-        "summary": "The quickest path to a Study Line that works for you, in order.",
-        "scenario": "You just created your account. Here's the fastest path to a Study Line that actually works for you.",
+        "summary": "The quickest path to a Lessonio that works for you, in order.",
+        "scenario": "You just created your account. Here's the fastest path to a Lessonio that actually works for you.",
         "steps": [
           "Add your first Subject — the course you want to track (e.g. “Mathematics”). This is the foundation everything else attaches to.",
           "Add a Class if this subject meets on a regular schedule (e.g. every Monday at 9:00). Skip this step if you're only self-studying — it's optional.",
@@ -1656,13 +1656,13 @@
       "subjects": {
         "title": "Subjects",
         "summary": "Organize your courses — the foundation everything else builds on.",
-        "whatIsIt": "A Subject is the course or topic you're studying — Mathematics, Physics, French, whatever you're taking. It's the top of Study Line's organization: almost everything else belongs to a Subject.",
+        "whatIsIt": "A Subject is the course or topic you're studying — Mathematics, Physics, French, whatever you're taking. It's the top of Lessonio's organization: almost everything else belongs to a Subject.",
         "whyUseIt": "Grouping your work by Subject means your Classes, Lessons, Homework, Exams and Grades are automatically organized without extra effort — and each Subject can show you, at a glance, how much attention it's getting.",
-        "whenToUse": "Add a Subject as your very first step in Study Line, before anything else — and add a new one anytime you start a new course.",
+        "whenToUse": "Add a Subject as your very first step in Lessonio, before anything else — and add a new one anytime you start a new course.",
         "how": [
           "Go to Subjects and choose “New Subject”.",
           "Give it a name, and optionally pick a color and icon so it's easy to recognize at a glance.",
-          "If your school uses credit hours, add them here — Study Line uses this to weight your GPA correctly."
+          "If your school uses credit hours, add them here — Lessonio uses this to weight your GPA correctly."
         ],
         "afterEffect": "Once a Subject exists, you can add Classes and Lessons under it, and its card will start showing your study time, lesson count, and progress automatically.",
         "connections": "A Subject is the parent of Classes and Lessons. Deleting a Subject deletes everything under it — its Classes, Lessons, Homework, Exams, Notes, and Attachments. If you just want to stop actively studying something without losing its history, use Archive instead of Delete.",
@@ -1673,14 +1673,14 @@
         "title": "Classes",
         "summary": "Set your recurring weekly schedule, once.",
         "whatIsIt": "A Class is the recurring meeting pattern for a Subject — for example, “Math meets every Monday and Wednesday at 9:00.” It describes when and where a Subject regularly happens, not any one specific day.",
-        "whyUseIt": "Once you set up a Class, Study Line automatically creates each week's actual lesson for you (called a Class Occurrence) — you don't have to add “Monday's Math class” by hand every single week.",
+        "whyUseIt": "Once you set up a Class, Lessonio automatically creates each week's actual lesson for you (called a Class Occurrence) — you don't have to add “Monday's Math class” by hand every single week.",
         "whenToUse": "Add a Class for any Subject that meets on a regular weekly schedule — a school class, a recurring tutoring session, a weekly club. If something is one-off rather than recurring, you don't need a Class for it.",
         "how": [
           "Open a Subject and choose “Add Class”.",
           "Add the teacher and location if you'd like — both are optional.",
           "Set one or more meeting times (day of week, start time, and how long it runs). A single Class can meet more than once a week."
         ],
-        "afterEffect": "Study Line automatically generates the next several weeks of actual lesson dates from this schedule — you'll see them appear as Class Occurrences on your Calendar and Dashboard without doing anything else.",
+        "afterEffect": "Lessonio automatically generates the next several weeks of actual lesson dates from this schedule — you'll see them appear as Class Occurrences on your Calendar and Dashboard without doing anything else.",
         "connections": "A Class is the template; a Class Occurrence is one real, dated instance of it. Pausing a Class (marking it inactive) stops new Occurrences from being generated, but never deletes ones that already happened or already have attendance recorded on them.",
         "learnMore": "Editing a Class's schedule only affects Occurrences that haven't happened yet and don't have anything recorded on them. Past Occurrences — and any you've already marked attendance or exam status for — are never rewritten, so your history always reflects reality.",
         "cta": "Go to Classes"
@@ -1696,9 +1696,9 @@
           "Once its start time has passed, set its Attendance status.",
           "If an exam is tied to this Occurrence, set its Exam status separately — this doesn't depend on attendance."
         ],
-        "afterEffect": "Marking attendance updates your attendance history immediately, and it's one of the things Study Line checks for the Perfect Attendance achievement. Exam status is tracked completely separately, so marking one never changes the other.",
+        "afterEffect": "Marking attendance updates your attendance history immediately, and it's one of the things Lessonio checks for the Perfect Attendance achievement. Exam status is tracked completely separately, so marking one never changes the other.",
         "connections": "Occurrences belong to a Class, which belongs to a Subject. You can optionally link a Lesson to the Occurrence you studied it for, but a Lesson doesn't need a Class Occurrence to exist.",
-        "learnMore": "You'll notice the Attendance option stays locked until the class's actual start time — this is intentional, so you can't accidentally mark a class as attended before it happens. Study Line creates upcoming Occurrences for you automatically about a month ahead of time, so you don't need to create them yourself.",
+        "learnMore": "You'll notice the Attendance option stays locked until the class's actual start time — this is intentional, so you can't accidentally mark a class as attended before it happens. Lessonio creates upcoming Occurrences for you automatically about a month ahead of time, so you don't need to create them yourself.",
         "cta": "Go to Classes"
       },
       "lessons": {
@@ -1722,7 +1722,7 @@
         "title": "Study Sessions & Focus Timer",
         "summary": "Log real study time — the thing that drives everything else.",
         "whatIsIt": "A Study Session is a record of real time you spent studying — a start time, an end time, and what you were working on. It's different from a Class, which is just when something is scheduled to happen.",
-        "whyUseIt": "This is the single most important thing you can log in Study Line — it's what actually drives your statistics, streaks, goals, and XP. A scheduled class doesn't count as study time on its own; only a logged Study Session does.",
+        "whyUseIt": "This is the single most important thing you can log in Lessonio — it's what actually drives your statistics, streaks, goals, and XP. A scheduled class doesn't count as study time on its own; only a logged Study Session does.",
         "whenToUse": "Start the Focus Timer whenever you sit down to study, or log a session manually afterward if you studied without the timer running (e.g. away from your device).",
         "how": [
           "Choose the Subject (and optionally the Lesson) you're about to study.",
@@ -1739,7 +1739,7 @@
         "title": "Homework",
         "summary": "Track assignments and their deadlines.",
         "whatIsIt": "Homework tracks a specific assignment for a Lesson — its title, a deadline, and whether it's done.",
-        "whyUseIt": "Keeping deadlines in Study Line means they show up automatically on your Calendar, Dashboard, and in reminders, instead of relying on memory.",
+        "whyUseIt": "Keeping deadlines in Lessonio means they show up automatically on your Calendar, Dashboard, and in reminders, instead of relying on memory.",
         "whenToUse": "Add homework as soon as it's assigned, so its deadline is on your radar from day one.",
         "how": [
           "Open the Lesson it belongs to and choose “Add Homework”.",
@@ -1755,12 +1755,12 @@
         "title": "Exams",
         "summary": "Record exam dates and scores.",
         "whatIsIt": "An Exam tracks a test or assessment tied to a Lesson — its date, and once it's graded, your score.",
-        "whyUseIt": "Recording your exam scores is what powers your Grades and GPA — without a score here, there's nothing for Study Line to calculate a grade from.",
+        "whyUseIt": "Recording your exam scores is what powers your Grades and GPA — without a score here, there's nothing for Lessonio to calculate a grade from.",
         "whenToUse": "Add an exam as soon as you know its date, and come back to fill in your score once it's graded.",
         "how": [
           "Open the Lesson it belongs to and choose “Add Exam”.",
           "Give it a title, date, and the total possible score.",
-          "Once you get your result, enter your score — Study Line calculates the percentage for you automatically."
+          "Once you get your result, enter your score — Lessonio calculates the percentage for you automatically."
         ],
         "afterEffect": "A scored exam immediately feeds your Grades page — its percentage is converted into a letter grade and contributes to your Subject's average and your overall GPA.",
         "connections": "An Exam always belongs to a Lesson. Its percentage is used directly by Grades & GPA — nowhere else calculates it independently.",
@@ -1777,7 +1777,7 @@
           "Open a Lesson and choose “Add Flashcard”, then write the front (the question) and the back (the answer).",
           "Open the Review screen to go through the cards that are due today.",
           "For each card, rate how well you knew it: Again, Hard, Good, or Easy.",
-          "Study Line uses your rating to decide when to show you that card next."
+          "Lessonio uses your rating to decide when to show you that card next."
         ],
         "afterEffect": "Rating a card “Good” or “Easy” pushes it further into the future before it needs review again. Rating it “Again” brings it back tomorrow, since it means you haven't learned it yet. Every review also adds a small amount of XP.",
         "connections": "Flashcards belong to a Lesson. They don't affect a Lesson's Study or Review status directly — they're a separate, independent way of reinforcing what you've learned.",
@@ -1805,7 +1805,7 @@
         "summary": "Reminders for what's coming up, so nothing slips through.",
         "whatIsIt": "Notifications are short reminders about things coming up — an upcoming class, a homework deadline, or a lesson due for review.",
         "whyUseIt": "They're a safety net so nothing slips through unnoticed, without you having to constantly check every section of the app.",
-        "whenToUse": "Check your notification bell regularly, and turn on browser notifications in Settings if you'd like a reminder even when Study Line isn't open.",
+        "whenToUse": "Check your notification bell regularly, and turn on browser notifications in Settings if you'd like a reminder even when Lessonio isn't open.",
         "how": [
           "Open the bell icon in the header to see your recent notifications.",
           "Select a notification to jump straight to what it's about.",
@@ -1813,7 +1813,7 @@
         ],
         "afterEffect": "Reading a notification just marks it as seen — it doesn't change any of your academic data.",
         "connections": "Notifications reference Classes, Lessons, and Homework, but aren't stored as part of those records — they're generated automatically based on what's coming up.",
-        "learnMore": "Notifications aren't sent the instant something happens — Study Line checks periodically (about every few minutes) for anything worth telling you about, and only sends one reminder per event so you're not repeated at. You can turn each type on or off individually in Settings.",
+        "learnMore": "Notifications aren't sent the instant something happens — Lessonio checks periodically (about every few minutes) for anything worth telling you about, and only sends one reminder per event so you're not repeated at. You can turn each type on or off individually in Settings.",
         "cta": "Go to Notifications"
       },
       "statistics": {
@@ -1834,7 +1834,7 @@
         "title": "Grades & GPA",
         "summary": "See your grades and GPA, calculated automatically.",
         "whatIsIt": "Grades shows your GPA and a letter grade for each Subject, calculated automatically from your Exam scores.",
-        "whyUseIt": "Instead of doing GPA math by hand, Study Line calculates it for you the moment you enter an exam score — and shows you which subjects are pulling your average up or down.",
+        "whyUseIt": "Instead of doing GPA math by hand, Lessonio calculates it for you the moment you enter an exam score — and shows you which subjects are pulling your average up or down.",
         "whenToUse": "Check it after any exam you've entered a score for, or whenever you want a big-picture view of how you're doing.",
         "how": [
           "Enter your score on an Exam — that's the only thing that feeds Grades.",
@@ -1849,7 +1849,7 @@
       "goals-achievements": {
         "title": "Goals & Achievements",
         "summary": "Set targets and see the milestones you've unlocked.",
-        "whatIsIt": "Goals let you set a weekly or monthly study-time target. Achievements are milestones — like a 7-day streak or your first completed lesson — that unlock as you go. Together with your level and XP, they're Study Line's way of encouraging consistency.",
+        "whatIsIt": "Goals let you set a weekly or monthly study-time target. Achievements are milestones — like a 7-day streak or your first completed lesson — that unlock as you go. Together with your level and XP, they're Lessonio's way of encouraging consistency.",
         "whyUseIt": "A visible target and a bit of recognition make it easier to stick with studying regularly, not just in occasional bursts.",
         "whenToUse": "Set a Goal at the start of a week or month, and check your Achievements whenever you want a quick sense of your overall consistency.",
         "how": [
@@ -1864,10 +1864,10 @@
       },
       "first-week": {
         "title": "I just joined — what now?",
-        "summary": "A realistic plan for your first week with Study Line.",
-        "scenario": "You've just signed up. Here's what a realistic first week with Study Line looks like, instead of trying to set up everything on day one.",
+        "summary": "A realistic plan for your first week with Lessonio.",
+        "scenario": "You've just signed up. Here's what a realistic first week with Lessonio looks like, instead of trying to set up everything on day one.",
         "steps": [
-          "Day 1: Read “How Study Line Works” and add your Subjects — just the courses you're currently taking, nothing else yet.",
+          "Day 1: Read “How Lessonio Works” and add your Subjects — just the courses you're currently taking, nothing else yet.",
           "Day 1–2: Add a Class for any Subject that meets on a regular schedule. If you're only self-studying something, skip this and go straight to Lessons.",
           "Every day: Add a Lesson whenever you sit down to study a topic, and start a Study Session while you work.",
           "End of each day: Mark attendance for any Class Occurrences that happened, and update Homework as you complete it.",
@@ -1877,12 +1877,12 @@
       "add-first-subject-and-class": {
         "title": "Add your first Subject and Class",
         "summary": "Set up a course that meets on a regular schedule.",
-        "scenario": "You want to get Mathematics set up in Study Line — a Subject you're taking, with a class that meets every Monday and Wednesday.",
+        "scenario": "You want to get Mathematics set up in Lessonio — a Subject you're taking, with a class that meets every Monday and Wednesday.",
         "steps": [
           "Go to Subjects and create “Mathematics” — pick a color and icon if you'd like, this is just to make it easy to spot later.",
           "Open the new Subject and choose “Add Class”.",
           "Add two meeting times: Monday at 9:00 and Wednesday at 9:00, each lasting however long the class actually runs.",
-          "Save — Study Line automatically creates the next several weeks of Monday and Wednesday Class Occurrences for you on your Calendar."
+          "Save — Lessonio automatically creates the next several weeks of Monday and Wednesday Class Occurrences for you on your Calendar."
         ]
       },
       "record-attendance": {
@@ -1898,7 +1898,7 @@
       "start-studying": {
         "title": "Start studying and track your time",
         "summary": "Use the Focus Timer to log a real study session.",
-        "scenario": "You're about to sit down and study Linear Algebra for Math.",
+        "scenario": "You're about to sit down and Lessonioar Algebra for Math.",
         "steps": [
           "Go to Study Sessions and choose the Focus Timer.",
           "Select the Subject (Mathematics) and, if you've created it, the Lesson (Linear Algebra).",
@@ -1971,7 +1971,7 @@
           },
           {
             "question": "I'm not getting notifications.",
-            "answer": "Check three things: that the relevant notification type is turned on in Settings → Notifications, that your browser has actually granted Study Line permission to show notifications, and that a little time has passed — notifications are generated periodically (every few minutes), not the instant something changes."
+            "answer": "Check three things: that the relevant notification type is turned on in Settings → Notifications, that your browser has actually granted Lessonio permission to show notifications, and that a little time has passed — notifications are generated periodically (every few minutes), not the instant something changes."
           },
           {
             "question": "My Dashboard isn't showing today's activity.",

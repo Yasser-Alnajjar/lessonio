@@ -39,7 +39,6 @@ export const OnboardingRoleForm = () => {
         return;
       }
       router.push("/home");
-      router.refresh();
     },
   });
 

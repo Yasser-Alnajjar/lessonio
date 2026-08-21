@@ -125,7 +125,7 @@ export function RecurringClassCard({
           )}
         </CardContent>
       </Card>
-      {actions && <div className="absolute end-4 top-4">{actions}</div>}
+      {actions && <div className="absolute inset-e-4 top-4">{actions}</div>}
     </div>
   );
 }

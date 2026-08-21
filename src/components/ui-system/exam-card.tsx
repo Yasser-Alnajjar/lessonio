@@ -2,9 +2,10 @@
 
 import { useState, useTransition } from "react";
 import { format, parseISO } from "date-fns";
-import { CalendarDays, BookOpen, Loader2 } from "lucide-react";
+import { CalendarDays, BookOpen } from "lucide-react";
 
 import { updateExamScore } from "@/actions/exams.mutations";
+import { LessonioSpinner } from "@/components/shared/lessonio-mark";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -40,7 +41,13 @@ export function ExamCard({
 
   const handleRecordScore = () => {
     const value = Number(scoreInput);
-    if (!scoreInput || Number.isNaN(value) || value < 0 || value > exam.totalScore) return;
+    if (
+      !scoreInput ||
+      Number.isNaN(value) ||
+      value < 0 ||
+      value > exam.totalScore
+    )
+      return;
 
     setError(null);
     startTransition(async () => {
@@ -55,20 +62,31 @@ export function ExamCard({
   };
 
   return (
-    <Card data-slot="exam-card" className={cn("h-full gap-3 transition-shadow", className)} {...props}>
+    <Card
+      data-slot="exam-card"
+      className={cn("h-full gap-3 transition-shadow", className)}
+      {...props}
+    >
       <CardHeader className="flex-row items-start justify-between gap-3 space-y-0">
         <div className="min-w-0 flex-1">
           <span
             className="mb-1 inline-flex items-center gap-1.5 text-xs font-medium"
             style={{ color: exam.subjectColor }}
           >
-            <span className="size-1.5 rounded-full" style={{ backgroundColor: exam.subjectColor }} />
+            <span
+              className="size-1.5 rounded-full"
+              style={{ backgroundColor: exam.subjectColor }}
+            />
             {exam.subjectName}
           </span>
-          <h3 className="truncate text-sm font-medium text-foreground">{exam.title}</h3>
+          <h3 className="truncate text-sm font-medium text-foreground">
+            {exam.title}
+          </h3>
         </div>
         <div className="flex shrink-0 items-center gap-2">
-          {exam.percentage !== null && <Ring value={exam.percentage} size="sm" />}
+          {exam.percentage !== null && (
+            <Ring value={exam.percentage} size="sm" />
+          )}
           {actions}
         </div>
       </CardHeader>
@@ -109,7 +127,7 @@ export function ExamCard({
               disabled={isPending || !scoreInput}
               onClick={handleRecordScore}
             >
-              {isPending && <Loader2 className="animate-spin" />}
+              {isPending && <LessonioSpinner className="size-8" />}
               {recordScoreLabel}
             </Button>
           </div>
@@ -120,9 +138,16 @@ export function ExamCard({
   );
 }
 
-export function ExamCardSkeleton({ className, ...props }: React.ComponentProps<"div">) {
+export function ExamCardSkeleton({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
   return (
-    <Card data-slot="exam-card-skeleton" className={cn("h-full gap-3", className)} {...props}>
+    <Card
+      data-slot="exam-card-skeleton"
+      className={cn("h-full gap-3", className)}
+      {...props}
+    >
       <CardHeader className="flex-row items-start justify-between gap-3 space-y-0">
         <div className="flex min-w-0 flex-1 flex-col gap-2">
           <Skeleton className="h-3 w-1/4" />

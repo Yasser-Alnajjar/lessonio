@@ -5,9 +5,10 @@ import { useMutation } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useTranslations } from "next-intl";
-import { CheckCircle2, Loader2, UserPlus } from "lucide-react";
+import { CheckCircle2, UserPlus } from "lucide-react";
 
 import { register } from "@/actions/auth.mutations";
+import { LessonioSpinner } from "@/components/shared/lessonio-mark";
 import { OAuthButtons } from "@/components/shared/oauth-buttons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,7 +40,12 @@ export const RegisterForm = () => {
 
   const form = useForm<RegisterInput>({
     resolver: zodResolver(schema),
-    defaultValues: { fullName: "", email: "", password: "", confirmPassword: "" },
+    defaultValues: {
+      fullName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
   });
 
   const mutation = useMutation({
@@ -69,15 +75,24 @@ export const RegisterForm = () => {
         {succeeded ? (
           <div className="border-success/30 bg-success/10 flex flex-col items-center gap-3 rounded-xl border p-6 text-center">
             <CheckCircle2 className="text-success h-8 w-8" />
-            <p className="text-foreground text-sm font-medium">{t("success")}</p>
-            <Link href="/auth/login" className="text-primary text-sm font-medium hover:underline">
+            <p className="text-foreground text-sm font-medium">
+              {t("success")}
+            </p>
+            <Link
+              href="/auth/login"
+              className="text-primary text-sm font-medium hover:underline"
+            >
               {t("loginLink")}
             </Link>
           </div>
         ) : (
           <>
             <Form {...form}>
-              <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
+              <form
+                onSubmit={onSubmit}
+                noValidate
+                className="flex flex-col gap-4"
+              >
                 <FormField
                   control={form.control}
                   name="fullName"
@@ -154,17 +169,20 @@ export const RegisterForm = () => {
                 />
 
                 {formError && (
-                  <p role="alert" className="text-destructive text-sm font-medium">
+                  <p
+                    role="alert"
+                    className="text-destructive text-sm font-medium"
+                  >
                     {formError}
                   </p>
                 )}
 
-                <Button type="submit" disabled={mutation.isPending} className="mt-2">
-                  {mutation.isPending ? (
-                    <Loader2 className="animate-spin" />
-                  ) : (
-                    <UserPlus />
-                  )}
+                <Button
+                  type="submit"
+                  disabled={mutation.isPending}
+                  className="mt-2"
+                >
+                  {mutation.isPending ? <LessonioSpinner /> : <UserPlus />}
                   {mutation.isPending ? t("submitting") : t("submit")}
                 </Button>
               </form>
@@ -176,7 +194,10 @@ export const RegisterForm = () => {
 
             <p className="text-muted-foreground mt-6 text-center text-sm">
               {t("haveAccount")}{" "}
-              <Link href="/auth/login" className="text-primary font-medium hover:underline">
+              <Link
+                href="/auth/login"
+                className="text-primary font-medium hover:underline"
+              >
                 {t("loginLink")}
               </Link>
             </p>

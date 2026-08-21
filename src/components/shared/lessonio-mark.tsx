@@ -1,6 +1,13 @@
 "use client";
 
-export function LessonioMark({ className }: { className?: string }) {
+export function LessonioMark({
+  className,
+  loading = false,
+}: {
+  className?: string;
+  /** Swaps the one-time draw-in intro for a continuous pulse, for use as a loading indicator. */
+  loading?: boolean;
+}) {
   return (
     <svg
       viewBox="0 0 96 96"
@@ -9,6 +16,11 @@ export function LessonioMark({ className }: { className?: string }) {
       className={className}
       role="presentation"
       aria-hidden="true"
+      style={
+        loading
+          ? { animation: "lessonio-pulse 1.1s ease-in-out infinite" }
+          : undefined
+      }
     >
       {/* Left page */}
       <path
@@ -17,11 +29,15 @@ export function LessonioMark({ className }: { className?: string }) {
         strokeWidth="3"
         strokeLinejoin="round"
         pathLength={1}
-        style={{
-          strokeDasharray: 1,
-          strokeDashoffset: 0,
-          animation: "lessonio-draw 1s ease-out",
-        }}
+        style={
+          loading
+            ? undefined
+            : {
+                strokeDasharray: 1,
+                strokeDashoffset: 0,
+                animation: "lessonio-draw 1s ease-out",
+              }
+        }
       />
 
       {/* Right page */}
@@ -31,11 +47,15 @@ export function LessonioMark({ className }: { className?: string }) {
         strokeWidth="3"
         strokeLinejoin="round"
         pathLength={1}
-        style={{
-          strokeDasharray: 1,
-          strokeDashoffset: 0,
-          animation: "lessonio-draw 1s ease-out 0.15s both",
-        }}
+        style={
+          loading
+            ? undefined
+            : {
+                strokeDasharray: 1,
+                strokeDashoffset: 0,
+                animation: "lessonio-draw 1s ease-out 0.15s both",
+              }
+        }
       />
 
       {/* Center spine */}
@@ -58,18 +78,31 @@ export function LessonioMark({ className }: { className?: string }) {
         opacity="0.35"
       />
 
-      <style>
-        {`
-          @keyframes lessonio-draw {
-            from {
-              stroke-dashoffset: 1;
+      {!loading && (
+        <style>
+          {`
+            @keyframes lessonio-draw {
+              from {
+                stroke-dashoffset: 1;
+              }
+              to {
+                stroke-dashoffset: 0;
+              }
             }
-            to {
-              stroke-dashoffset: 0;
-            }
-          }
-        `}
-      </style>
+          `}
+        </style>
+      )}
     </svg>
   );
+}
+
+/** Drop-in loading indicator built from the Lessonio mark, for use anywhere a spinner icon (e.g. Loader2) was used. */
+export function LessonioSpinner({
+  className,
+  loading = true,
+}: {
+  className?: string;
+  loading?: boolean;
+}) {
+  return <LessonioMark loading={loading} className={className} />;
 }

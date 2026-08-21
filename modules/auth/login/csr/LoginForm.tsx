@@ -6,9 +6,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Loader2, LogIn } from "lucide-react";
+import { LogIn } from "lucide-react";
 
 import { login } from "@/actions/auth.mutations";
+import { LessonioSpinner } from "@/components/shared/lessonio-mark";
 import { OAuthButtons } from "@/components/shared/oauth-buttons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -133,12 +134,12 @@ export const LoginForm = () => {
               </p>
             )}
 
-            <Button type="submit" disabled={mutation.isPending} className="mt-2">
-              {mutation.isPending ? (
-                <Loader2 className="animate-spin" />
-              ) : (
-                <LogIn />
-              )}
+            <Button
+              type="submit"
+              disabled={mutation.isPending}
+              className="mt-2"
+            >
+              {mutation.isPending ? <LessonioSpinner /> : <LogIn />}
               {mutation.isPending ? t("submitting") : t("submit")}
             </Button>
           </form>
@@ -150,7 +151,10 @@ export const LoginForm = () => {
 
         <p className="text-muted-foreground mt-6 text-center text-sm">
           {t("noAccount")}{" "}
-          <Link href="/auth/register" className="text-primary font-medium hover:underline">
+          <Link
+            href="/auth/register"
+            className="text-primary font-medium hover:underline"
+          >
             {t("registerLink")}
           </Link>
         </p>

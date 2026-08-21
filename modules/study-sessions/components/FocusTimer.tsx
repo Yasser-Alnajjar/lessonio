@@ -2,13 +2,14 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { Loader2, Play, Square, X } from "lucide-react";
+import { Play, Square, X } from "lucide-react";
 
 import {
   cancelStudySession,
   startStudySession,
   stopStudySession,
 } from "@/actions/study-sessions.mutations";
+import { LessonioSpinner } from "@/components/shared/lessonio-mark";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -141,7 +142,7 @@ export function FocusTimer({ running, subjects, lessons }: FocusTimerProps) {
                 className="gap-2"
               >
                 {stopMutation.isPending ? (
-                  <Loader2 className="size-4 animate-spin" />
+                  <LessonioSpinner className="size-4" />
                 ) : (
                   <Square className="size-4" />
                 )}
@@ -204,7 +205,7 @@ export function FocusTimer({ running, subjects, lessons }: FocusTimerProps) {
               className="gap-2"
             >
               {startMutation.isPending ? (
-                <Loader2 className="size-4 animate-spin" />
+                <LessonioSpinner className="size-4" />
               ) : (
                 <Play className="size-4" />
               )}

@@ -2,11 +2,11 @@
 
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { Loader2 } from "lucide-react";
 
 import { signInWithOAuth } from "@/actions/auth.mutations";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { LessonioSpinner } from "@/components/shared/lessonio-mark";
 import { GoogleIcon } from "@/components/shared/oauth-icons";
 import type { OAuthProvider } from "@/lib/types/auth";
 
@@ -58,7 +58,7 @@ export function OAuthButtons({ next }: OAuthButtonsProps) {
         onClick={() => handleClick("google")}
       >
         {isPending && pendingProvider === "google" ? (
-          <Loader2 className="animate-spin" />
+          <LessonioSpinner />
         ) : (
           <GoogleIcon className="size-4" />
         )}

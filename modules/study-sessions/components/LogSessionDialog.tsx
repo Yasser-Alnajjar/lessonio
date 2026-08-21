@@ -5,12 +5,12 @@ import { useMutation } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useWatch } from "react-hook-form";
 import { useLocale, useTranslations } from "next-intl";
-import { Loader2 } from "lucide-react";
 
 import {
   logManualSession,
   updateStudySession,
 } from "@/actions/study-sessions.mutations";
+import { LessonioSpinner } from "@/components/shared/lessonio-mark";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -326,9 +326,7 @@ export function LogSessionDialog({
                 disabled={mutation.isPending}
                 className="gap-2"
               >
-                {mutation.isPending && (
-                  <Loader2 className="size-4 animate-spin" />
-                )}
+                {mutation.isPending && <LessonioSpinner className="size-4" />}
 
                 {mutation.isPending
                   ? t("submitting")

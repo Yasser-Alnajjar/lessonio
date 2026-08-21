@@ -5,9 +5,8 @@ import { useMutation } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useLocale, useTranslations } from "next-intl";
-import { Loader2 } from "lucide-react";
-
 import { setCurrentGoal, updateGoal } from "@/actions/gamification.mutations";
+import { LessonioSpinner } from "@/components/shared/lessonio-mark";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -64,7 +63,10 @@ export function GoalFormDialog({
 
   const form = useForm<CreateGoalInput>({
     resolver: zodResolver(schema),
-    defaultValues: { period: defaultPeriod, targetMinutes: DEFAULT_TARGET_MINUTES },
+    defaultValues: {
+      period: defaultPeriod,
+      targetMinutes: DEFAULT_TARGET_MINUTES,
+    },
   });
 
   const [wasOpen, setWasOpen] = useState(open);
@@ -82,7 +84,9 @@ export function GoalFormDialog({
 
   const mutation = useMutation({
     mutationFn: (values: CreateGoalInput) =>
-      isEdit && goal ? updateGoal(goal.id, { targetMinutes: values.targetMinutes }) : setCurrentGoal(values),
+      isEdit && goal
+        ? updateGoal(goal.id, { targetMinutes: values.targetMinutes })
+        : setCurrentGoal(values),
     onSuccess: (result) => {
       if (!result.success) {
         setFormError(result.error);
@@ -102,7 +106,9 @@ export function GoalFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{isEdit ? t("editTitle") : t("createTitle")}</DialogTitle>
+          <DialogTitle>
+            {isEdit ? t("editTitle") : t("createTitle")}
+          </DialogTitle>
           <DialogDescription>
             {isEdit ? t("editDescription") : t("createDescription")}
           </DialogDescription>
@@ -118,7 +124,9 @@ export function GoalFormDialog({
                   <FormLabel>{t("periodLabel")}</FormLabel>
                   <Select
                     value={field.value}
-                    onValueChange={(value) => field.onChange(value as GoalPeriod)}
+                    onValueChange={(value) =>
+                      field.onChange(value as GoalPeriod)
+                    }
                     disabled={isEdit}
                     dir={isArabic ? "rtl" : "ltr"}
                   >
@@ -150,7 +158,9 @@ export function GoalFormDialog({
                       placeholder={t("targetMinutesPlaceholder")}
                       autoFocus
                       value={field.value}
-                      onChange={(event) => field.onChange(event.target.valueAsNumber)}
+                      onChange={(event) =>
+                        field.onChange(event.target.valueAsNumber)
+                      }
                     />
                   </FormControl>
                   <FormMessage />
@@ -165,11 +175,15 @@ export function GoalFormDialog({
             )}
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
                 {t("cancel")}
               </Button>
               <Button type="submit" disabled={mutation.isPending}>
-                {mutation.isPending && <Loader2 className="animate-spin" />}
+                {mutation.isPending && <LessonioSpinner />}
                 {mutation.isPending
                   ? t("submitting")
                   : isEdit

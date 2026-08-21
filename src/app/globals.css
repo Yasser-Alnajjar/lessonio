@@ -198,6 +198,20 @@
   }
 }
 
+/* Lessonio mark — continuous loading pulse, used by LessonioSpinner in
+   place of a generic spinner icon anywhere the app shows a loading state. */
+@keyframes lessonio-pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 @layer utilities {
   /* Reserved for floating/overlay surfaces (command palette, popovers,
      the mobile FAB menu) — deliberately not used on standard cards, so

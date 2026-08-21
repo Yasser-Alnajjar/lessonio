@@ -5,9 +5,10 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocale, useTranslations } from "next-intl";
-import { Loader2, Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 
 import { createClass, updateClass } from "@/actions/classes.mutations";
+import { LessonioSpinner } from "@/components/shared/lessonio-mark";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -374,7 +375,7 @@ export function ClassFormDialog({
                 type="submit"
                 disabled={mutation.isPending || subjects.length === 0}
               >
-                {mutation.isPending && <Loader2 className="animate-spin" />}
+                {mutation.isPending && <LessonioSpinner />}
                 {mutation.isPending
                   ? t("submitting")
                   : isEdit

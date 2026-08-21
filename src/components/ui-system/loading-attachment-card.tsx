@@ -2,13 +2,13 @@ import {
   AlertCircleIcon,
   FileTextIcon,
   ImageIcon,
-  Loader2Icon,
   Music2Icon,
   RefreshCwIcon,
   VideoIcon,
   XIcon,
 } from "lucide-react";
 
+import { LessonioSpinner } from "@/components/shared/lessonio-mark";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
@@ -17,14 +17,18 @@ import type { AttachmentKind } from "@/lib/types/attachment";
 
 export type AttachmentProcessingStatus = "uploading" | "ready" | "failed";
 
-const KIND_ICONS: Record<AttachmentKind, React.ComponentType<{ className?: string }>> = {
+const KIND_ICONS: Record<
+  AttachmentKind,
+  React.ComponentType<{ className?: string }>
+> = {
   image: ImageIcon,
   pdf: FileTextIcon,
   video: VideoIcon,
   audio: Music2Icon,
 };
 
-export interface LoadingAttachmentCardProps extends React.ComponentProps<"div"> {
+export interface LoadingAttachmentCardProps
+  extends React.ComponentProps<"div"> {
   fileName: string;
   kind: AttachmentKind;
   status: AttachmentProcessingStatus;
@@ -64,7 +68,7 @@ export function LoadingAttachmentCard({
         )}
       >
         {status === "uploading" ? (
-          <Loader2Icon className="size-4 animate-spin" />
+          <LessonioSpinner className="size-4" />
         ) : status === "failed" ? (
           <AlertCircleIcon className="size-4" />
         ) : (
@@ -73,7 +77,9 @@ export function LoadingAttachmentCard({
       </span>
 
       <div className="flex min-w-0 flex-1 flex-col gap-1">
-        <span className="truncate text-sm font-medium text-foreground">{fileName}</span>
+        <span className="truncate text-sm font-medium text-foreground">
+          {fileName}
+        </span>
         {status === "uploading" && (
           <div className="flex items-center gap-2">
             <Progress value={progress} className="h-1.5" />
@@ -93,12 +99,22 @@ export function LoadingAttachmentCard({
       </div>
 
       {status === "failed" && onRetry && (
-        <Button variant="ghost" size="icon-sm" onClick={onRetry} aria-label="Retry upload">
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          onClick={onRetry}
+          aria-label="Retry upload"
+        >
           <RefreshCwIcon className="size-4" />
         </Button>
       )}
       {onRemove && status !== "uploading" && (
-        <Button variant="ghost" size="icon-sm" onClick={onRemove} aria-label="Remove attachment">
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          onClick={onRemove}
+          aria-label="Remove attachment"
+        >
           <XIcon className="size-4" />
         </Button>
       )}

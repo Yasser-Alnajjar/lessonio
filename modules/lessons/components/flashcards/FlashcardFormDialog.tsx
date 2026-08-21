@@ -5,9 +5,11 @@ import { useMutation } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useLocale, useTranslations } from "next-intl";
-import { Loader2 } from "lucide-react";
-
-import { createFlashcard, updateFlashcard } from "@/actions/flashcards.mutations";
+import {
+  createFlashcard,
+  updateFlashcard,
+} from "@/actions/flashcards.mutations";
+import { LessonioSpinner } from "@/components/shared/lessonio-mark";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -27,7 +29,10 @@ import {
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { createFlashcardSchema } from "@/lib/validations/flashcard";
-import type { CreateFlashcardInput, FlashcardWithRelations } from "@/lib/types/flashcard";
+import type {
+  CreateFlashcardInput,
+  FlashcardWithRelations,
+} from "@/lib/types/flashcard";
 
 export interface FlashcardFormDialogProps {
   open: boolean;
@@ -77,7 +82,10 @@ export function FlashcardFormDialog({
   const mutation = useMutation({
     mutationFn: (values: CreateFlashcardInput) =>
       isEdit && flashcard
-        ? updateFlashcard(flashcard.id, { front: values.front, back: values.back })
+        ? updateFlashcard(flashcard.id, {
+            front: values.front,
+            back: values.back,
+          })
         : createFlashcard(values),
     onSuccess: (result) => {
       if (!result.success) {
@@ -118,7 +126,11 @@ export function FlashcardFormDialog({
                 <FormItem>
                   <FormLabel>{t("frontLabel")}</FormLabel>
                   <FormControl>
-                    <Textarea rows={3} placeholder={t("frontPlaceholder")} {...field} />
+                    <Textarea
+                      rows={3}
+                      placeholder={t("frontPlaceholder")}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -132,14 +144,20 @@ export function FlashcardFormDialog({
                 <FormItem>
                   <FormLabel>{t("backLabel")}</FormLabel>
                   <FormControl>
-                    <Textarea rows={4} placeholder={t("backPlaceholder")} {...field} />
+                    <Textarea
+                      rows={4}
+                      placeholder={t("backPlaceholder")}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            {formError && <p className="text-sm text-destructive">{formError}</p>}
+            {formError && (
+              <p className="text-sm text-destructive">{formError}</p>
+            )}
 
             <DialogFooter>
               <Button
@@ -150,8 +168,12 @@ export function FlashcardFormDialog({
               >
                 {t("cancel")}
               </Button>
-              <Button type="submit" disabled={mutation.isPending} className="gap-2">
-                {mutation.isPending && <Loader2 className="size-4 animate-spin" />}
+              <Button
+                type="submit"
+                disabled={mutation.isPending}
+                className="gap-2"
+              >
+                {mutation.isPending && <LessonioSpinner className="size-4" />}
                 {mutation.isPending
                   ? t("submitting")
                   : isEdit

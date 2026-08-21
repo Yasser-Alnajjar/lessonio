@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { deleteAccount } from "@/actions/settings.mutations";
+import { LessonioSpinner } from "@/components/shared/lessonio-mark";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -25,7 +25,11 @@ interface DeleteAccountDialogProps {
   email: string;
 }
 
-export function DeleteAccountDialog({ open, onOpenChange, email }: DeleteAccountDialogProps) {
+export function DeleteAccountDialog({
+  open,
+  onOpenChange,
+  email,
+}: DeleteAccountDialogProps) {
   const t = useTranslations("settings.data.deleteDialog");
   const router = useRouter();
   const [confirmText, setConfirmText] = useState("");
@@ -61,7 +65,9 @@ export function DeleteAccountDialog({ open, onOpenChange, email }: DeleteAccount
         </DialogHeader>
 
         <div className="flex flex-col gap-2">
-          <Label htmlFor="delete-account-confirm">{t("confirmLabel", { email })}</Label>
+          <Label htmlFor="delete-account-confirm">
+            {t("confirmLabel", { email })}
+          </Label>
           <Input
             id="delete-account-confirm"
             value={confirmText}
@@ -79,7 +85,11 @@ export function DeleteAccountDialog({ open, onOpenChange, email }: DeleteAccount
         )}
 
         <DialogFooter>
-          <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => handleOpenChange(false)}
+          >
             {t("cancel")}
           </Button>
           <Button
@@ -88,7 +98,7 @@ export function DeleteAccountDialog({ open, onOpenChange, email }: DeleteAccount
             disabled={confirmText !== email || mutation.isPending}
             onClick={() => mutation.mutate()}
           >
-            {mutation.isPending && <Loader2 className="animate-spin" />}
+            {mutation.isPending && <LessonioSpinner />}
             {mutation.isPending ? t("deleting") : t("confirm")}
           </Button>
         </DialogFooter>

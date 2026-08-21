@@ -3,9 +3,10 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { CheckCircle2, Loader2 } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 
 import { recordFlashcardReview } from "@/actions/flashcards.mutations";
+import { LessonioSpinner } from "@/components/shared/lessonio-mark";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui-system/empty-state";
@@ -56,7 +57,9 @@ export function ReviewRunner({ cards, backHref }: ReviewRunnerProps) {
       <div className="flex flex-col items-center gap-4 py-16 text-center">
         <CheckCircle2 className="size-12 text-success" />
         <div>
-          <h2 className="text-lg font-semibold text-foreground">{t("sessionCompleteTitle")}</h2>
+          <h2 className="text-lg font-semibold text-foreground">
+            {t("sessionCompleteTitle")}
+          </h2>
           <p className="text-sm text-muted-foreground">
             {t("sessionCompleteDescription", { count: reviewedCount })}
           </p>
@@ -92,7 +95,8 @@ export function ReviewRunner({ cards, backHref }: ReviewRunnerProps) {
         tabIndex={0}
         onClick={() => setFlipped((prev) => !prev)}
         onKeyDown={(event) => {
-          if (event.key === "Enter" || event.key === " ") setFlipped((prev) => !prev);
+          if (event.key === "Enter" || event.key === " ")
+            setFlipped((prev) => !prev);
         }}
         className="flex min-h-64 cursor-pointer items-center justify-center p-8 text-center transition-colors"
       >
@@ -111,7 +115,9 @@ export function ReviewRunner({ cards, backHref }: ReviewRunnerProps) {
             {flipped ? current.back : current.front}
           </p>
           {!flipped && (
-            <p className="mt-2 text-xs text-muted-foreground">{t("tapToFlip")}</p>
+            <p className="mt-2 text-xs text-muted-foreground">
+              {t("tapToFlip")}
+            </p>
           )}
         </CardContent>
       </Card>
@@ -128,7 +134,7 @@ export function ReviewRunner({ cards, backHref }: ReviewRunnerProps) {
               className={cn("flex-col gap-1 py-3", GRADE_STYLES[grade])}
             >
               {mutation.isPending && mutation.variables?.grade === grade ? (
-                <Loader2 className="size-4 animate-spin" />
+                <LessonioSpinner className="size-4" />
               ) : (
                 t(`grades.${grade}`)
               )}

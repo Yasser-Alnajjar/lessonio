@@ -5,9 +5,8 @@ import { useMutation } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useLocale, useTranslations } from "next-intl";
-import { Loader2 } from "lucide-react";
-
 import { createExam, updateExam } from "@/actions/exams.mutations";
+import { LessonioSpinner } from "@/components/shared/lessonio-mark";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -119,7 +118,9 @@ export function ExamFormDialog({
         dir={isArabic ? "rtl" : "ltr"}
       >
         <DialogHeader>
-          <DialogTitle className="w-fit">{isEdit ? t("editTitle") : t("createTitle")}</DialogTitle>
+          <DialogTitle className="w-fit">
+            {isEdit ? t("editTitle") : t("createTitle")}
+          </DialogTitle>
           <DialogDescription className="w-fit">
             {isEdit ? t("editDescription") : t("createDescription")}
           </DialogDescription>
@@ -167,7 +168,11 @@ export function ExamFormDialog({
                 <FormItem>
                   <FormLabel>{t("titleLabel")}</FormLabel>
                   <FormControl>
-                    <Input placeholder={t("titlePlaceholder")} autoFocus {...field} />
+                    <Input
+                      placeholder={t("titlePlaceholder")}
+                      autoFocus
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -199,7 +204,9 @@ export function ExamFormDialog({
                         type="number"
                         min={1}
                         value={field.value}
-                        onChange={(event) => field.onChange(event.target.valueAsNumber)}
+                        onChange={(event) =>
+                          field.onChange(event.target.valueAsNumber)
+                        }
                       />
                     </FormControl>
                     <FormMessage />
@@ -220,7 +227,9 @@ export function ExamFormDialog({
                         value={field.value ?? ""}
                         onChange={(event) =>
                           field.onChange(
-                            event.target.value === "" ? undefined : event.target.valueAsNumber,
+                            event.target.value === ""
+                              ? undefined
+                              : event.target.valueAsNumber,
                           )
                         }
                       />
@@ -238,11 +247,18 @@ export function ExamFormDialog({
             )}
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
                 {t("cancel")}
               </Button>
-              <Button type="submit" disabled={mutation.isPending || lessons.length === 0}>
-                {mutation.isPending && <Loader2 className="animate-spin" />}
+              <Button
+                type="submit"
+                disabled={mutation.isPending || lessons.length === 0}
+              >
+                {mutation.isPending && <LessonioSpinner />}
                 {mutation.isPending
                   ? t("submitting")
                   : isEdit

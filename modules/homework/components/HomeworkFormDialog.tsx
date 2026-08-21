@@ -5,9 +5,8 @@ import { useMutation } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useLocale, useTranslations } from "next-intl";
-import { Loader2 } from "lucide-react";
-
 import { createHomework, updateHomework } from "@/actions/homework.mutations";
+import { LessonioSpinner } from "@/components/shared/lessonio-mark";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -34,7 +33,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { createHomeworkSchema } from "@/lib/validations/homework";
-import type { CreateHomeworkInput, HomeworkWithRelations } from "@/lib/types/homework";
+import type {
+  CreateHomeworkInput,
+  HomeworkWithRelations,
+} from "@/lib/types/homework";
 import type { LessonWithRelations } from "@/lib/types/lesson";
 
 export interface HomeworkFormDialogProps {
@@ -92,7 +94,9 @@ export function HomeworkFormDialog({
 
   const mutation = useMutation({
     mutationFn: (values: CreateHomeworkInput) =>
-      isEdit && homework ? updateHomework(homework.id, values) : createHomework(values),
+      isEdit && homework
+        ? updateHomework(homework.id, values)
+        : createHomework(values),
     onSuccess: (result) => {
       if (!result.success) {
         setFormError(result.error);
@@ -165,7 +169,11 @@ export function HomeworkFormDialog({
                 <FormItem>
                   <FormLabel>{t("titleLabel")}</FormLabel>
                   <FormControl>
-                    <Input placeholder={t("titlePlaceholder")} autoFocus {...field} />
+                    <Input
+                      placeholder={t("titlePlaceholder")}
+                      autoFocus
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -193,11 +201,18 @@ export function HomeworkFormDialog({
             )}
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
                 {t("cancel")}
               </Button>
-              <Button type="submit" disabled={mutation.isPending || lessons.length === 0}>
-                {mutation.isPending && <Loader2 className="animate-spin" />}
+              <Button
+                type="submit"
+                disabled={mutation.isPending || lessons.length === 0}
+              >
+                {mutation.isPending && <LessonioSpinner />}
                 {mutation.isPending
                   ? t("submitting")
                   : isEdit

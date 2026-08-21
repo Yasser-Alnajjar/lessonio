@@ -1,8 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { Loader2Icon } from "lucide-react";
 
+import { LessonioSpinner } from "@/components/shared/lessonio-mark";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -60,7 +60,11 @@ export function ConfirmDialog({
       updateOpen(false);
     } catch (err) {
       setPending(false);
-      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again.",
+      );
     }
   };
 
@@ -78,7 +82,9 @@ export function ConfirmDialog({
           </p>
         )}
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={pending}>{cancelLabel}</AlertDialogCancel>
+          <AlertDialogCancel disabled={pending}>
+            {cancelLabel}
+          </AlertDialogCancel>
           <AlertDialogAction
             variant={variant}
             disabled={pending}
@@ -88,7 +94,7 @@ export function ConfirmDialog({
             }}
             className={cn(pending && "pointer-events-none")}
           >
-            {pending && <Loader2Icon className="size-4 animate-spin" />}
+            {pending && <LessonioSpinner className="size-4" />}
             {error ? "Retry" : confirmLabel}
           </AlertDialogAction>
         </AlertDialogFooter>

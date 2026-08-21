@@ -6,9 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { format, parseISO } from "date-fns";
 import { useLocale, useTranslations } from "next-intl";
-import { Loader2 } from "lucide-react";
-
 import { createLesson, updateLesson } from "@/actions/lessons.mutations";
+import { LessonioSpinner } from "@/components/shared/lessonio-mark";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -223,7 +222,9 @@ export function LessonFormDialog({
                     <Select
                       value={field.value ?? CLASS_UNSET_VALUE}
                       onValueChange={(value) =>
-                        field.onChange(value === CLASS_UNSET_VALUE ? undefined : value)
+                        field.onChange(
+                          value === CLASS_UNSET_VALUE ? undefined : value,
+                        )
                       }
                       dir={isArabic ? "rtl" : "ltr"}
                     >
@@ -289,7 +290,7 @@ export function LessonFormDialog({
                 type="submit"
                 disabled={mutation.isPending || subjects.length === 0}
               >
-                {mutation.isPending && <Loader2 className="animate-spin" />}
+                {mutation.isPending && <LessonioSpinner />}
                 {mutation.isPending
                   ? t("submitting")
                   : isEdit

@@ -4,10 +4,10 @@ import { useMemo, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
-import { Loader2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
 import { updateProfile } from "@/actions/auth.mutations";
+import { LessonioSpinner } from "@/components/shared/lessonio-mark";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -37,7 +37,12 @@ interface SettingsProfileViewProps {
   data: User | null;
 }
 
-const FALLBACK_TIMEZONES = ["UTC", "America/New_York", "Europe/London", "Asia/Dubai"];
+const FALLBACK_TIMEZONES = [
+  "UTC",
+  "America/New_York",
+  "Europe/London",
+  "Asia/Dubai",
+];
 
 function supportedTimezones(): string[] {
   try {
@@ -65,9 +70,10 @@ export const SettingsProfileView = ({ data }: SettingsProfileViewProps) => {
   const locale = useLocale();
   const isArabic = locale === "ar";
 
-  const [status, setStatus] = useState<{ kind: "saved" | "error"; message: string } | null>(
-    null,
-  );
+  const [status, setStatus] = useState<{
+    kind: "saved" | "error";
+    message: string;
+  } | null>(null);
 
   const timezones = useMemo(() => supportedTimezones(), []);
   const schema = useMemo(() => createUpdateProfileSchema(t), [t]);
@@ -91,7 +97,10 @@ export const SettingsProfileView = ({ data }: SettingsProfileViewProps) => {
         setStatus({ kind: "saved", message: t("saved") });
         router.refresh();
       } else {
-        setStatus({ kind: "error", message: result.error ?? t("genericError") });
+        setStatus({
+          kind: "error",
+          message: result.error ?? t("genericError"),
+        });
       }
     },
     onError: () => setStatus({ kind: "error", message: t("genericError") }),
@@ -108,7 +117,9 @@ export const SettingsProfileView = ({ data }: SettingsProfileViewProps) => {
         <SettingsNav />
 
         <div>
-          <h1 className="text-foreground text-xl font-semibold">{t("title")}</h1>
+          <h1 className="text-foreground text-xl font-semibold">
+            {t("title")}
+          </h1>
           <p className="text-muted-foreground text-sm">{t("subtitle")}</p>
         </div>
 
@@ -121,7 +132,9 @@ export const SettingsProfileView = ({ data }: SettingsProfileViewProps) => {
         <div className="flex items-center gap-4">
           <Avatar size="lg">
             <AvatarImage src={data?.avatarUrl ?? undefined} alt="" />
-            <AvatarFallback>{initialsOf(data?.fullName ?? null, data?.email ?? "")}</AvatarFallback>
+            <AvatarFallback>
+              {initialsOf(data?.fullName ?? null, data?.email ?? "")}
+            </AvatarFallback>
           </Avatar>
           <div className="flex flex-col gap-0.5">
             <Label>{t("emailLabel")}</Label>
@@ -170,21 +183,31 @@ export const SettingsProfileView = ({ data }: SettingsProfileViewProps) => {
                       </SelectContent>
                     </Select>
                   </FormControl>
-                  <p className="text-muted-foreground text-xs">{t("timezoneDescription")}</p>
+                  <p className="text-muted-foreground text-xs">
+                    {t("timezoneDescription")}
+                  </p>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
             <div className="flex items-center gap-3">
-              <Button type="submit" disabled={!data || mutation.isPending} className="w-fit">
-                {mutation.isPending && <Loader2 className="animate-spin" />}
+              <Button
+                type="submit"
+                disabled={!data || mutation.isPending}
+                className="w-fit"
+              >
+                {mutation.isPending && <LessonioSpinner />}
                 {mutation.isPending ? t("saving") : t("save")}
               </Button>
               {status && (
                 <p
                   role="status"
-                  className={status.kind === "error" ? "text-destructive text-sm" : "text-sm"}
+                  className={
+                    status.kind === "error"
+                      ? "text-destructive text-sm"
+                      : "text-sm"
+                  }
                 >
                   {status.message}
                 </p>

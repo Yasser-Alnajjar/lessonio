@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 
-import { StudyLineMark } from "@/components/shared/study-line-mark";
+import { LessonioMark } from "@/components/shared/lessonio-mark";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { LanguageSwitch } from "@/components/shared/language-switch";
 
@@ -20,7 +20,7 @@ export async function AuthShell({ children }: AuthShellProps) {
     <div className="bg-background grid min-h-svh lg:grid-cols-2">
       <section className="from-primary/10 via-background to-highlighter/10 relative hidden flex-col justify-between overflow-hidden bg-linear-to-br p-10 lg:flex">
         <div className="flex items-center gap-2">
-          <StudyLineMark className="h-8 w-auto" />
+          <LessonioMark className="h-8 w-auto" />
           <span className="font-display text-lg">{t("brand")}</span>
         </div>
 
@@ -42,7 +42,7 @@ export async function AuthShell({ children }: AuthShellProps) {
       <section className="flex flex-col gap-6 p-6 sm:p-10">
         <div className="flex items-center justify-between lg:justify-end gap-2 flex-wrap">
           <div className="flex items-center gap-2 lg:hidden">
-            <StudyLineMark className="h-7 w-auto" />
+            <LessonioMark className="h-7 w-auto" />
             <span className="font-display text-base">{t("brand")}</span>
           </div>
           <ThemeToggle />

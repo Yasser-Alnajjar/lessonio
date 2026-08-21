@@ -36,8 +36,8 @@ export async function generateMetadata({
 
   return {
     title: {
-      default: "Study Line",
-      template: `%s · Study Line`,
+      default: "Lessonio",
+      template: `%s · Lessonio`,
     },
     description: t("tagline"),
   };

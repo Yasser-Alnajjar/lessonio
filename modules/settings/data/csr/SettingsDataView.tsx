@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { Download, Loader2 } from "lucide-react";
+import { Download } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { exportData } from "@/actions/settings.mutations";
+import { LessonioSpinner } from "@/components/shared/lessonio-mark";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import type { UserSettings } from "@/lib/types/settings";
@@ -18,7 +19,9 @@ interface SettingsDataViewProps {
 }
 
 function downloadJson(payload: unknown, fileName: string) {
-  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {
+    type: "application/json",
+  });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
@@ -41,7 +44,10 @@ export const SettingsDataView = ({ data, email }: SettingsDataViewProps) => {
         setExportError(result.error ?? t("exportError"));
         return;
       }
-      downloadJson(result.data, `study-line-backup-${result.data.exportedAt.slice(0, 10)}.json`);
+      downloadJson(
+        result.data,
+        `study-line-backup-${result.data.exportedAt.slice(0, 10)}.json`,
+      );
     },
     onError: () => setExportError(t("exportError")),
   });
@@ -52,7 +58,9 @@ export const SettingsDataView = ({ data, email }: SettingsDataViewProps) => {
         <SettingsNav />
 
         <div>
-          <h1 className="text-foreground text-xl font-semibold">{t("title")}</h1>
+          <h1 className="text-foreground text-xl font-semibold">
+            {t("title")}
+          </h1>
           <p className="text-muted-foreground text-sm">{t("subtitle")}</p>
         </div>
 
@@ -65,7 +73,9 @@ export const SettingsDataView = ({ data, email }: SettingsDataViewProps) => {
         <section className="flex flex-col gap-3">
           <div>
             <h2 className="text-sm font-semibold">{t("exportTitle")}</h2>
-            <p className="text-muted-foreground text-sm">{t("exportDescription")}</p>
+            <p className="text-muted-foreground text-sm">
+              {t("exportDescription")}
+            </p>
           </div>
           <div className="flex items-center gap-3">
             <Button
@@ -78,12 +88,10 @@ export const SettingsDataView = ({ data, email }: SettingsDataViewProps) => {
                 exportMutation.mutate();
               }}
             >
-              {exportMutation.isPending ? (
-                <Loader2 className="animate-spin" />
-              ) : (
-                <Download />
-              )}
-              {exportMutation.isPending ? t("exportPreparing") : t("exportButton")}
+              {exportMutation.isPending ? <LessonioSpinner /> : <Download />}
+              {exportMutation.isPending
+                ? t("exportPreparing")
+                : t("exportButton")}
             </Button>
             {exportError && (
               <p role="alert" className="text-destructive text-sm">
@@ -97,8 +105,12 @@ export const SettingsDataView = ({ data, email }: SettingsDataViewProps) => {
 
         <section className="border-destructive/30 flex flex-col gap-3 rounded-lg border p-4">
           <div>
-            <h2 className="text-destructive text-sm font-semibold">{t("dangerTitle")}</h2>
-            <p className="text-muted-foreground text-sm">{t("dangerDescription")}</p>
+            <h2 className="text-destructive text-sm font-semibold">
+              {t("dangerTitle")}
+            </h2>
+            <p className="text-muted-foreground text-sm">
+              {t("dangerDescription")}
+            </p>
           </div>
           <Button
             type="button"
@@ -112,7 +124,11 @@ export const SettingsDataView = ({ data, email }: SettingsDataViewProps) => {
         </section>
 
         {email && (
-          <DeleteAccountDialog open={deleteOpen} onOpenChange={setDeleteOpen} email={email} />
+          <DeleteAccountDialog
+            open={deleteOpen}
+            onOpenChange={setDeleteOpen}
+            email={email}
+          />
         )}
       </div>
     </div>

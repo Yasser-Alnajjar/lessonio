@@ -5,9 +5,8 @@ import { useMutation } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useTranslations } from "next-intl";
-import { Loader2 } from "lucide-react";
-
 import { createSubject, updateSubject } from "@/actions/subjects.mutations";
+import { LessonioSpinner } from "@/components/shared/lessonio-mark";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -89,7 +88,9 @@ export function SubjectFormDialog({
 
   const mutation = useMutation({
     mutationFn: (values: CreateSubjectInput) =>
-      isEdit && subject ? updateSubject(subject.id, values) : createSubject(values),
+      isEdit && subject
+        ? updateSubject(subject.id, values)
+        : createSubject(values),
     onSuccess: (result) => {
       if (!result.success) {
         setFormError(result.error);
@@ -109,7 +110,9 @@ export function SubjectFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{isEdit ? t("editTitle") : t("createTitle")}</DialogTitle>
+          <DialogTitle>
+            {isEdit ? t("editTitle") : t("createTitle")}
+          </DialogTitle>
           <DialogDescription>
             {isEdit ? t("editDescription") : t("createDescription")}
           </DialogDescription>
@@ -124,7 +127,11 @@ export function SubjectFormDialog({
                 <FormItem>
                   <FormLabel>{t("nameLabel")}</FormLabel>
                   <FormControl>
-                    <Input placeholder={t("namePlaceholder")} autoFocus {...field} />
+                    <Input
+                      placeholder={t("namePlaceholder")}
+                      autoFocus
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -148,7 +155,8 @@ export function SubjectFormDialog({
                           onClick={() => field.onChange(color)}
                           className={cn(
                             "size-8 rounded-full outline-offset-2 transition-transform hover:scale-105",
-                            field.value === color && "outline-2 outline-foreground",
+                            field.value === color &&
+                              "outline-2 outline-foreground",
                           )}
                           style={{ backgroundColor: color }}
                         />
@@ -180,7 +188,8 @@ export function SubjectFormDialog({
                             onClick={() => field.onChange(icon)}
                             className={cn(
                               "flex size-10 items-center justify-center rounded-lg border text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground",
-                              selected && "border-primary bg-primary/10 text-primary",
+                              selected &&
+                                "border-primary bg-primary/10 text-primary",
                             )}
                           >
                             <Icon className="size-5" />
@@ -207,7 +216,9 @@ export function SubjectFormDialog({
                       max={20}
                       step={0.5}
                       value={field.value}
-                      onChange={(event) => field.onChange(event.target.valueAsNumber)}
+                      onChange={(event) =>
+                        field.onChange(event.target.valueAsNumber)
+                      }
                     />
                   </FormControl>
                   <FormMessage />
@@ -222,11 +233,15 @@ export function SubjectFormDialog({
             )}
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
                 {t("cancel")}
               </Button>
               <Button type="submit" disabled={mutation.isPending}>
-                {mutation.isPending && <Loader2 className="animate-spin" />}
+                {mutation.isPending && <LessonioSpinner />}
                 {mutation.isPending
                   ? t("submitting")
                   : isEdit

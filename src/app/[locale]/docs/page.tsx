@@ -19,7 +19,7 @@ import { Actions } from "@/actions";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { LanguageSwitch } from "@/components/shared/language-switch";
-import { StudyLineMark } from "@/components/shared/study-line-mark";
+import { LessonioMark } from "@/components/shared/lessonio-mark";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 
 const FEATURE_ICONS = {
@@ -59,8 +59,8 @@ export default async function DocsPage() {
       <header className="border-border/60 border-b">
         <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-4 px-6">
           <Link href="/" className="flex items-center gap-2">
-            <StudyLineMark className="h-6 w-auto" />
-            <span className="text-md">Study Line</span>
+            <LessonioMark className="h-6 w-auto" />
+            <span className="text-md">Lessonio</span>
           </Link>
 
           <div className="ms-auto flex items-center gap-2">
@@ -228,7 +228,7 @@ export default async function DocsPage() {
       <footer className="border-border/60 mt-auto border-t">
         <div className="text-muted-foreground/70 mx-auto flex w-full max-w-6xl flex-col items-center justify-between gap-2 px-6 py-8 text-xs sm:flex-row">
           <div className="flex items-center gap-2">
-            <StudyLineMark className="h-4 w-auto" />
+            <LessonioMark className="h-4 w-auto" />
             <Link href="/" className="hover:text-foreground transition-colors">
               {t("backHome")}
             </Link>

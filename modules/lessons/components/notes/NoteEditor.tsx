@@ -5,9 +5,10 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { CheckIcon, Loader2, Trash2 } from "lucide-react";
+import { CheckIcon, Trash2 } from "lucide-react";
 
 import { deleteNote, updateNote } from "@/actions/lesson-notes.mutations";
+import { LessonioSpinner } from "@/components/shared/lessonio-mark";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -93,7 +94,7 @@ export function NoteEditor({ note, setNotes, onDeleted }: NoteEditorProps) {
         <span className="w-20 shrink-0 text-xs whitespace-nowrap text-muted-foreground">
           {isSaving ? (
             <span className="inline-flex items-center gap-1">
-              <Loader2 className="size-3 animate-spin" />
+              <LessonioSpinner className="size-3" />
               {t("saving")}
             </span>
           ) : saved ? (

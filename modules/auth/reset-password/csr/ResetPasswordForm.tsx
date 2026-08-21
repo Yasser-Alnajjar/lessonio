@@ -5,9 +5,10 @@ import { useMutation } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useTranslations } from "next-intl";
-import { CheckCircle2, KeyRound, Loader2 } from "lucide-react";
+import { CheckCircle2, KeyRound } from "lucide-react";
 
 import { resetPassword } from "@/actions/auth.mutations";
+import { LessonioSpinner } from "@/components/shared/lessonio-mark";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -78,11 +79,17 @@ export const ResetPasswordForm = () => {
         {succeeded ? (
           <div className="border-success/30 bg-success/10 flex flex-col items-center gap-3 rounded-xl border p-6 text-center">
             <CheckCircle2 className="text-success h-8 w-8" />
-            <p className="text-foreground text-sm font-medium">{t("success")}</p>
+            <p className="text-foreground text-sm font-medium">
+              {t("success")}
+            </p>
           </div>
         ) : (
           <Form {...form}>
-            <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
+            <form
+              onSubmit={onSubmit}
+              noValidate
+              className="flex flex-col gap-4"
+            >
               <FormField
                 control={form.control}
                 name="password"
@@ -122,17 +129,20 @@ export const ResetPasswordForm = () => {
               />
 
               {formError && (
-                <p role="alert" className="text-destructive text-sm font-medium">
+                <p
+                  role="alert"
+                  className="text-destructive text-sm font-medium"
+                >
                   {formError}
                 </p>
               )}
 
-              <Button type="submit" disabled={mutation.isPending} className="mt-2">
-                {mutation.isPending ? (
-                  <Loader2 className="animate-spin" />
-                ) : (
-                  <KeyRound />
-                )}
+              <Button
+                type="submit"
+                disabled={mutation.isPending}
+                className="mt-2"
+              >
+                {mutation.isPending ? <LessonioSpinner /> : <KeyRound />}
                 {mutation.isPending ? t("submitting") : t("submit")}
               </Button>
             </form>

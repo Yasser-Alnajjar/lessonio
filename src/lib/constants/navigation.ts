@@ -4,6 +4,7 @@ import {
   BookOpen,
   CalendarClock,
   CalendarDays,
+  ClipboardCheck,
   ClipboardList,
   GraduationCap,
   HelpCircle,
@@ -52,6 +53,12 @@ export const NAV_ITEMS = [
     roles: TEACHER_ONLY,
   },
   {
+    href: "/teaching/assignments",
+    key: "teachingAssignments",
+    icon: ClipboardCheck,
+    roles: TEACHER_ONLY,
+  },
+  {
     href: "/subjects/list",
     key: "subjects",
     icon: BookOpen,
@@ -67,6 +74,12 @@ export const NAV_ITEMS = [
     href: "/classroom/classes",
     key: "classroomClasses",
     icon: Users,
+    roles: STUDENT_ONLY,
+  },
+  {
+    href: "/classroom/assignments",
+    key: "classroomAssignments",
+    icon: ClipboardCheck,
     roles: STUDENT_ONLY,
   },
   {

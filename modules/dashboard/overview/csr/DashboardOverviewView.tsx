@@ -8,6 +8,7 @@ import { ClassListCard } from "./class-list-card";
 import { RecentActivityCard } from "./recent-activity-card";
 import { WeeklySummaryCard } from "./weekly-summary-card";
 import { QuickActionsCard } from "./quick-actions-card";
+import { AssignedWorkCard } from "./assigned-work-card";
 import useTranslate from "@/hooks/useTranslate";
 
 interface DashboardOverviewViewProps {
@@ -34,6 +35,7 @@ export const DashboardOverviewView = ({ data }: DashboardOverviewViewProps) => {
     targetMinutes: 0,
     dayBreakdown: [],
   };
+  const assignedWork = data?.assignedWork ?? [];
 
   return (
     <div className="flex flex-col gap-6 p-4">
@@ -71,6 +73,14 @@ export const DashboardOverviewView = ({ data }: DashboardOverviewViewProps) => {
       </div>
 
       <QuickActionsCard />
+
+      {assignedWork.length > 0 && (
+        <AssignedWorkCard
+          title={t("assignedWork.title")}
+          overdueLabel={t("assignedWork.overdue")}
+          assignments={assignedWork}
+        />
+      )}
     </div>
   );
 };

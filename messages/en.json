@@ -48,7 +48,8 @@
     "help": "Help",
     "teachingClasses": "Classes",
     "teachingAssignments": "Assignments",
-    "classroomClasses": "My Classes"
+    "classroomClasses": "My Classes",
+    "classroomAssignments": "Assignments"
   },
   "landing": {
     "nav": {
@@ -369,6 +370,10 @@
       "startSession": "Start studying",
       "logHomework": "Log homework",
       "viewCalendar": "View calendar"
+    },
+    "assignedWork": {
+      "title": "From your teachers",
+      "overdue": "Overdue"
     }
   },
   "subjects": {
@@ -617,6 +622,61 @@
         "rotate": "Rotate join code",
         "hint": "Share this code with students. Rotating it invalidates the old code."
       }
+    },
+    "assignments": {
+      "card": {
+        "actionsLabel": "Assignment actions",
+        "edit": "Edit",
+        "publish": "Publish",
+        "unpublish": "Unpublish",
+        "delete": "Delete",
+        "draft": "Draft",
+        "published": "Published",
+        "points": "{points, plural, =1 {# point} other {# points}}"
+      },
+      "form": {
+        "classLabel": "Class",
+        "classPlaceholder": "Choose a class",
+        "titleLabel": "Title",
+        "titlePlaceholder": "e.g. Problem set 3",
+        "instructionsLabel": "Instructions (optional)",
+        "instructionsPlaceholder": "What students need to do",
+        "dueAtLabel": "Due",
+        "totalPointsLabel": "Points",
+        "createTitle": "New assignment",
+        "createDescription": "Publish it when you're ready — drafts stay hidden from students.",
+        "editTitle": "Edit assignment",
+        "editDescription": "Update this assignment's details.",
+        "cancel": "Cancel",
+        "submitting": "Saving…",
+        "submitCreate": "Create assignment",
+        "submitEdit": "Save changes",
+        "errors": {
+          "classRequired": "Choose a class.",
+          "titleRequired": "Enter a title.",
+          "titleMax": "Title is too long.",
+          "instructionsMax": "Instructions are too long.",
+          "dueAtRequired": "Choose a due date.",
+          "totalPointsInvalid": "Enter a number of points greater than 0.",
+          "totalPointsMax": "Points must be 1000 or fewer."
+        }
+      },
+      "delete": {
+        "title": "Delete this assignment?",
+        "description": "\"{title}\" will be permanently deleted. This can't be undone.",
+        "confirm": "Delete assignment",
+        "cancel": "Cancel",
+        "genericError": "Something went wrong deleting this assignment."
+      },
+      "list": {
+        "title": "Assignments",
+        "subtitle": "Create assignments and publish them when you're ready.",
+        "newAssignment": "New assignment",
+        "noClassesHint": "Create a class first — assignments need one to belong to.",
+        "emptyTitle": "No assignments yet",
+        "emptyDescription": "Create your first assignment for one of your classes.",
+        "emptyAction": "New assignment"
+      }
     }
   },
   "classroom": {
@@ -651,6 +711,24 @@
         "cancel": "Cancel",
         "genericError": "Something went wrong leaving this class."
       }
+    },
+    "assignments": {
+      "title": "Assignments",
+      "subtitle": "Work your teachers have published for you.",
+      "empty": {
+        "title": "No assignments yet",
+        "description": "Assignments your teachers publish will show up here."
+      },
+      "card": {
+        "overdue": "Overdue",
+        "points": "{points, plural, =1 {# point} other {# points}}"
+      }
+    },
+    "assignment": {
+      "notFound": "This assignment couldn't be found.",
+      "backToAssignments": "Back to assignments",
+      "due": "Due {date}",
+      "points": "{points, plural, =1 {# point} other {# points}}"
     }
   },
   "lessons": {
@@ -935,7 +1013,12 @@
       "emptyDescription": "Add your first homework to start tracking deadlines.",
       "emptyAction": "New homework",
       "noResultsTitle": "No matching homework",
-      "noResultsDescription": "Try a different search term or clear your filters."
+      "noResultsDescription": "Try a different search term or clear your filters.",
+      "teacherSection": {
+        "title": "From your teachers",
+        "subtitle": "Published assignments from classes you've joined.",
+        "points": "{points, plural, =1 {# point} other {# points}}"
+      }
     },
     "card": {
       "actionsLabel": "Homework actions",

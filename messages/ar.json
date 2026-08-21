@@ -48,7 +48,8 @@
     "help": "المساعدة",
     "teachingClasses": "الحصص",
     "teachingAssignments": "الواجبات المسندة",
-    "classroomClasses": "حصصي"
+    "classroomClasses": "حصصي",
+    "classroomAssignments": "مهام الحصص"
   },
   "landing": {
     "nav": {
@@ -369,6 +370,10 @@
       "startSession": "ابدأ المذاكرة",
       "logHomework": "تسجيل واجب",
       "viewCalendar": "عرض التقويم"
+    },
+    "assignedWork": {
+      "title": "من معلميك",
+      "overdue": "متأخر"
     }
   },
   "subjects": {
@@ -617,6 +622,61 @@
         "rotate": "تدوير رمز الانضمام",
         "hint": "شارك هذا الرمز مع الطلاب. تدويره يُبطل الرمز القديم."
       }
+    },
+    "assignments": {
+      "card": {
+        "actionsLabel": "إجراءات المهمة",
+        "edit": "تعديل",
+        "publish": "نشر",
+        "unpublish": "إلغاء النشر",
+        "delete": "حذف",
+        "draft": "مسودة",
+        "published": "منشورة",
+        "points": "{points, plural, =1 {نقطة واحدة} other {# نقطة}}"
+      },
+      "form": {
+        "classLabel": "الحصة",
+        "classPlaceholder": "اختر حصة",
+        "titleLabel": "العنوان",
+        "titlePlaceholder": "مثال: مجموعة مسائل 3",
+        "instructionsLabel": "التعليمات (اختياري)",
+        "instructionsPlaceholder": "ما يجب على الطلاب فعله",
+        "dueAtLabel": "الموعد النهائي",
+        "totalPointsLabel": "النقاط",
+        "createTitle": "مهمة جديدة",
+        "createDescription": "انشرها عندما تكون جاهزاً — تبقى المسودات مخفية عن الطلاب.",
+        "editTitle": "تعديل المهمة",
+        "editDescription": "حدّث تفاصيل هذه المهمة.",
+        "cancel": "إلغاء",
+        "submitting": "جارٍ الحفظ…",
+        "submitCreate": "إنشاء المهمة",
+        "submitEdit": "حفظ التغييرات",
+        "errors": {
+          "classRequired": "اختر حصة.",
+          "titleRequired": "أدخل عنواناً.",
+          "titleMax": "العنوان طويل جداً.",
+          "instructionsMax": "التعليمات طويلة جداً.",
+          "dueAtRequired": "اختر موعداً نهائياً.",
+          "totalPointsInvalid": "أدخل عدد نقاط أكبر من 0.",
+          "totalPointsMax": "يجب ألا تتجاوز النقاط 1000."
+        }
+      },
+      "delete": {
+        "title": "حذف هذه المهمة؟",
+        "description": "سيتم حذف \"{title}\" نهائياً. لا يمكن التراجع عن هذا.",
+        "confirm": "حذف المهمة",
+        "cancel": "إلغاء",
+        "genericError": "حدث خطأ أثناء حذف هذه المهمة."
+      },
+      "list": {
+        "title": "المهام",
+        "subtitle": "أنشئ مهاماً وانشرها عندما تكون جاهزاً.",
+        "newAssignment": "مهمة جديدة",
+        "noClassesHint": "أنشئ حصة أولاً — تحتاج المهام إلى حصة تنتمي إليها.",
+        "emptyTitle": "لا توجد مهام بعد",
+        "emptyDescription": "أنشئ مهمتك الأولى لإحدى حصصك.",
+        "emptyAction": "مهمة جديدة"
+      }
     }
   },
   "classroom": {
@@ -651,6 +711,24 @@
         "cancel": "إلغاء",
         "genericError": "حدث خطأ أثناء مغادرة هذه الحصة."
       }
+    },
+    "assignments": {
+      "title": "المهام",
+      "subtitle": "المهام التي نشرها معلموك لك.",
+      "empty": {
+        "title": "لا توجد مهام بعد",
+        "description": "ستظهر هنا المهام التي ينشرها معلموك."
+      },
+      "card": {
+        "overdue": "متأخر",
+        "points": "{points, plural, =1 {نقطة واحدة} other {# نقطة}}"
+      }
+    },
+    "assignment": {
+      "notFound": "تعذّر العثور على هذه المهمة.",
+      "backToAssignments": "العودة إلى المهام",
+      "due": "الموعد النهائي {date}",
+      "points": "{points, plural, =1 {نقطة واحدة} other {# نقطة}}"
     }
   },
   "lessons": {
@@ -935,7 +1013,12 @@
       "emptyDescription": "أضف واجبك الأول لتبدأ بتتبع المواعيد النهائية.",
       "emptyAction": "واجب جديد",
       "noResultsTitle": "لا توجد واجبات مطابقة",
-      "noResultsDescription": "جرّب كلمة بحث مختلفة أو امسح عوامل التصفية."
+      "noResultsDescription": "جرّب كلمة بحث مختلفة أو امسح عوامل التصفية.",
+      "teacherSection": {
+        "title": "من معلميك",
+        "subtitle": "المهام المنشورة من الحصص التي انضممت إليها.",
+        "points": "{points, plural, =1 {نقطة واحدة} other {# نقطة}}"
+      }
     },
     "card": {
       "actionsLabel": "إجراءات الواجب",

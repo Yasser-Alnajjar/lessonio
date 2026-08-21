@@ -10,8 +10,11 @@ import type {
   RecentActivityItem,
   WeeklyStudySummary,
 } from "@/lib/types/dashboard";
+import type { AssignmentForStudent } from "@/lib/types/assignment";
 import type { GamificationProgress } from "@/lib/types/gamification";
 import type { ClassOccurrenceWithRelations } from "@/lib/types/class-occurrence";
+import type { AppRole } from "@/lib/types/user";
+import { assignmentsActions } from "./assignments";
 import { classOccurrencesActions } from "./class-occurrences";
 import { syncAndFetchUserAchievements } from "./gamification";
 
@@ -267,6 +270,19 @@ async function fetchProgress(
   return { xp, level, xpToNextLevel, currentStreakDays, longestStreakDays };
 }
 
+/**
+ * Skipped entirely for a teacher (or a not-yet-onboarded null role) — a
+ * teacher structurally cannot have assigned work of their own, and this
+ * dashboard slice is student-only per the plan.
+ */
+async function fetchAssignedWork(
+  role: AppRole | null,
+): Promise<AssignmentForStudent[]> {
+  if (role !== "student") return [];
+  const { data } = await assignmentsActions.getAssignedToMe();
+  return data ?? [];
+}
+
 async function fetchGreetingName(
   supabase: SupabaseServerClient,
   userId: string,
@@ -300,12 +316,20 @@ export const dashboardActions = {
         ? authData.user.user_metadata.full_name
         : null;
 
+    const { data: profileRole } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", userId)
+      .maybeSingle();
+    const role = (profileRole?.role ?? null) as AppRole | null;
+
     const [
       greetingName,
       { today, upcoming },
       recentActivity,
       weeklySummary,
       progress,
+      assignedWork,
     ] = await Promise.all([
       fetchGreetingName(
         supabase,
@@ -317,6 +341,7 @@ export const dashboardActions = {
       fetchRecentActivity(supabase, userId),
       fetchWeeklySummary(supabase, userId),
       fetchProgress(supabase, userId),
+      fetchAssignedWork(role),
     ]);
 
     const overallProgressPercent =
@@ -336,6 +361,7 @@ export const dashboardActions = {
         overallProgressPercent,
         todayClasses: today,
         upcomingClasses: upcoming,
+        assignedWork,
         recentActivity,
         weeklySummary,
       },

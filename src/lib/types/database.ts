@@ -36,6 +36,56 @@ export type Database = {
         };
         Relationships: [];
       };
+      assignments: {
+        Row: {
+          created_at: string;
+          due_at: string;
+          id: string;
+          instructions: string | null;
+          published_at: string | null;
+          status: string;
+          teacher_class_id: string;
+          teacher_id: string;
+          title: string;
+          total_points: number;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          due_at: string;
+          id?: string;
+          instructions?: string | null;
+          published_at?: string | null;
+          status?: string;
+          teacher_class_id: string;
+          teacher_id: string;
+          title: string;
+          total_points: number;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          due_at?: string;
+          id?: string;
+          instructions?: string | null;
+          published_at?: string | null;
+          status?: string;
+          teacher_class_id?: string;
+          teacher_id?: string;
+          title?: string;
+          total_points?: number;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "assignments_teacher_class_id_fkey";
+            columns: ["teacher_class_id"];
+            isOneToOne: false;
+            referencedRelation: "teacher_classes";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       attachments: {
         Row: {
           created_at: string;

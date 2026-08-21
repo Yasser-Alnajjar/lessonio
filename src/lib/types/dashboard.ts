@@ -1,4 +1,5 @@
 import type { UUID } from "./common";
+import type { AssignmentForStudent } from "./assignment";
 import type { ClassOccurrenceWithRelations } from "./class-occurrence";
 import type { GamificationProgress } from "./gamification";
 
@@ -23,4 +24,6 @@ export interface DashboardOverviewData {
   upcomingClasses: ClassOccurrenceWithRelations[];
   recentActivity: RecentActivityItem[];
   weeklySummary: WeeklyStudySummary;
+  /** Skipped entirely for a teacher; `[]` for a student with no published assignments. */
+  assignedWork: AssignmentForStudent[];
 }

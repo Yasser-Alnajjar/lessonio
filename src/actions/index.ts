@@ -1,3 +1,4 @@
+import { assignmentsActions } from "./assignments";
 import { attachmentsActions } from "./attachments";
 import { authActions } from "./auth";
 import { calendarActions } from "./calendar";
@@ -48,4 +49,5 @@ export const Actions = {
   Settings: settingsActions,
   TeacherClasses: teacherClassesActions,
   Enrollments: enrollmentsActions,
+  Assignments: assignmentsActions,
 };

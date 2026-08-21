@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { AssignmentCard } from "@/components/ui-system/assignment-card";
 import { EmptyState } from "@/components/ui-system/empty-state";
 import {
   EMPTY_FILTER_VALUE,
@@ -14,6 +15,7 @@ import { HomeworkCard } from "@/components/ui-system/homework-card";
 import { SearchInput } from "@/components/ui-system/search-input";
 import { useRouter } from "@/i18n/navigation";
 import useTranslate from "@/hooks/useTranslate";
+import type { AssignmentForStudent } from "@/lib/types/assignment";
 import type { HomeworkWithRelations } from "@/lib/types/homework";
 import type { LessonWithRelations } from "@/lib/types/lesson";
 import type { Subject } from "@/lib/types/subject";
@@ -25,6 +27,7 @@ interface HomeworkListViewProps {
   data: HomeworkWithRelations[];
   lessons: LessonWithRelations[];
   subjects: Subject[];
+  assignedWork: AssignmentForStudent[];
 }
 
 interface FormState {
@@ -32,15 +35,24 @@ interface FormState {
   homework: HomeworkWithRelations | null;
 }
 
-export const HomeworkListView = ({ data, lessons, subjects }: HomeworkListViewProps) => {
+export const HomeworkListView = ({
+  data,
+  lessons,
+  subjects,
+  assignedWork,
+}: HomeworkListViewProps) => {
   const t = useTranslate("homework");
   const router = useRouter();
 
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<FilterSidebarValue>(EMPTY_FILTER_VALUE);
   const [showCompleted, setShowCompleted] = useState(false);
-  const [formState, setFormState] = useState<FormState>({ open: false, homework: null });
-  const [deleteTarget, setDeleteTarget] = useState<HomeworkWithRelations | null>(null);
+  const [formState, setFormState] = useState<FormState>({
+    open: false,
+    homework: null,
+  });
+  const [deleteTarget, setDeleteTarget] =
+    useState<HomeworkWithRelations | null>(null);
 
   const subjectOptions = subjects.map((subject) => ({
     value: subject.id,
@@ -58,7 +70,10 @@ export const HomeworkListView = ({ data, lessons, subjects }: HomeworkListViewPr
       ) {
         return false;
       }
-      if (filter.subjectIds.length > 0 && !filter.subjectIds.includes(item.subjectId)) {
+      if (
+        filter.subjectIds.length > 0 &&
+        !filter.subjectIds.includes(item.subjectId)
+      ) {
         return false;
       }
       if (filter.dateFrom && item.deadline < filter.dateFrom) return false;
@@ -81,9 +96,13 @@ export const HomeworkListView = ({ data, lessons, subjects }: HomeworkListViewPr
       return (
         <EmptyState
           variant={data.length === 0 ? "no-data" : "no-results"}
-          title={data.length === 0 ? t("list.emptyTitle") : t("list.noResultsTitle")}
+          title={
+            data.length === 0 ? t("list.emptyTitle") : t("list.noResultsTitle")
+          }
           description={
-            data.length === 0 ? t("list.emptyDescription") : t("list.noResultsDescription")
+            data.length === 0
+              ? t("list.emptyDescription")
+              : t("list.noResultsDescription")
           }
           action={
             data.length === 0 && lessons.length > 0
@@ -121,7 +140,9 @@ export const HomeworkListView = ({ data, lessons, subjects }: HomeworkListViewPr
     <div className="flex flex-col gap-6 p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold text-foreground">{t("list.title")}</h1>
+          <h1 className="text-xl font-semibold text-foreground">
+            {t("list.title")}
+          </h1>
           <p className="text-sm text-muted-foreground">{t("list.subtitle")}</p>
         </div>
         <Button
@@ -134,7 +155,9 @@ export const HomeworkListView = ({ data, lessons, subjects }: HomeworkListViewPr
       </div>
 
       {lessons.length === 0 && (
-        <p className="text-sm text-muted-foreground">{t("list.noLessonsHint")}</p>
+        <p className="text-sm text-muted-foreground">
+          {t("list.noLessonsHint")}
+        </p>
       )}
 
       <div className="flex flex-wrap items-center gap-3">
@@ -164,9 +187,35 @@ export const HomeworkListView = ({ data, lessons, subjects }: HomeworkListViewPr
             className="w-fit text-muted-foreground"
             onClick={() => setShowCompleted((prev) => !prev)}
           >
-            {showCompleted ? t("list.hideCompleted") : t("list.showCompleted")} ({completed.length})
+            {showCompleted ? t("list.hideCompleted") : t("list.showCompleted")}{" "}
+            ({completed.length})
           </Button>
           {showCompleted && renderCards(completed)}
+        </div>
+      )}
+
+      {assignedWork.length > 0 && (
+        <div className="flex flex-col gap-3 border-t pt-4">
+          <div>
+            <h2 className="text-sm font-semibold text-foreground">
+              {t("list.teacherSection.title")}
+            </h2>
+            <p className="text-xs text-muted-foreground">
+              {t("list.teacherSection.subtitle")}
+            </p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {assignedWork.map((item) => (
+              <AssignmentCard
+                key={item.id}
+                assignment={item}
+                overdueLabel={t("card.overdue")}
+                pointsLabel={t("list.teacherSection.points", {
+                  points: item.totalPoints,
+                })}
+              />
+            ))}
+          </div>
         </div>
       )}
 

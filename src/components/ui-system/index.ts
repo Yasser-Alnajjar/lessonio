@@ -1,5 +1,7 @@
 export * from "./status-badge";
 export * from "./empty-state";
+export * from "./callout";
+export * from "./help-popover";
 export * from "./subject-card";
 export * from "./lesson-card";
 export * from "./class-occurrence-card";

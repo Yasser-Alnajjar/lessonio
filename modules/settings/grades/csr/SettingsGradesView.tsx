@@ -7,7 +7,8 @@ import { updateGradeScale } from "@/actions/settings.mutations";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useRouter } from "@/i18n/navigation";
+import { Callout } from "@/components/ui-system/callout";
+import { Link, useRouter } from "@/i18n/navigation";
 import useTranslate from "@/hooks/useTranslate";
 import { DEFAULT_GRADE_SCALE, type GradeScaleEntry } from "@/lib/types/grade";
 import { SettingsNav } from "../../components/SettingsNav";
@@ -28,6 +29,7 @@ function isValidScale(scale: GradeScaleEntry[]): boolean {
 
 export const SettingsGradesView = ({ scale: initialScale }: SettingsGradesViewProps) => {
   const t = useTranslate("settings.grades");
+  const tHelp = useTranslate("help");
   const router = useRouter();
 
   const [scale, setScale] = useState<GradeScaleEntry[]>(initialScale ?? DEFAULT_GRADE_SCALE);
@@ -62,6 +64,13 @@ export const SettingsGradesView = ({ scale: initialScale }: SettingsGradesViewPr
           <h1 className="text-xl font-semibold text-foreground">{t("title")}</h1>
           <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
         </div>
+
+        <Callout variant="note" title={tHelp("topics.grades.title")}>
+          <p>{tHelp("topics.grades.whatIsIt")}</p>
+          <Link href="/help/detail/grades" className="mt-1 inline-block font-medium">
+            {tHelp("ui.learnMore")}
+          </Link>
+        </Callout>
 
         <div className="flex flex-col gap-3">
           <div className="grid grid-cols-[3rem_1fr_1fr] items-center gap-3 text-xs font-medium text-muted-foreground">

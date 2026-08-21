@@ -11,6 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { HelpPopover } from "@/components/ui-system/help-popover";
+import { HELP_STATUS_VALUES } from "@/lib/help/statuses";
 import {
   ATTENDANCE_STATUSES,
   CLASS_EXAM_STATUSES,
@@ -33,6 +35,7 @@ export function ClassOccurrenceStatusControls({
   onUpdated,
 }: ClassOccurrenceStatusControlsProps) {
   const t = useTranslations("classes.status");
+  const tHelp = useTranslations("help.statuses");
   const [isPending, startTransition] = useTransition();
   const [now, setNow] = useState(() => Date.now());
 
@@ -99,9 +102,26 @@ export function ClassOccurrenceStatusControls({
   return (
     <div className="grid gap-3 sm:grid-cols-2">
       <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-medium text-muted-foreground">
-          {t("attendance.label")}
-        </label>
+        <div className="flex items-center gap-1">
+          <label className="text-xs font-medium text-muted-foreground">
+            {t("attendance.label")}
+          </label>
+          <HelpPopover
+            title={tHelp("attendance.label")}
+            triggerLabel={tHelp("attendance.label")}
+          >
+            <div className="flex flex-col gap-1.5">
+              {HELP_STATUS_VALUES.attendance.map((status) => (
+                <p key={status}>
+                  <span className="text-foreground font-medium">
+                    {tHelp(`attendance.values.${status}.label`)}:
+                  </span>{" "}
+                  {tHelp(`attendance.values.${status}.meaning`)}
+                </p>
+              ))}
+            </div>
+          </HelpPopover>
+        </div>
 
         <Select
           value={occurrence.attendanceStatus ?? ATTENDANCE_UNSET_VALUE}
@@ -123,9 +143,26 @@ export function ClassOccurrenceStatusControls({
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-medium text-muted-foreground">
-          {t("exam.label")}
-        </label>
+        <div className="flex items-center gap-1">
+          <label className="text-xs font-medium text-muted-foreground">
+            {t("exam.label")}
+          </label>
+          <HelpPopover
+            title={tHelp("examStatus.label")}
+            triggerLabel={tHelp("examStatus.label")}
+          >
+            <div className="flex flex-col gap-1.5">
+              {HELP_STATUS_VALUES.examStatus.map((status) => (
+                <p key={status}>
+                  <span className="text-foreground font-medium">
+                    {tHelp(`examStatus.values.${status}.label`)}:
+                  </span>{" "}
+                  {tHelp(`examStatus.values.${status}.meaning`)}
+                </p>
+              ))}
+            </div>
+          </HelpPopover>
+        </div>
 
         <Select value={occurrence.examStatus} onValueChange={onExamChange}>
           <SelectTrigger className="w-full">

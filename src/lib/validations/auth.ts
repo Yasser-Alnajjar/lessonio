@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { APP_ROLES } from "@/lib/types/user";
+
 /**
  * Auth forms build their schema at render time via `useTranslations`, so
  * every message below is a lookup key into the `auth.*.errors` namespace
@@ -18,6 +20,7 @@ export function createLoginSchema(t: Translator) {
 export function createRegisterSchema(t: Translator) {
   return z
     .object({
+      role: z.enum(APP_ROLES, { message: t("errors.roleRequired") }),
       fullName: z
         .string()
         .trim()

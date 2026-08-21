@@ -50,7 +50,7 @@ export default async function LandingPage() {
             </div>
             {user ? (
               <Button asChild size="sm">
-                <Link href="/dashboard/overview">{t("hero.ctaDashboard")}</Link>
+                <Link href="/home">{t("hero.ctaDashboard")}</Link>
               </Button>
             ) : (
               <>
@@ -83,7 +83,7 @@ export default async function LandingPage() {
           <div className="mt-2 flex flex-wrap items-center justify-center gap-3">
             {user ? (
               <Button asChild size="lg">
-                <Link href="/dashboard/overview">{t("hero.ctaDashboard")}</Link>
+                <Link href="/home">{t("hero.ctaDashboard")}</Link>
               </Button>
             ) : (
               <>

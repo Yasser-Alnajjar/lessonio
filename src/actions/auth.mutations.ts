@@ -56,10 +56,7 @@ export async function signInWithOAuth(
 
   const redirectTo = new URL("/api/auth/callback", env.NEXT_PUBLIC_APP_URL);
   if (next) {
-    redirectTo.searchParams.set(
-      "next",
-      getSafeRedirectPath(next, "/dashboard/overview"),
-    );
+    redirectTo.searchParams.set("next", getSafeRedirectPath(next, "/home"));
   }
 
   const { data, error } = await supabase.auth.signInWithOAuth({
@@ -76,11 +73,15 @@ export async function signInWithOAuth(
 
 export async function register(input: RegisterInput): Promise<MutationResult> {
   const supabase = await createClient();
+  // Whitelisted server-side even though the client already validates it —
+  // handle_new_user() does the same whitelist on raw_user_meta_data, since
+  // that data is client-supplied and never trusted blindly.
+  const role = input.role === "teacher" ? "teacher" : "student";
   const { error } = await supabase.auth.signUp({
     email: input.email,
     password: input.password,
     options: {
-      data: { full_name: input.fullName },
+      data: { full_name: input.fullName, role },
     },
   });
 

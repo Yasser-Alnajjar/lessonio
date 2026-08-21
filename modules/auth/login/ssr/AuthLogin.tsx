@@ -15,7 +15,7 @@ export const AuthLogin = async () => {
 
   if (user) {
     const locale = await getLocale();
-    redirect({ href: "/dashboard/overview", locale });
+    redirect({ href: "/home", locale });
   }
 
   return (

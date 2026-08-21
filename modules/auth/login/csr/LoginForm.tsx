@@ -55,7 +55,7 @@ export const LoginForm = () => {
       }
       const destination = getSafeRedirectPath(
         searchParams.get("next"),
-        "/dashboard/overview",
+        "/home",
       );
       router.push(destination);
       router.refresh();

@@ -45,7 +45,10 @@
     "label": "Main navigation",
     "toggleSidebar": "Toggle sidebar",
     "language": "Language",
-    "help": "Help"
+    "help": "Help",
+    "teachingClasses": "Classes",
+    "teachingAssignments": "Assignments",
+    "classroomClasses": "My Classes"
   },
   "landing": {
     "nav": {
@@ -232,6 +235,12 @@
     "register": {
       "title": "Create your account",
       "subtitle": "Start tracking every subject, lesson, and study hour in one place.",
+      "roleLabel": "I'm signing up as a...",
+      "roleStudent": "Student",
+      "roleStudentHint": "Track your own subjects, lessons, and study time.",
+      "roleTeacher": "Teacher",
+      "roleTeacherHint": "Run classes and assign work to your students.",
+      "roleImmutableNote": "This can't be changed later.",
       "fullNameLabel": "Full name",
       "fullNamePlaceholder": "Ada Lovelace",
       "emailLabel": "Email",
@@ -246,6 +255,7 @@
       "loginLink": "Log in",
       "success": "Account created. Check your email to confirm, then log in.",
       "errors": {
+        "roleRequired": "Choose whether you're a student or a teacher.",
         "fullNameMin": "Enter your full name.",
         "fullNameMax": "Full name is too long.",
         "emailInvalid": "Enter a valid email address.",
@@ -285,6 +295,18 @@
     },
     "logout": "Log out",
     "loggingOut": "Logging out…"
+  },
+  "onboarding": {
+    "role": {
+      "title": "One last thing",
+      "subtitle": "How will you use Lessonio? This can't be changed later.",
+      "roleStudent": "Student",
+      "roleStudentHint": "Track your own subjects, lessons, and study time.",
+      "roleTeacher": "Teacher",
+      "roleTeacherHint": "Run classes and assign work to your students.",
+      "submit": "Continue",
+      "submitting": "Saving…"
+    }
   },
   "theme": {
     "toggleLabel": "Theme",
@@ -527,6 +549,108 @@
       "thursday": "Thursday",
       "friday": "Friday",
       "saturday": "Saturday"
+    }
+  },
+  "teaching": {
+    "classes": {
+      "card": {
+        "studentCount": "{count, plural, =0 {No students} =1 {# student} other {# students}}",
+        "archived": "Archived",
+        "actionsLabel": "Class actions",
+        "edit": "Edit",
+        "archive": "Archive",
+        "unarchive": "Unarchive",
+        "delete": "Delete"
+      },
+      "form": {
+        "nameLabel": "Class name",
+        "namePlaceholder": "Algebra I",
+        "subjectLabelLabel": "Subject (optional)",
+        "subjectLabelPlaceholder": "Math",
+        "descriptionLabel": "Description (optional)",
+        "descriptionPlaceholder": "What this class covers",
+        "createTitle": "Create a class",
+        "createDescription": "Students join with a code you can share and rotate anytime.",
+        "editTitle": "Edit class",
+        "editDescription": "Update this class's details.",
+        "cancel": "Cancel",
+        "submitting": "Saving…",
+        "submitCreate": "Create class",
+        "submitEdit": "Save changes",
+        "errors": {
+          "nameRequired": "Enter a class name.",
+          "nameMax": "Class name is too long.",
+          "subjectLabelMax": "Subject is too long.",
+          "descriptionMax": "Description is too long."
+        }
+      },
+      "delete": {
+        "title": "Delete this class?",
+        "description": "\"{name}\" and its roster will be permanently deleted. This can't be undone.",
+        "confirm": "Delete class",
+        "cancel": "Cancel",
+        "genericError": "Something went wrong deleting this class."
+      },
+      "list": {
+        "title": "Your classes",
+        "subtitle": "Create classes and share a join code with your students.",
+        "newClass": "New class",
+        "emptyTitle": "No classes yet",
+        "emptyDescription": "Create your first class to get a join code you can share with students.",
+        "emptyAction": "Create a class"
+      }
+    },
+    "roster": {
+      "notFound": "This class couldn't be found.",
+      "backToClasses": "Back to classes",
+      "emptyTitle": "No students yet",
+      "emptyDescription": "Share the join code above so students can join this class.",
+      "table": {
+        "student": "Student",
+        "joined": "Joined",
+        "remove": "Remove",
+        "unnamedStudent": "Unnamed student"
+      },
+      "joinCode": {
+        "label": "Join code",
+        "copy": "Copy join code",
+        "rotate": "Rotate join code",
+        "hint": "Share this code with students. Rotating it invalidates the old code."
+      }
+    }
+  },
+  "classroom": {
+    "classes": {
+      "title": "Your classes",
+      "subtitle": "Classes you've joined with a teacher's code.",
+      "joinClass": "Join a class",
+      "taughtBy": "Taught by {name}",
+      "leave": "Leave class",
+      "empty": {
+        "title": "No classes yet",
+        "description": "Have a class code? Join your teacher's class to see assignments here.",
+        "action": "Join a class"
+      },
+      "join": {
+        "title": "Join a class",
+        "subtitle": "Enter the 6-character code your teacher shared with you.",
+        "codeLabel": "Class code",
+        "codePlaceholder": "ABC123",
+        "cancel": "Cancel",
+        "submitting": "Joining…",
+        "submit": "Join class",
+        "errors": {
+          "codeInvalid": "Enter a valid 6-character code.",
+          "codeNotFound": "That code doesn't match any class. Check it and try again."
+        }
+      },
+      "leaveDialog": {
+        "title": "Leave this class?",
+        "description": "You'll leave \"{name}\". You can rejoin anytime with the class code.",
+        "confirm": "Leave class",
+        "cancel": "Cancel",
+        "genericError": "Something went wrong leaving this class."
+      }
     }
   },
   "lessons": {

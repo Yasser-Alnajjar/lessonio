@@ -4,6 +4,7 @@ import { calendarActions } from "./calendar";
 import { classOccurrencesActions } from "./class-occurrences";
 import { classesActions } from "./classes";
 import { dashboardActions } from "./dashboard";
+import { enrollmentsActions } from "./enrollments";
 import { examsActions } from "./exams";
 import { flashcardsActions } from "./flashcards";
 import { gamificationActions } from "./gamification";
@@ -18,6 +19,7 @@ import { statisticsActions } from "./statistics";
 import { studySessionsActions } from "./study-sessions";
 import { subjectsActions } from "./subjects";
 import { tagsActions } from "./tags";
+import { teacherClassesActions } from "./teacher-classes";
 
 /**
  * Single entry point for all data access, per the mandatory architecture:
@@ -44,4 +46,6 @@ export const Actions = {
   Notifications: notificationsActions,
   Gamification: gamificationActions,
   Settings: settingsActions,
+  TeacherClasses: teacherClassesActions,
+  Enrollments: enrollmentsActions,
 };

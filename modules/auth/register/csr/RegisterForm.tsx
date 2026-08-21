@@ -10,6 +10,7 @@ import { CheckCircle2, UserPlus } from "lucide-react";
 import { register } from "@/actions/auth.mutations";
 import { LessonioSpinner } from "@/components/shared/lessonio-mark";
 import { OAuthButtons } from "@/components/shared/oauth-buttons";
+import { RolePickerCards } from "@/components/shared/role-picker-cards";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -41,6 +42,7 @@ export const RegisterForm = () => {
   const form = useForm<RegisterInput>({
     resolver: zodResolver(schema),
     defaultValues: {
+      role: "student",
       fullName: "",
       email: "",
       password: "",
@@ -93,6 +95,34 @@ export const RegisterForm = () => {
                 noValidate
                 className="flex flex-col gap-4"
               >
+                <FormField
+                  control={form.control}
+                  name="role"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("roleLabel")}</FormLabel>
+                      <RolePickerCards
+                        value={field.value}
+                        onChange={field.onChange}
+                        labels={{
+                          student: {
+                            label: t("roleStudent"),
+                            hint: t("roleStudentHint"),
+                          },
+                          teacher: {
+                            label: t("roleTeacher"),
+                            hint: t("roleTeacherHint"),
+                          },
+                        }}
+                      />
+                      <p className="text-muted-foreground text-xs">
+                        {t("roleImmutableNote")}
+                      </p>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <FormField
                   control={form.control}
                   name="fullName"

@@ -132,11 +132,25 @@ export async function updateSession(
   }
 
   if (user && isRoleRelevant(segment)) {
-    const { data: profile } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("role")
       .eq("id", user.id)
       .maybeSingle();
+
+    // A failed lookup (network blip, pooler timeout, RLS/auth mismatch, ...)
+    // is not the same as "row has no role" — treating it as null would send
+    // a user who genuinely has a role into onboarding whenever this query
+    // happens to fail. Fail open and log instead of misredirecting.
+    if (profileError) {
+      console.error("[middleware] profiles role lookup failed", {
+        userId: user.id,
+        segment,
+        error: profileError,
+      });
+      return response;
+    }
+
     const role = (profile?.role ?? null) as AppRole | null;
 
     // A null role means onboarding was never finished (only reachable via
@@ -144,6 +158,10 @@ export async function updateSession(
     // role-relevant branch below assumes role is non-null, so this check
     // must run first and short-circuit the rest.
     if (role === null && segment !== ONBOARDING_SEGMENT) {
+      console.warn("[middleware] sending user to onboarding: no role found", {
+        userId: user.id,
+        segment,
+      });
       const url = request.nextUrl.clone();
       url.pathname = `${localePrefix}/${ONBOARDING_SEGMENT}`;
       url.search = "";

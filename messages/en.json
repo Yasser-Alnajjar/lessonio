@@ -44,7 +44,8 @@
     "account": "Account",
     "label": "Main navigation",
     "toggleSidebar": "Toggle sidebar",
-    "language": "Language"
+    "language": "Language",
+    "help": "Help"
   },
   "landing": {
     "nav": {
@@ -1241,6 +1242,750 @@
         "confirm": "Delete goal",
         "cancel": "Cancel",
         "genericError": "Something went wrong. Please try again."
+      }
+    }
+  },
+  "help": {
+    "meta": {
+      "title": "Help Center",
+      "description": "Learn how Study Line works, in plain language — what everything means, why it's there, and what to do next."
+    },
+    "home": {
+      "title": "Help Center",
+      "subtitle": "Everything you need to understand Study Line, explained the way you'd want a friend to explain it.",
+      "searchPlaceholder": "Search for a topic...",
+      "flow": {
+        "title": "How Study Line Works",
+        "steps": [
+          "Your Subjects — the courses you're taking",
+          "Your Classes — when each subject meets",
+          "Today's Class Occurrence — one specific lesson, on one specific day",
+          "Mark your Attendance — did it happen, and were you there?",
+          "Study Sessions — the real time you spend studying",
+          "Your Progress — grades, streaks, and statistics, built from all of the above"
+        ]
+      },
+      "continueSetup": {
+        "title": "New here? Start with your first steps.",
+        "description": "You haven't added any subjects yet. A few minutes of setup now makes everything else in Study Line make sense.",
+        "cta": "Start your first steps"
+      }
+    },
+    "sections": {
+      "gettingStarted": {
+        "title": "Getting Started",
+        "description": "What Study Line is, and what to do first."
+      },
+      "dailyUse": {
+        "title": "Daily Use",
+        "description": "Everything you use day to day, one guide per feature."
+      },
+      "progress": {
+        "title": "Tracking Your Progress",
+        "description": "How Study Line turns your activity into numbers you can trust."
+      },
+      "journeys": {
+        "title": "Common Tasks",
+        "description": "Step-by-step help for things you'll actually want to do."
+      },
+      "troubleshooting": {
+        "title": "Troubleshooting",
+        "description": "Answers to the questions students ask most."
+      }
+    },
+    "ui": {
+      "backToHelp": "Back to Help Center",
+      "whatIsIt": "What is it?",
+      "whyUseIt": "Why use it?",
+      "whenToUse": "When should I use it?",
+      "howToUseIt": "How do I use it?",
+      "whatHappensAfter": "What happens after?",
+      "howItConnects": "How this connects",
+      "learnMore": "Learn more",
+      "readyToDoThis": "Ready to try this yourself?",
+      "relatedTopics": "Related topics",
+      "mainConcepts": "The main ideas"
+    },
+    "glossary": {
+      "title": "Glossary",
+      "subtitle": "Every Study Line term, explained simply, with an example.",
+      "searchPlaceholder": "Search for a word...",
+      "noResults": "No terms match your search.",
+      "terms": {
+        "subject": {
+          "name": "Subject",
+          "explanation": "The course or topic you're studying, like Mathematics or Physics. It's the top-level container almost everything else belongs to.",
+          "example": "“Mathematics” is a Subject. Its Classes, Lessons, Homework, and Exams all belong to it."
+        },
+        "class": {
+          "name": "Class",
+          "explanation": "The recurring weekly schedule for a Subject — when and where it regularly meets. It's a pattern, not any single day.",
+          "example": "“Math meets every Monday and Wednesday at 9:00” is a Class."
+        },
+        "classOccurrence": {
+          "name": "Class Occurrence",
+          "explanation": "One specific, dated meeting generated from a Class — the actual lesson that happens on one particular day.",
+          "example": "This coming Monday's Math class is a single Class Occurrence, created automatically from the Math Class."
+        },
+        "lesson": {
+          "name": "Lesson",
+          "explanation": "A specific topic you're studying, managed on its own — it doesn't need to be tied to a scheduled Class.",
+          "example": "“Eigenvalues” is a Lesson under Mathematics — you can create it whether or not there was a class about it."
+        },
+        "studySession": {
+          "name": "Study Session",
+          "explanation": "A record of real time you spent studying — a start time, an end time, and how long it lasted.",
+          "example": "Studying Linear Algebra from 7:00 to 7:45 pm is one Study Session — 45 minutes."
+        },
+        "focusTimer": {
+          "name": "Focus Timer",
+          "explanation": "The tool you start and stop to record a Study Session in real time, instead of typing the times in by hand afterward.",
+          "example": "You press Start before opening your textbook, and Stop when you're done — Study Line saves the session for you."
+        },
+        "homework": {
+          "name": "Homework",
+          "explanation": "An assignment tied to a Lesson, with a deadline and a done/not-done status.",
+          "example": "“Problem set 3, due Friday” is a piece of Homework under the Eigenvalues Lesson."
+        },
+        "exam": {
+          "name": "Exam",
+          "explanation": "A test or assessment tied to a Lesson, with a date and — once graded — your score.",
+          "example": "“Midterm, March 3rd, scored 85 out of 100” is an Exam."
+        },
+        "grade": {
+          "name": "Grade",
+          "explanation": "A letter (like A or B) calculated automatically from your Exam scores — you never enter it yourself.",
+          "example": "An 85% exam score might calculate to a Grade of B, depending on your grade scale."
+        },
+        "gpa": {
+          "name": "GPA",
+          "explanation": "Your overall average grade across all Subjects, weighted by each Subject's credit hours.",
+          "example": "If Math (4 credit hours) has a higher grade than a 1-credit elective, Math counts for more of your GPA."
+        },
+        "flashcard": {
+          "name": "Flashcard",
+          "explanation": "A simple front-and-back study card tied to a Lesson, reviewed on a smart schedule rather than all at once.",
+          "example": "Front: “What is the derivative of sin(x)?” Back: “cos(x)” — one Flashcard."
+        },
+        "spacedRepetition": {
+          "name": "Spaced Repetition",
+          "explanation": "The scheduling method behind Flashcards — cards you know well are shown less often, and ones you're shaky on come back sooner.",
+          "example": "Rate a card “Easy” and it might not resurface for weeks; rate it “Again” and it comes back tomorrow."
+        },
+        "goal": {
+          "name": "Goal",
+          "explanation": "A weekly or monthly study-time target you set for yourself.",
+          "example": "“Study 10 hours this week” is a Goal — your logged Study Sessions count toward it automatically."
+        },
+        "streak": {
+          "name": "Streak",
+          "explanation": "How many days in a row you've logged study activity, encouraging consistency over occasional long sessions.",
+          "example": "Studying at least a little every day for a week gives you a 7-day Streak."
+        },
+        "xp": {
+          "name": "XP",
+          "explanation": "Points that reflect your overall activity — completed Lessons, study time, finished Homework, exam scores, and more, all added up.",
+          "example": "Completing a Lesson and logging an hour of study both add XP the moment you do them."
+        },
+        "level": {
+          "name": "Level",
+          "explanation": "A number that goes up as your total XP grows — a simple way to see your overall progress at a glance.",
+          "example": "Leveling up doesn't unlock anything by itself; it's just a milestone marker for your accumulated XP."
+        },
+        "achievement": {
+          "name": "Achievement",
+          "explanation": "A milestone that unlocks once you meet a specific condition, like a study streak or perfect attendance.",
+          "example": "The “7-Day Streak” Achievement unlocks the first time you study seven days in a row."
+        },
+        "notification": {
+          "name": "Notification",
+          "explanation": "A short, automatically generated reminder about something coming up or due.",
+          "example": "“Homework due tomorrow” is a Notification generated the day before its deadline."
+        }
+      }
+    },
+    "statuses": {
+      "attendance": {
+        "label": "Attendance",
+        "values": {
+          "not_recorded": {
+            "label": "Not recorded",
+            "meaning": "Nobody has said yet whether this class happened or whether you were there.",
+            "whenToUse": "This is the default for every upcoming class — you don't need to do anything until after it starts.",
+            "effect": "Has no effect on your history yet.",
+            "reversible": "You can set it to any other status once the class's start time has passed."
+          },
+          "attended": {
+            "label": "Attended",
+            "meaning": "The class happened and you were there.",
+            "whenToUse": "Select this once you've actually attended the class.",
+            "effect": "Counts toward your attendance history and the Perfect Attendance achievement.",
+            "reversible": "Yes — you can change it later if you picked the wrong one."
+          },
+          "late": {
+            "label": "Late",
+            "meaning": "The class happened and you arrived after it started.",
+            "whenToUse": "Select this if you were present for only part of the class.",
+            "effect": "Recorded separately from Attended, so your history reflects what actually happened.",
+            "reversible": "Yes — it can be changed anytime."
+          },
+          "absent": {
+            "label": "Absent",
+            "meaning": "The class happened, but you weren't there.",
+            "whenToUse": "Select this if you missed a class that took place.",
+            "effect": "Recorded in your attendance history — it doesn't block you from adding Homework, Exams, or Study Sessions for that topic.",
+            "reversible": "Yes — it can be changed anytime."
+          },
+          "cancelled": {
+            "label": "Cancelled",
+            "meaning": "The class didn't happen at all — no attendance applies.",
+            "whenToUse": "Select this if the class itself was called off.",
+            "effect": "Excluded from attendance-based calculations, since there was nothing to attend.",
+            "reversible": "Yes — it can be changed anytime."
+          }
+        }
+      },
+      "examStatus": {
+        "label": "Exam status",
+        "values": {
+          "none": {
+            "label": "No exam",
+            "meaning": "There's no exam tied to this particular class session.",
+            "whenToUse": "This is the default — leave it as is unless an exam happens during this class.",
+            "effect": "No effect.",
+            "reversible": "Yes."
+          },
+          "upcoming": {
+            "label": "Upcoming",
+            "meaning": "An exam is expected during or around this class session.",
+            "whenToUse": "Select this once you know an exam is coming up for this session.",
+            "effect": "Helps you spot upcoming exams when scanning your Classes.",
+            "reversible": "Yes — update it to Completed once it's happened."
+          },
+          "completed": {
+            "label": "Completed",
+            "meaning": "The exam tied to this class session has taken place.",
+            "whenToUse": "Select this after the exam happens.",
+            "effect": "No effect beyond marking it as done — entering your actual score is a separate step, done on the Exam itself under the Lesson.",
+            "reversible": "Yes."
+          }
+        }
+      },
+      "studyStatus": {
+        "label": "Study status",
+        "values": {
+          "not_started": {
+            "label": "Not started",
+            "meaning": "You haven't begun studying this Lesson yet.",
+            "whenToUse": "The default when you first create a Lesson.",
+            "effect": "No effect on XP or progress yet.",
+            "reversible": "Yes, anytime."
+          },
+          "studying": {
+            "label": "Studying",
+            "meaning": "You've started working on this Lesson but aren't finished.",
+            "whenToUse": "Set this once you begin, so you can find in-progress topics easily.",
+            "effect": "No effect on XP by itself — logging a Study Session is what actually counts toward your activity.",
+            "reversible": "Yes, anytime."
+          },
+          "completed": {
+            "label": "Completed",
+            "meaning": "You've finished studying this Lesson.",
+            "whenToUse": "Set this once you feel you've covered the topic.",
+            "effect": "Adds a small amount of XP.",
+            "reversible": "Yes, anytime."
+          },
+          "reviewed": {
+            "label": "Reviewed",
+            "meaning": "You've gone back over this Lesson after completing it.",
+            "whenToUse": "Set this after revisiting a topic you'd already completed.",
+            "effect": "Adds a small amount of XP, same as Completed.",
+            "reversible": "Yes, anytime."
+          }
+        }
+      },
+      "reviewStatus": {
+        "label": "Review status",
+        "values": {
+          "not_reviewed": {
+            "label": "Not reviewed",
+            "meaning": "You haven't gone back over this Lesson since studying it.",
+            "whenToUse": "The default until you revisit a topic.",
+            "effect": "No effect by itself.",
+            "reversible": "Yes, anytime."
+          },
+          "needs_review": {
+            "label": "Needs review",
+            "meaning": "This Lesson is due for a second look — usually because time has passed since you last studied it.",
+            "whenToUse": "Set this yourself as a reminder, or notice it in your Lesson list when planning what to revisit.",
+            "effect": "Helps you spot what's worth reviewing when you check your Lessons.",
+            "reversible": "Yes, anytime."
+          },
+          "reviewed": {
+            "label": "Reviewed",
+            "meaning": "You've revisited this Lesson.",
+            "whenToUse": "Set this after going back over the material.",
+            "effect": "No direct effect beyond keeping your record accurate.",
+            "reversible": "Yes, anytime."
+          }
+        }
+      },
+      "homeworkStatus": {
+        "label": "Homework status",
+        "values": {
+          "none": {
+            "label": "No homework",
+            "meaning": "There's no homework tracked for this Lesson.",
+            "whenToUse": "The default when a Lesson has no homework attached.",
+            "effect": "No effect.",
+            "reversible": "Yes, anytime."
+          },
+          "pending": {
+            "label": "Pending",
+            "meaning": "Homework exists for this Lesson and hasn't been started.",
+            "whenToUse": "Reflects the state of the Homework items you've added to this Lesson.",
+            "effect": "No effect beyond showing you what's outstanding.",
+            "reversible": "Yes, anytime."
+          },
+          "in_progress": {
+            "label": "In progress",
+            "meaning": "You've started the homework for this Lesson but haven't finished.",
+            "whenToUse": "Update this as you work through it.",
+            "effect": "No effect beyond tracking.",
+            "reversible": "Yes, anytime."
+          },
+          "completed": {
+            "label": "Completed",
+            "meaning": "All homework tracked for this Lesson is done.",
+            "whenToUse": "Set once every Homework item under this Lesson is marked complete.",
+            "effect": "No effect beyond reflecting your progress accurately.",
+            "reversible": "Yes, anytime."
+          }
+        }
+      },
+      "goalPeriod": {
+        "label": "Goal period",
+        "values": {
+          "weekly": {
+            "label": "Weekly",
+            "meaning": "Your target resets and is measured every week.",
+            "whenToUse": "Choose this if you'd rather track progress in smaller, frequent chunks.",
+            "effect": "Your progress bar compares logged Study Session minutes against this week's target only.",
+            "reversible": "Yes — you can switch periods anytime; it only affects the current and future goal, not past history."
+          },
+          "monthly": {
+            "label": "Monthly",
+            "meaning": "Your target resets and is measured every month.",
+            "whenToUse": "Choose this if you prefer a longer-term, less frequent target.",
+            "effect": "Your progress bar compares logged Study Session minutes against this month's target only.",
+            "reversible": "Yes — you can switch periods anytime."
+          }
+        }
+      },
+      "notificationType": {
+        "label": "Notification types",
+        "values": {
+          "upcoming_class": {
+            "label": "Upcoming class",
+            "meaning": "A reminder that a Class Occurrence is about to start.",
+            "whenToUse": "Sent automatically shortly before class starts, if this type is turned on.",
+            "effect": "Just a reminder — has no effect on your data.",
+            "reversible": "Turn it off anytime in Settings → Notifications."
+          },
+          "upcoming_lesson": {
+            "label": "Upcoming lesson",
+            "meaning": "A reminder about a Lesson scheduled for today or tomorrow.",
+            "whenToUse": "Sent automatically, if this type is turned on.",
+            "effect": "Just a reminder.",
+            "reversible": "Turn it off anytime in Settings."
+          },
+          "homework_due": {
+            "label": "Homework due",
+            "meaning": "A reminder that a homework deadline is close.",
+            "whenToUse": "Sent automatically a couple of days before the deadline, if this type is turned on.",
+            "effect": "Just a reminder.",
+            "reversible": "Turn it off anytime in Settings."
+          },
+          "review_reminder": {
+            "label": "Review reminder",
+            "meaning": "A nudge that an older Lesson hasn't been marked as reviewed yet.",
+            "whenToUse": "Sent automatically for Lessons that have been sitting a while without review, if this type is turned on.",
+            "effect": "Just a reminder — it doesn't change the Lesson's Review status for you.",
+            "reversible": "Turn it off anytime in Settings."
+          },
+          "daily_reminder": {
+            "label": "Daily reminder",
+            "meaning": "A general once-a-day nudge to check in on Study Line.",
+            "whenToUse": "Sent once per day if this type is turned on.",
+            "effect": "Just a reminder.",
+            "reversible": "Turn it off anytime in Settings."
+          }
+        }
+      }
+    },
+    "topics": {
+      "welcome": {
+        "title": "Welcome to Study Line",
+        "summary": "What Study Line is, and how this Help Center works.",
+        "intro": [
+          "Study Line brings everything about your studies into one place — the subjects you're taking, the classes you attend, the lessons you study, and the progress you're making.",
+          "Instead of juggling a planner, a notes app, and a mental list of deadlines, you keep it all here — and Study Line connects it together automatically.",
+          "This Help Center is written for you, not for a developer. Every term you'll see in the app is explained here in plain language, with a real example."
+        ]
+      },
+      "how-it-works": {
+        "title": "How Study Line Works",
+        "summary": "The big picture — how Subjects, Classes, Lessons and Study Sessions all fit together.",
+        "intro": [
+          "Study Line is built around one simple idea: what you plan, what actually happens, and what you achieve are three different things — and keeping them separate is what makes your progress trustworthy.",
+          "Here's the path most students follow, from top to bottom."
+        ]
+      },
+      "first-steps": {
+        "title": "Your First Steps",
+        "summary": "The quickest path to a Study Line that works for you, in order.",
+        "scenario": "You just created your account. Here's the fastest path to a Study Line that actually works for you.",
+        "steps": [
+          "Add your first Subject — the course you want to track (e.g. “Mathematics”). This is the foundation everything else attaches to.",
+          "Add a Class if this subject meets on a regular schedule (e.g. every Monday at 9:00). Skip this step if you're only self-studying — it's optional.",
+          "Add a Lesson for the topic you're currently studying (e.g. “Linear Algebra”). A Lesson is independent of Class — you can have one even without a scheduled Class.",
+          "Start a Study Session the next time you sit down to study. This is what actually feeds your statistics, streaks, and progress.",
+          "Check back on your Dashboard and the Tracking Progress section once you have a few days of activity — that's when the numbers start meaning something."
+        ]
+      },
+      "subjects": {
+        "title": "Subjects",
+        "summary": "Organize your courses — the foundation everything else builds on.",
+        "whatIsIt": "A Subject is the course or topic you're studying — Mathematics, Physics, French, whatever you're taking. It's the top of Study Line's organization: almost everything else belongs to a Subject.",
+        "whyUseIt": "Grouping your work by Subject means your Classes, Lessons, Homework, Exams and Grades are automatically organized without extra effort — and each Subject can show you, at a glance, how much attention it's getting.",
+        "whenToUse": "Add a Subject as your very first step in Study Line, before anything else — and add a new one anytime you start a new course.",
+        "how": [
+          "Go to Subjects and choose “New Subject”.",
+          "Give it a name, and optionally pick a color and icon so it's easy to recognize at a glance.",
+          "If your school uses credit hours, add them here — Study Line uses this to weight your GPA correctly."
+        ],
+        "afterEffect": "Once a Subject exists, you can add Classes and Lessons under it, and its card will start showing your study time, lesson count, and progress automatically.",
+        "connections": "A Subject is the parent of Classes and Lessons. Deleting a Subject deletes everything under it — its Classes, Lessons, Homework, Exams, Notes, and Attachments. If you just want to stop actively studying something without losing its history, use Archive instead of Delete.",
+        "learnMore": "Archiving hides a Subject from your active list but keeps every bit of its history intact — you can unarchive it anytime. Deleting is permanent and removes all of its Classes, Lessons, Homework, Exams, Notes and Attachments along with it, so use it only when you're sure.",
+        "cta": "Go to Subjects"
+      },
+      "classes": {
+        "title": "Classes",
+        "summary": "Set your recurring weekly schedule, once.",
+        "whatIsIt": "A Class is the recurring meeting pattern for a Subject — for example, “Math meets every Monday and Wednesday at 9:00.” It describes when and where a Subject regularly happens, not any one specific day.",
+        "whyUseIt": "Once you set up a Class, Study Line automatically creates each week's actual lesson for you (called a Class Occurrence) — you don't have to add “Monday's Math class” by hand every single week.",
+        "whenToUse": "Add a Class for any Subject that meets on a regular weekly schedule — a school class, a recurring tutoring session, a weekly club. If something is one-off rather than recurring, you don't need a Class for it.",
+        "how": [
+          "Open a Subject and choose “Add Class”.",
+          "Add the teacher and location if you'd like — both are optional.",
+          "Set one or more meeting times (day of week, start time, and how long it runs). A single Class can meet more than once a week."
+        ],
+        "afterEffect": "Study Line automatically generates the next several weeks of actual lesson dates from this schedule — you'll see them appear as Class Occurrences on your Calendar and Dashboard without doing anything else.",
+        "connections": "A Class is the template; a Class Occurrence is one real, dated instance of it. Pausing a Class (marking it inactive) stops new Occurrences from being generated, but never deletes ones that already happened or already have attendance recorded on them.",
+        "learnMore": "Editing a Class's schedule only affects Occurrences that haven't happened yet and don't have anything recorded on them. Past Occurrences — and any you've already marked attendance or exam status for — are never rewritten, so your history always reflects reality.",
+        "cta": "Go to Classes"
+      },
+      "class-occurrences": {
+        "title": "Class Occurrences & Attendance",
+        "summary": "Record what actually happened in a specific class session.",
+        "whatIsIt": "A Class Occurrence is one specific, dated meeting of a Class — not the recurring pattern, but the actual lesson on an actual day. If your Math Class meets every Monday, this Monday's meeting is one Class Occurrence.",
+        "whyUseIt": "This is where you record what really happened — did the class happen, were you there, and is there an exam attached to it. That real information is what makes your attendance history and related achievements accurate.",
+        "whenToUse": "Check in on today's or this week's Occurrences from your Calendar or Dashboard, and record attendance once the class has actually started or finished.",
+        "how": [
+          "Find the Occurrence on your Calendar, Dashboard, or the Class's page.",
+          "Once its start time has passed, set its Attendance status.",
+          "If an exam is tied to this Occurrence, set its Exam status separately — this doesn't depend on attendance."
+        ],
+        "afterEffect": "Marking attendance updates your attendance history immediately, and it's one of the things Study Line checks for the Perfect Attendance achievement. Exam status is tracked completely separately, so marking one never changes the other.",
+        "connections": "Occurrences belong to a Class, which belongs to a Subject. You can optionally link a Lesson to the Occurrence you studied it for, but a Lesson doesn't need a Class Occurrence to exist.",
+        "learnMore": "You'll notice the Attendance option stays locked until the class's actual start time — this is intentional, so you can't accidentally mark a class as attended before it happens. Study Line creates upcoming Occurrences for you automatically about a month ahead of time, so you don't need to create them yourself.",
+        "cta": "Go to Classes"
+      },
+      "lessons": {
+        "title": "Lessons",
+        "summary": "Track what you're actually studying, topic by topic.",
+        "whatIsIt": "A Lesson is a specific topic you're studying — like “Eigenvalues” under Mathematics. It's yours to manage independently: it doesn't need to be tied to a scheduled Class at all.",
+        "whyUseIt": "Lessons are the hub for your actual academic work on a topic — notes, homework, exams, and flashcards all attach to a Lesson, and your study status shows how far along you are with it.",
+        "whenToUse": "Create a Lesson whenever you start a new topic, whether or not it came from a scheduled class — self-study topics work just as well as ones tied to a lecture.",
+        "how": [
+          "Go to Lessons and choose “New Lesson”.",
+          "Pick the Subject it belongs to, give it a title and date, and optionally link it to the Class Occurrence you studied it for.",
+          "Add tags if you want to group related lessons together (e.g. “exam-prep”).",
+          "Update its three statuses as you go: how far you are in studying it, whether it needs review, and whether homework for it is done."
+        ],
+        "afterEffect": "A Lesson becomes the home for everything related to that topic — you can attach Notes, Homework, Exams, and Flashcards to it, all in one place.",
+        "connections": "A Lesson optionally links to one Class Occurrence (the class session it came from), and is the parent of its own Homework, Exams, Notes, Attachments, and Flashcards. Deleting a Lesson deletes all of those with it.",
+        "learnMore": "A Lesson actually tracks three separate things at once, which can be confusing at first: Study status (how far along you are), Review status (whether you've revisited it since), and a Homework status (a summary of whether homework tied to this lesson is done). They don't affect each other directly — updating one doesn't change the others.",
+        "cta": "Go to Lessons"
+      },
+      "study-sessions": {
+        "title": "Study Sessions & Focus Timer",
+        "summary": "Log real study time — the thing that drives everything else.",
+        "whatIsIt": "A Study Session is a record of real time you spent studying — a start time, an end time, and what you were working on. It's different from a Class, which is just when something is scheduled to happen.",
+        "whyUseIt": "This is the single most important thing you can log in Study Line — it's what actually drives your statistics, streaks, goals, and XP. A scheduled class doesn't count as study time on its own; only a logged Study Session does.",
+        "whenToUse": "Start the Focus Timer whenever you sit down to study, or log a session manually afterward if you studied without the timer running (e.g. away from your device).",
+        "how": [
+          "Choose the Subject (and optionally the Lesson) you're about to study.",
+          "Start the Focus Timer — it runs in the background even if you refresh the page or switch tabs.",
+          "Stop the timer when you're done to save the session, or use Cancel if you started it by accident.",
+          "Studied earlier without the timer? Use “Log a session” to add it manually with the date, start time, and duration."
+        ],
+        "afterEffect": "As soon as a session is saved, its minutes count toward your weekly and monthly statistics, your current streak, your goals, and your XP. A cancelled session is discarded and never counted.",
+        "connections": "A Study Session can optionally point to a Subject and a Lesson, but doesn't have to — it can also just be free-standing study time. It feeds Statistics, Goals, and Gamification directly.",
+        "learnMore": "The timer is based on the actual clock time it was started, not just a countdown running in your browser tab — so refreshing the page or coming back later doesn't lose your progress. Only one session can run at a time.",
+        "cta": "Start studying"
+      },
+      "homework": {
+        "title": "Homework",
+        "summary": "Track assignments and their deadlines.",
+        "whatIsIt": "Homework tracks a specific assignment for a Lesson — its title, a deadline, and whether it's done.",
+        "whyUseIt": "Keeping deadlines in Study Line means they show up automatically on your Calendar, Dashboard, and in reminders, instead of relying on memory.",
+        "whenToUse": "Add homework as soon as it's assigned, so its deadline is on your radar from day one.",
+        "how": [
+          "Open the Lesson it belongs to and choose “Add Homework”.",
+          "Give it a title and a deadline.",
+          "Mark it complete once you've finished it."
+        ],
+        "afterEffect": "Completed homework updates that Lesson's homework status and contributes to your overall activity — and an upcoming deadline can trigger a reminder notification before it's due.",
+        "connections": "Homework always belongs to a Lesson (and through it, a Subject). Deleting the Lesson deletes its Homework too.",
+        "learnMore": "Homework's completion is a simple yes/no — for more detailed progress on the topic itself, use the Lesson's own Study status.",
+        "cta": "Go to Homework"
+      },
+      "exams": {
+        "title": "Exams",
+        "summary": "Record exam dates and scores.",
+        "whatIsIt": "An Exam tracks a test or assessment tied to a Lesson — its date, and once it's graded, your score.",
+        "whyUseIt": "Recording your exam scores is what powers your Grades and GPA — without a score here, there's nothing for Study Line to calculate a grade from.",
+        "whenToUse": "Add an exam as soon as you know its date, and come back to fill in your score once it's graded.",
+        "how": [
+          "Open the Lesson it belongs to and choose “Add Exam”.",
+          "Give it a title, date, and the total possible score.",
+          "Once you get your result, enter your score — Study Line calculates the percentage for you automatically."
+        ],
+        "afterEffect": "A scored exam immediately feeds your Grades page — its percentage is converted into a letter grade and contributes to your Subject's average and your overall GPA.",
+        "connections": "An Exam always belongs to a Lesson. Its percentage is used directly by Grades & GPA — nowhere else calculates it independently.",
+        "learnMore": "Your score can never be entered higher than the total possible score, and the percentage is always calculated for you — you never need to do that math yourself.",
+        "cta": "Go to Exams"
+      },
+      "flashcards": {
+        "title": "Flashcards",
+        "summary": "Review what you're learning with a smart, spaced schedule.",
+        "whatIsIt": "Flashcards are simple front-and-back study cards attached to a Lesson, reviewed using a smart review schedule instead of all at once.",
+        "whyUseIt": "Instead of re-reading everything before an exam, flashcards resurface exactly the cards you're about to forget — so your review time goes where it actually matters.",
+        "whenToUse": "Create flashcards for facts, definitions, or formulas you need to memorize, and review your due cards a little bit each day rather than cramming.",
+        "how": [
+          "Open a Lesson and choose “Add Flashcard”, then write the front (the question) and the back (the answer).",
+          "Open the Review screen to go through the cards that are due today.",
+          "For each card, rate how well you knew it: Again, Hard, Good, or Easy.",
+          "Study Line uses your rating to decide when to show you that card next."
+        ],
+        "afterEffect": "Rating a card “Good” or “Easy” pushes it further into the future before it needs review again. Rating it “Again” brings it back tomorrow, since it means you haven't learned it yet. Every review also adds a small amount of XP.",
+        "connections": "Flashcards belong to a Lesson. They don't affect a Lesson's Study or Review status directly — they're a separate, independent way of reinforcing what you've learned.",
+        "learnMore": "This is based on “spaced repetition”, a well-studied memory technique — cards you know well are shown less often, and cards you're shaky on come back sooner, so your time is always spent where it helps most.",
+        "cta": "Go to Flashcards"
+      },
+      "calendar": {
+        "title": "Calendar",
+        "summary": "See your whole academic workload by date.",
+        "whatIsIt": "The Calendar shows everything happening on a given day — Class Occurrences, Lessons, Homework deadlines, and Exams — laid out by date.",
+        "whyUseIt": "It's the fastest way to see your academic workload at a glance, instead of checking four separate lists.",
+        "whenToUse": "Check it at the start of the week to plan ahead, or at the start of each day to see what's coming up.",
+        "how": [
+          "Open the Calendar and browse by month.",
+          "Select any day to see everything scheduled for it.",
+          "Drag a Lesson to a different day if your plans change — its date updates immediately."
+        ],
+        "afterEffect": "Moving a Lesson on the Calendar updates its actual date everywhere else it appears in the app.",
+        "connections": "The Calendar doesn't store anything of its own — it's a live view built from your Classes, Lessons, Homework, and Exams.",
+        "learnMore": "Only Lessons can be rescheduled by dragging — Class Occurrences follow their Class's schedule, and Homework/Exam dates are edited from their own pages.",
+        "cta": "Go to Calendar"
+      },
+      "notifications": {
+        "title": "Notifications",
+        "summary": "Reminders for what's coming up, so nothing slips through.",
+        "whatIsIt": "Notifications are short reminders about things coming up — an upcoming class, a homework deadline, or a lesson due for review.",
+        "whyUseIt": "They're a safety net so nothing slips through unnoticed, without you having to constantly check every section of the app.",
+        "whenToUse": "Check your notification bell regularly, and turn on browser notifications in Settings if you'd like a reminder even when Study Line isn't open.",
+        "how": [
+          "Open the bell icon in the header to see your recent notifications.",
+          "Select a notification to jump straight to what it's about.",
+          "Mark them as read individually, or all at once."
+        ],
+        "afterEffect": "Reading a notification just marks it as seen — it doesn't change any of your academic data.",
+        "connections": "Notifications reference Classes, Lessons, and Homework, but aren't stored as part of those records — they're generated automatically based on what's coming up.",
+        "learnMore": "Notifications aren't sent the instant something happens — Study Line checks periodically (about every few minutes) for anything worth telling you about, and only sends one reminder per event so you're not repeated at. You can turn each type on or off individually in Settings.",
+        "cta": "Go to Notifications"
+      },
+      "statistics": {
+        "title": "Statistics",
+        "summary": "Turn your activity into charts you can actually read.",
+        "whatIsIt": "Statistics turn your logged activity into charts — how much you've studied, which subjects get the most attention, and how consistent you've been.",
+        "whyUseIt": "Numbers make patterns visible that are easy to miss day to day — like a subject you've been neglecting, or a study streak worth protecting.",
+        "whenToUse": "Check in weekly to see how your study time is trending, especially before it's too late to adjust.",
+        "how": [
+          "Open Statistics to see your weekly study time, subject breakdown, and activity heat map."
+        ],
+        "afterEffect": "Nothing changes when you view Statistics — it's a read-only picture of your activity so far.",
+        "connections": "Every chart here is built entirely from your logged Study Sessions and recorded attendance — nothing is estimated from scheduled Classes.",
+        "learnMore": "If your statistics look empty or stuck at zero, it almost always means no Study Sessions have been logged yet — scheduled Classes alone never count as study time.",
+        "cta": "Go to Statistics"
+      },
+      "grades": {
+        "title": "Grades & GPA",
+        "summary": "See your grades and GPA, calculated automatically.",
+        "whatIsIt": "Grades shows your GPA and a letter grade for each Subject, calculated automatically from your Exam scores.",
+        "whyUseIt": "Instead of doing GPA math by hand, Study Line calculates it for you the moment you enter an exam score — and shows you which subjects are pulling your average up or down.",
+        "whenToUse": "Check it after any exam you've entered a score for, or whenever you want a big-picture view of how you're doing.",
+        "how": [
+          "Enter your score on an Exam — that's the only thing that feeds Grades.",
+          "Open Grades to see the resulting letter grade, your Subject averages, and your overall GPA.",
+          "If your school uses a different grading scale, adjust it from Settings → Grades."
+        ],
+        "afterEffect": "Your GPA recalculates immediately from every scored Exam, weighted by each Subject's credit hours.",
+        "connections": "Grades has no data of its own — it's entirely derived from your Exams and each Subject's credit hours. There's nothing to add or edit here directly.",
+        "learnMore": "The grade scale (which percentage becomes an A, a B, and so on) is customizable per student in Settings, in case your school uses different cutoffs than the default.",
+        "cta": "Go to Grades"
+      },
+      "goals-achievements": {
+        "title": "Goals & Achievements",
+        "summary": "Set targets and see the milestones you've unlocked.",
+        "whatIsIt": "Goals let you set a weekly or monthly study-time target. Achievements are milestones — like a 7-day streak or your first completed lesson — that unlock as you go. Together with your level and XP, they're Study Line's way of encouraging consistency.",
+        "whyUseIt": "A visible target and a bit of recognition make it easier to stick with studying regularly, not just in occasional bursts.",
+        "whenToUse": "Set a Goal at the start of a week or month, and check your Achievements whenever you want a quick sense of your overall consistency.",
+        "how": [
+          "Go to Goals and set a weekly or monthly study-time target.",
+          "Keep logging Study Sessions — your progress toward the goal updates automatically as you go.",
+          "Check Achievements to see which milestones you've unlocked and which are close."
+        ],
+        "afterEffect": "Your goal progress, streak, level, and XP are all recalculated live from your Study Sessions, completed Lessons, Homework, and Exams every time you open the app — nothing needs to be manually refreshed or claimed.",
+        "connections": "Goals and Achievements are both built entirely from your existing activity — Study Sessions, Lessons, Homework, and Exams. There's no separate thing to log for them specifically.",
+        "learnMore": "XP and level aren't stored anywhere permanently — they're recalculated fresh from your activity every time. That means if XP or your streak doesn't look right, logging the missing activity (usually a Study Session) fixes it immediately, rather than needing a refresh or a wait.",
+        "cta": "Go to Goals"
+      },
+      "first-week": {
+        "title": "I just joined — what now?",
+        "summary": "A realistic plan for your first week with Study Line.",
+        "scenario": "You've just signed up. Here's what a realistic first week with Study Line looks like, instead of trying to set up everything on day one.",
+        "steps": [
+          "Day 1: Read “How Study Line Works” and add your Subjects — just the courses you're currently taking, nothing else yet.",
+          "Day 1–2: Add a Class for any Subject that meets on a regular schedule. If you're only self-studying something, skip this and go straight to Lessons.",
+          "Every day: Add a Lesson whenever you sit down to study a topic, and start a Study Session while you work.",
+          "End of each day: Mark attendance for any Class Occurrences that happened, and update Homework as you complete it.",
+          "End of the week: Open Statistics to see your first week of study time, and set a Goal for the week ahead."
+        ]
+      },
+      "add-first-subject-and-class": {
+        "title": "Add your first Subject and Class",
+        "summary": "Set up a course that meets on a regular schedule.",
+        "scenario": "You want to get Mathematics set up in Study Line — a Subject you're taking, with a class that meets every Monday and Wednesday.",
+        "steps": [
+          "Go to Subjects and create “Mathematics” — pick a color and icon if you'd like, this is just to make it easy to spot later.",
+          "Open the new Subject and choose “Add Class”.",
+          "Add two meeting times: Monday at 9:00 and Wednesday at 9:00, each lasting however long the class actually runs.",
+          "Save — Study Line automatically creates the next several weeks of Monday and Wednesday Class Occurrences for you on your Calendar."
+        ]
+      },
+      "record-attendance": {
+        "title": "Record attendance for a class",
+        "summary": "Mark whether you attended a class that just happened.",
+        "scenario": "Your Math class just met, and you want to log whether you were there.",
+        "steps": [
+          "Find today's Class Occurrence on your Dashboard, Calendar, or the Class's own page.",
+          "Once the class's start time has passed, open its Attendance dropdown.",
+          "Choose Attended, Late, Absent, or Cancelled — whichever matches what actually happened."
+        ]
+      },
+      "start-studying": {
+        "title": "Start studying and track your time",
+        "summary": "Use the Focus Timer to log a real study session.",
+        "scenario": "You're about to sit down and study Linear Algebra for Math.",
+        "steps": [
+          "Go to Study Sessions and choose the Focus Timer.",
+          "Select the Subject (Mathematics) and, if you've created it, the Lesson (Linear Algebra).",
+          "Start the timer and study — it keeps running even if you switch tabs or refresh the page.",
+          "When you're done, stop the timer to save the session — or if you studied without it running, use “Log a session” afterward instead."
+        ]
+      },
+      "track-homework-and-exams": {
+        "title": "Track homework and exams",
+        "summary": "Add an assignment and an exam, then record your results.",
+        "scenario": "You just got an assignment and know your next exam date.",
+        "steps": [
+          "Open the relevant Lesson and add the Homework, with its title and deadline.",
+          "Add the Exam the same way, with its date and total possible score.",
+          "Mark the Homework complete once it's done.",
+          "Once you're graded, come back and enter your Exam score — your Grades update automatically."
+        ]
+      },
+      "know-what-to-study-today": {
+        "title": "Know what to study today",
+        "summary": "Find today's classes, deadlines, and what needs review.",
+        "scenario": "You want a quick answer to “what do I actually need to do today?”",
+        "steps": [
+          "Open your Dashboard — it shows today's Class Occurrences, upcoming deadlines, and your recent activity in one place.",
+          "Check the Calendar's day view for a fuller picture of everything scheduled today.",
+          "Look at any Lessons marked “Needs review” — these are worth revisiting even if nothing is formally due."
+        ]
+      },
+      "missed-a-class": {
+        "title": "I missed a class — what do I do?",
+        "summary": "How to record it, and what it does (and doesn't) affect.",
+        "scenario": "You weren't able to attend a class that already happened.",
+        "steps": [
+          "Find that Class Occurrence and set its Attendance to Absent (or Late, if you arrived partway through) — this doesn't undo anything, it just records what happened.",
+          "If you still need to study that material, add or update the related Lesson so it isn't forgotten.",
+          "Marking a class Absent doesn't block you from anything — you can still add Homework, Exams, or a Study Session connected to that topic."
+        ]
+      },
+      "review-past-activity": {
+        "title": "Review your past activity",
+        "summary": "Look back at what you've studied and when.",
+        "scenario": "You want to look back at what you've studied and when.",
+        "steps": [
+          "Open Study Sessions → History to see every past session, searchable by date, Subject, and Lesson.",
+          "Use the Calendar to browse previous days, weeks, or months.",
+          "Open Statistics for a summarized view — trends, totals, and your activity heat map over time."
+        ]
+      },
+      "change-something-earlier": {
+        "title": "Change something you entered earlier",
+        "summary": "Edit a Subject, Class, Lesson, or Study Session after the fact.",
+        "scenario": "You entered something wrong, or your plans changed.",
+        "steps": [
+          "Most things — Subjects, Classes, Lessons, Homework, and Exams — have an edit option in their menu; open it and update the details.",
+          "A Study Session's start time, end time, Subject, or Lesson can also be edited after the fact from its History entry.",
+          "Changing a Class's schedule only affects future, not-yet-recorded Class Occurrences — anything already attended or recorded stays exactly as it was."
+        ]
+      },
+      "troubleshooting": {
+        "title": "Troubleshooting & FAQ",
+        "summary": "Answers to the questions students ask most often.",
+        "faq": [
+          {
+            "question": "My statistics show zero — what's wrong?",
+            "answer": "Nothing's wrong — this almost always means no Study Sessions have been logged yet. A scheduled Class doesn't count as study time by itself; only an actual logged Study Session (via the Focus Timer or manual logging) does. Log one and your statistics will update immediately."
+          },
+          {
+            "question": "My XP or level didn't change after I studied.",
+            "answer": "XP and level aren't stored — they're recalculated fresh every time you open the app, from your logged Study Sessions, completed Lessons, Homework, and Exams. If a number looks stale, refresh the page; if it's still not moving, double-check the activity was actually saved (e.g. the Study Session was stopped, not cancelled)."
+          },
+          {
+            "question": "I'm not getting notifications.",
+            "answer": "Check three things: that the relevant notification type is turned on in Settings → Notifications, that your browser has actually granted Study Line permission to show notifications, and that a little time has passed — notifications are generated periodically (every few minutes), not the instant something changes."
+          },
+          {
+            "question": "My Dashboard isn't showing today's activity.",
+            "answer": "Double-check that the Class, Lesson, or activity has the correct date, and that it's linked to the right Subject. Then refresh the page — the Dashboard is a live snapshot, so it always reflects your latest saved data once reloaded."
+          },
+          {
+            "question": "I started a Study Session by accident.",
+            "answer": "Use Cancel while it's still running, from the Focus Timer screen. A cancelled session is discarded completely and never counts toward your statistics, streak, or XP."
+          },
+          {
+            "question": "What's the difference between a Class and a Lesson?",
+            "answer": "A Class is a recurring schedule — “Math meets every Monday at 9:00.” A Lesson is a specific topic you're studying — “Eigenvalues.” A Lesson can optionally be linked to the Class Occurrence you studied it for, but it doesn't have to be — you can create Lessons for topics you're studying entirely on your own."
+          }
+        ]
       }
     }
   }

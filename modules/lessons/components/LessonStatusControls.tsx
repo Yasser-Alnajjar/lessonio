@@ -9,6 +9,7 @@ import {
   REVIEW_STATUS_META,
   STUDY_STATUS_META,
 } from "@/components/ui-system/status-badge";
+import { HelpPopover } from "@/components/ui-system/help-popover";
 import {
   Select,
   SelectContent,
@@ -38,6 +39,7 @@ export function LessonStatusControls({
   onUpdated,
 }: LessonStatusControlsProps) {
   const t = useTranslations("lessons.status");
+  const tHelp = useTranslations("help");
   const [isPending, startTransition] = useTransition();
 
   const fields: Array<{
@@ -100,30 +102,44 @@ export function LessonStatusControls({
   ];
 
   return (
-    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-      {fields.map((field) => (
-        <div key={field.key} className="flex flex-col gap-1.5">
-          <label className="text-xs font-medium text-muted-foreground">
-            {field.label}
-          </label>
-          <Select
-            value={field.value}
-            onValueChange={field.onChange}
-            disabled={isPending}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {field.options.map((option) => (
-                <SelectItem key={option.label} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      ))}
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center gap-1">
+        <span className="text-xs font-medium text-muted-foreground">
+          {t("study.label")} · {t("review.label")} · {t("homework.label")}
+        </span>
+        <HelpPopover
+          title={tHelp("ui.learnMore")}
+          triggerLabel={tHelp("ui.learnMore")}
+        >
+          {tHelp("topics.lessons.learnMore")}
+        </HelpPopover>
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {fields.map((field) => (
+          <div key={field.key} className="flex flex-col gap-1.5">
+            <label className="text-xs font-medium text-muted-foreground">
+              {field.label}
+            </label>
+            <Select
+              value={field.value}
+              onValueChange={field.onChange}
+              disabled={isPending}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {field.options.map((option) => (
+                  <SelectItem key={option.label} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

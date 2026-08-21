@@ -14,3 +14,4 @@ export * as Statistics from "./statistics";
 export * as Notifications from "./notifications";
 export * as Gamification from "./gamification";
 export * as Settings from "./settings";
+export * as Help from "./help";

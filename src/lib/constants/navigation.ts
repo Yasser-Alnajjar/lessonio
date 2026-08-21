@@ -6,6 +6,7 @@ import {
   CalendarDays,
   ClipboardList,
   GraduationCap,
+  HelpCircle,
   Layers,
   LayoutDashboard,
   NotebookText,
@@ -44,6 +45,7 @@ export const NAV_ITEMS = [
   { href: "/gamification/achievements", key: "achievements", icon: Trophy },
   { href: "/notifications/center", key: "notifications", icon: Bell },
   { href: "/settings/profile", key: "settings", icon: Settings },
+  { href: "/help/list", key: "help", icon: HelpCircle },
 ] as const satisfies readonly NavItem[];
 
 const ALL_NAV_HREFS = NAV_ITEMS.map((item) => item.href);

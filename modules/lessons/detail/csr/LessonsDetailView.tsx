@@ -32,7 +32,7 @@ import type { ClassOccurrenceWithRelations } from "@/lib/types/class-occurrence"
 import type { Subject } from "@/lib/types/subject";
 import type { Tag } from "@/lib/types/tag";
 import type { FlashcardWithRelations } from "@/lib/types/flashcard";
-import { AttachmentsPanel } from "../../components/attachments/AttachmentsPanel";
+// import { AttachmentsPanel } from "../../components/attachments/AttachmentsPanel";
 import { DeleteLessonDialog } from "../../components/DeleteLessonDialog";
 import { FlashcardsPanel } from "../../components/flashcards/FlashcardsPanel";
 import { LessonFormDialog } from "../../components/LessonFormDialog";
@@ -55,7 +55,7 @@ export const LessonsDetailView = ({
   subjects,
   tags: initialTags,
   notes,
-  attachments,
+  // attachments,
   flashcards,
   classes,
 }: LessonsDetailViewProps) => {
@@ -91,7 +91,6 @@ export const LessonsDetailView = ({
     await toggleArchiveLesson(data.id);
     router.refresh();
   };
-
 
   // `classes` here is the occurrence list the picker is drawn from; the
   // linked-class route addresses the *recurring* class, so resolve through it.
@@ -207,10 +206,10 @@ export const LessonsDetailView = ({
           <TabsTrigger value="notes">
             {t("notesTab")} {notes.length > 0 && `(${notes.length})`}
           </TabsTrigger>
-          <TabsTrigger value="attachments">
+          {/* <TabsTrigger value="attachments">
             {t("attachmentsTab")}{" "}
             {attachments.length > 0 && `(${attachments.length})`}
-          </TabsTrigger>
+          </TabsTrigger> */}
           <TabsTrigger value="flashcards">
             {t("flashcardsTab")}{" "}
             {flashcards.length > 0 && `(${flashcards.length})`}
@@ -219,9 +218,9 @@ export const LessonsDetailView = ({
         <TabsContent value="notes">
           <NotesPanel lessonId={data.id} notes={notes} />
         </TabsContent>
-        <TabsContent value="attachments">
+        {/* <TabsContent value="attachments">
           <AttachmentsPanel lessonId={data.id} attachments={attachments} />
-        </TabsContent>
+        </TabsContent> */}
         <TabsContent value="flashcards">
           <FlashcardsPanel lessonId={data.id} flashcards={flashcards} />
         </TabsContent>

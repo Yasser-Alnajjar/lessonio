@@ -1,4 +1,6 @@
 export * as Auth from "./auth";
+export * as Home from "./home";
+export * as Onboarding from "./onboarding";
 export * as Dashboard from "./dashboard";
 export * as Subjects from "./subjects";
 export * as Classes from "./classes";
@@ -15,3 +17,5 @@ export * as Notifications from "./notifications";
 export * as Gamification from "./gamification";
 export * as Settings from "./settings";
 export * as Help from "./help";
+export * as Teaching from "./teaching";
+export * as Classroom from "./classroom";

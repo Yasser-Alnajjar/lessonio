@@ -45,7 +45,10 @@
     "label": "التنقل الرئيسي",
     "toggleSidebar": "تبديل الشريط الجانبي",
     "language": "اللغة",
-    "help": "المساعدة"
+    "help": "المساعدة",
+    "teachingClasses": "الحصص",
+    "teachingAssignments": "الواجبات المسندة",
+    "classroomClasses": "حصصي"
   },
   "landing": {
     "nav": {
@@ -232,6 +235,12 @@
     "register": {
       "title": "أنشئ حسابك",
       "subtitle": "ابدأ بتتبّع كل مادة ودرس وساعة مذاكرة في مكان واحد.",
+      "roleLabel": "أنا أسجّل بصفتي...",
+      "roleStudent": "طالب",
+      "roleStudentHint": "تتبّع موادك ودروسك وساعات مذاكرتك.",
+      "roleTeacher": "معلّم",
+      "roleTeacherHint": "أدر حصصاً وأسند واجبات لطلابك.",
+      "roleImmutableNote": "لا يمكن تغيير هذا لاحقاً.",
       "fullNameLabel": "الاسم الكامل",
       "fullNamePlaceholder": "أحمد محمد",
       "emailLabel": "البريد الإلكتروني",
@@ -246,6 +255,7 @@
       "loginLink": "تسجيل الدخول",
       "success": "تم إنشاء الحساب. تحقق من بريدك الإلكتروني للتأكيد، ثم سجّل الدخول.",
       "errors": {
+        "roleRequired": "اختر ما إذا كنت طالباً أم معلّماً.",
         "fullNameMin": "أدخل اسمك الكامل.",
         "fullNameMax": "الاسم الكامل طويل جداً.",
         "emailInvalid": "أدخل بريداً إلكترونياً صحيحاً.",
@@ -285,6 +295,18 @@
     },
     "logout": "تسجيل الخروج",
     "loggingOut": "جارٍ تسجيل الخروج…"
+  },
+  "onboarding": {
+    "role": {
+      "title": "أمر أخير",
+      "subtitle": "كيف ستستخدم Lessonio؟ لا يمكن تغيير هذا لاحقاً.",
+      "roleStudent": "طالب",
+      "roleStudentHint": "تتبّع موادك ودروسك وساعات مذاكرتك.",
+      "roleTeacher": "معلّم",
+      "roleTeacherHint": "أدر حصصاً وأسند واجبات لطلابك.",
+      "submit": "متابعة",
+      "submitting": "جارٍ الحفظ…"
+    }
   },
   "theme": {
     "toggleLabel": "المظهر",
@@ -527,6 +549,108 @@
       "thursday": "الخميس",
       "friday": "الجمعة",
       "saturday": "السبت"
+    }
+  },
+  "teaching": {
+    "classes": {
+      "card": {
+        "studentCount": "{count, plural, =0 {لا يوجد طلاب} =1 {طالب واحد} other {# طلاب}}",
+        "archived": "مؤرشفة",
+        "actionsLabel": "إجراءات الحصة",
+        "edit": "تعديل",
+        "archive": "أرشفة",
+        "unarchive": "إلغاء الأرشفة",
+        "delete": "حذف"
+      },
+      "form": {
+        "nameLabel": "اسم الحصة",
+        "namePlaceholder": "الجبر 1",
+        "subjectLabelLabel": "المادة (اختياري)",
+        "subjectLabelPlaceholder": "الرياضيات",
+        "descriptionLabel": "الوصف (اختياري)",
+        "descriptionPlaceholder": "ما تغطيه هذه الحصة",
+        "createTitle": "إنشاء حصة",
+        "createDescription": "ينضم الطلاب برمز يمكنك مشاركته وتدويره في أي وقت.",
+        "editTitle": "تعديل الحصة",
+        "editDescription": "حدّث تفاصيل هذه الحصة.",
+        "cancel": "إلغاء",
+        "submitting": "جارٍ الحفظ…",
+        "submitCreate": "إنشاء الحصة",
+        "submitEdit": "حفظ التغييرات",
+        "errors": {
+          "nameRequired": "أدخل اسم الحصة.",
+          "nameMax": "اسم الحصة طويل جداً.",
+          "subjectLabelMax": "المادة طويلة جداً.",
+          "descriptionMax": "الوصف طويل جداً."
+        }
+      },
+      "delete": {
+        "title": "حذف هذه الحصة؟",
+        "description": "سيتم حذف \"{name}\" وقائمة طلابها نهائياً. لا يمكن التراجع عن هذا.",
+        "confirm": "حذف الحصة",
+        "cancel": "إلغاء",
+        "genericError": "حدث خطأ أثناء حذف هذه الحصة."
+      },
+      "list": {
+        "title": "حصصك",
+        "subtitle": "أنشئ حصصاً وشارك رمز الانضمام مع طلابك.",
+        "newClass": "حصة جديدة",
+        "emptyTitle": "لا توجد حصص بعد",
+        "emptyDescription": "أنشئ حصتك الأولى للحصول على رمز انضمام يمكنك مشاركته مع الطلاب.",
+        "emptyAction": "إنشاء حصة"
+      }
+    },
+    "roster": {
+      "notFound": "تعذّر العثور على هذه الحصة.",
+      "backToClasses": "العودة إلى الحصص",
+      "emptyTitle": "لا يوجد طلاب بعد",
+      "emptyDescription": "شارك رمز الانضمام أعلاه ليتمكن الطلاب من الانضمام إلى هذه الحصة.",
+      "table": {
+        "student": "الطالب",
+        "joined": "تاريخ الانضمام",
+        "remove": "إزالة",
+        "unnamedStudent": "طالب بلا اسم"
+      },
+      "joinCode": {
+        "label": "رمز الانضمام",
+        "copy": "نسخ رمز الانضمام",
+        "rotate": "تدوير رمز الانضمام",
+        "hint": "شارك هذا الرمز مع الطلاب. تدويره يُبطل الرمز القديم."
+      }
+    }
+  },
+  "classroom": {
+    "classes": {
+      "title": "حصصك",
+      "subtitle": "الحصص التي انضممت إليها برمز من معلّم.",
+      "joinClass": "الانضمام إلى حصة",
+      "taughtBy": "يُدرّسها {name}",
+      "leave": "مغادرة الحصة",
+      "empty": {
+        "title": "لا توجد حصص بعد",
+        "description": "هل لديك رمز حصة؟ انضم إلى حصة معلّمك لترى الواجبات هنا.",
+        "action": "الانضمام إلى حصة"
+      },
+      "join": {
+        "title": "الانضمام إلى حصة",
+        "subtitle": "أدخل الرمز المكوّن من 6 أحرف الذي شاركه معلّمك.",
+        "codeLabel": "رمز الحصة",
+        "codePlaceholder": "ABC123",
+        "cancel": "إلغاء",
+        "submitting": "جارٍ الانضمام…",
+        "submit": "الانضمام إلى الحصة",
+        "errors": {
+          "codeInvalid": "أدخل رمزاً صحيحاً مكوّناً من 6 أحرف.",
+          "codeNotFound": "لا يوجد حصة مطابقة لهذا الرمز. تحقق منه وحاول مرة أخرى."
+        }
+      },
+      "leaveDialog": {
+        "title": "مغادرة هذه الحصة؟",
+        "description": "ستغادر \"{name}\". يمكنك إعادة الانضمام في أي وقت برمز الحصة.",
+        "confirm": "مغادرة الحصة",
+        "cancel": "إلغاء",
+        "genericError": "حدث خطأ أثناء مغادرة هذه الحصة."
+      }
     }
   },
   "lessons": {

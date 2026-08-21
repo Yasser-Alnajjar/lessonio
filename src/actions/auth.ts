@@ -4,7 +4,7 @@ import type { User as SupabaseUser } from "@supabase/supabase-js";
 
 import { createClient } from "@/lib/supabase/server";
 import type { ActionResult } from "@/lib/types/common";
-import type { User } from "@/lib/types/user";
+import type { AppRole, User } from "@/lib/types/user";
 import type { Database } from "@/lib/types/database";
 import * as authMutations from "./auth.mutations";
 
@@ -32,8 +32,10 @@ function mapUser(authUser: SupabaseUser, profile: ProfileRow | null): User {
     fullName: profile?.full_name ?? metaFullName,
     avatarUrl: profile?.avatar_url ?? metaAvatarUrl,
     timezone: profile?.timezone ?? metaTimezone,
+    role: (profile?.role ?? null) as AppRole | null,
     createdAt: profile?.created_at ?? authUser.created_at,
-    updatedAt: profile?.updated_at ?? authUser.updated_at ?? authUser.created_at,
+    updatedAt:
+      profile?.updated_at ?? authUser.updated_at ?? authUser.created_at,
   };
 }
 

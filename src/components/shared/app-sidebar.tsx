@@ -23,8 +23,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { NAV_ITEMS, isActivePath } from "@/lib/constants/navigation";
-import type { User } from "@/lib/types/user";
+import { NAV_ITEMS, ROLE_HOME, isActivePath } from "@/lib/constants/navigation";
+import type { AppRole, User } from "@/lib/types/user";
+import type { Route } from "next";
+
 import { Link, usePathname } from "@/i18n/navigation";
 import { LanguageSwitch } from "./language-switch";
 import { LogoutButton } from "./logout-button";
@@ -45,7 +47,7 @@ function initialsOf(name: string | null, email: string): string {
 }
 
 interface AppSidebarProps {
-  user: Pick<User, "fullName" | "email" | "avatarUrl">;
+  user: Pick<User, "fullName" | "email" | "avatarUrl" | "role">;
 }
 
 export function AppSidebar({ user }: AppSidebarProps) {
@@ -56,6 +58,13 @@ export function AppSidebar({ user }: AppSidebarProps) {
   const pathname = usePathname();
   const { isMobile } = useSidebar();
 
+  // Falls back to "student" only as a rendering default — a null role here
+  // means the middleware hasn't bounced this request to /onboarding/role
+  // yet (e.g. an App Router cache navigation), not that the user is a
+  // student. RLS, not this fallback, is the real access boundary.
+  const role: AppRole = user.role ?? "student";
+  const items = NAV_ITEMS.filter((item) => item.roles.includes(role));
+
   const displayName = user.fullName ?? user.email;
   const initials = initialsOf(user.fullName, user.email);
 
@@ -63,7 +72,7 @@ export function AppSidebar({ user }: AppSidebarProps) {
     <Sidebar side={isArabic ? "right" : "left"} collapsible="icon">
       <SidebarHeader>
         <Link
-          href="/dashboard/overview"
+          href={ROLE_HOME[role] as Route}
           className="flex items-center gap-2 px-2 py-1"
           aria-label={t("dashboard")}
         >
@@ -76,7 +85,7 @@ export function AppSidebar({ user }: AppSidebarProps) {
           <SidebarGroupContent>
             <nav aria-label={t("label")}>
               <SidebarMenu>
-                {NAV_ITEMS.map(({ href, key, icon: Icon }) => {
+                {items.map(({ href, key, icon: Icon }) => {
                   const active = isActivePath(pathname, href);
                   return (
                     <SidebarMenuItem key={key}>

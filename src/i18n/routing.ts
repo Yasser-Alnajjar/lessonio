@@ -4,7 +4,7 @@ export const locales = ["en", "ar"] as const;
 
 export type AppLocale = (typeof locales)[number];
 
-export const defaultLocale: AppLocale = "en";
+export const defaultLocale: AppLocale = "ar";
 
 export const localeDirections: Record<AppLocale, "ltr" | "rtl"> = {
   en: "ltr",

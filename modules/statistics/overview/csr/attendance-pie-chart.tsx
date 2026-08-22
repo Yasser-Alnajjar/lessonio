@@ -1,6 +1,13 @@
 "use client";
 
-import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
+import {
+  Cell,
+  Legend,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+} from "recharts";
 
 import { ChartCard } from "@/components/ui-system/chart-card";
 import useTranslate from "@/hooks/useTranslate";

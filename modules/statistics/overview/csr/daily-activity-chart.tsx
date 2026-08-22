@@ -1,6 +1,13 @@
 "use client";
 
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis } from "recharts";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+} from "recharts";
 
 import { ChartCard } from "@/components/ui-system/chart-card";
 import useTranslate from "@/hooks/useTranslate";
@@ -25,8 +32,14 @@ export function DailyActivityChart({ data }: DailyActivityChartProps) {
     >
       <div style={{ height: 220 }}>
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
-            <CartesianGrid vertical={false} style={{ stroke: "var(--border)" }} />
+          <BarChart
+            data={data}
+            margin={{ top: 8, right: 8, left: -20, bottom: 0 }}
+          >
+            <CartesianGrid
+              vertical={false}
+              style={{ stroke: "var(--border)" }}
+            />
             <XAxis
               dataKey="label"
               axisLine={false}
@@ -41,8 +54,15 @@ export function DailyActivityChart({ data }: DailyActivityChartProps) {
                 borderRadius: 8,
                 fontSize: 12,
               }}
+              itemStyle={{
+                color: "var(--card-foreground)",
+              }}
             />
-            <Bar dataKey="value" radius={[4, 4, 0, 0]} style={{ fill: "var(--chart-4)" }} />
+            <Bar
+              dataKey="value"
+              radius={[4, 4, 0, 0]}
+              style={{ fill: "var(--chart-4)" }}
+            />
           </BarChart>
         </ResponsiveContainer>
       </div>

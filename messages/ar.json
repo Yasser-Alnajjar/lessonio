@@ -678,6 +678,40 @@
         "emptyDescription": "أنشئ مهمتك الأولى لإحدى حصصك.",
         "emptyAction": "مهمة جديدة"
       }
+    },
+    "grading": {
+      "notFound": "تعذّر العثور على هذه المهمة.",
+      "backToAssignments": "العودة إلى المهام",
+      "emptyTitle": "لا يوجد طلاب بعد",
+      "emptyDescription": "سيظهر هنا الطلاب المنضمون إلى هذه الحصة بعد نشر المهمة.",
+      "table": {
+        "student": "الطالب",
+        "status": "الحالة",
+        "submittedAtHeader": "تاريخ التسليم",
+        "score": "الدرجة",
+        "scoreValue": "{score} نقطة",
+        "grade": "تقييم",
+        "assigned": "مُكلَّف",
+        "submitted": "تم التسليم",
+        "graded": "تم التقييم",
+        "unnamedStudent": "طالب بلا اسم"
+      },
+      "dialog": {
+        "title": "تقييم التسليم",
+        "unnamedStudent": "طالب بلا اسم",
+        "scoreLabel": "الدرجة (من {totalPoints})",
+        "feedbackLabel": "ملاحظات (اختياري)",
+        "feedbackPlaceholder": "ملاحظات للطالب",
+        "cancel": "إلغاء",
+        "submitting": "جارٍ الحفظ…",
+        "submit": "حفظ التقييم",
+        "noSubmission": "لم يقم هذا الطالب بالتسليم بعد.",
+        "errors": {
+          "scoreInvalid": "أدخل درجة 0 أو أكثر.",
+          "scoreMax": "يجب ألا تتجاوز الدرجة مجموع نقاط المهمة.",
+          "feedbackMax": "الملاحظات طويلة جداً."
+        }
+      }
     }
   },
   "classroom": {
@@ -729,7 +763,21 @@
       "notFound": "تعذّر العثور على هذه المهمة.",
       "backToAssignments": "العودة إلى المهام",
       "due": "الموعد النهائي {date}",
-      "points": "{points, plural, =1 {نقطة واحدة} other {# نقطة}}"
+      "points": "{points, plural, =1 {نقطة واحدة} other {# نقطة}}",
+      "submission": {
+        "yourSubmission": "تسليمك",
+        "gradedScore": "{score}/{totalPoints}",
+        "feedbackLabel": "ملاحظات من معلّمك",
+        "submittedAt": "تم التسليم {date}",
+        "contentPlaceholder": "اكتب تسليمك هنا",
+        "submitting": "جارٍ الإرسال…",
+        "resubmit": "إعادة التسليم",
+        "submit": "تسليم",
+        "errors": {
+          "contentRequired": "أدخل تسليمك قبل إرساله.",
+          "contentMax": "تسليمك طويل جداً."
+        }
+      }
     }
   },
   "lessons": {

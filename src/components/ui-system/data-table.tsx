@@ -52,15 +52,13 @@ export function DataTable<TData extends DataTableRowData>({
   className,
 }: DataTableProps<TData>) {
   const fullColumns = React.useMemo<DataTableColumnDef<TData>[]>(() => {
-    const selectionColumn: DisplayColumnDef<
-      typeof dataTableFeatures,
-      TData
-    > = {
+    const selectionColumn: DisplayColumnDef<typeof dataTableFeatures, TData> = {
       id: "select",
       header: ({ table }) => (
         <Checkbox
           checked={
-            table.getIsSomePageRowsSelected() && !table.getIsAllPageRowsSelected()
+            table.getIsSomePageRowsSelected() &&
+            !table.getIsAllPageRowsSelected()
               ? "indeterminate"
               : table.getIsAllPageRowsSelected()
           }
@@ -81,8 +79,12 @@ export function DataTable<TData extends DataTableRowData>({
     const actionsColumn: DisplayColumnDef<typeof dataTableFeatures, TData> = {
       id: "actions",
       header: "",
-      cell: ({ row }) =>
-        rowActions && rowActions.length > 0 ? (
+      cell: ({ row }) => {
+        const visibleActions = (rowActions ?? []).filter(
+          (action) => !action.isHidden?.(row.original),
+        );
+        if (visibleActions.length === 0) return null;
+        return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon-sm" aria-label="Row actions">
@@ -90,10 +92,12 @@ export function DataTable<TData extends DataTableRowData>({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              {rowActions.map((action) => (
+              {visibleActions.map((action) => (
                 <DropdownMenuItem
                   key={action.label}
-                  variant={action.variant === "destructive" ? "destructive" : "default"}
+                  variant={
+                    action.variant === "destructive" ? "destructive" : "default"
+                  }
                   onClick={() => action.onClick(row.original)}
                 >
                   {action.label}
@@ -101,7 +105,8 @@ export function DataTable<TData extends DataTableRowData>({
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
-        ) : null,
+        );
+      },
       enableSorting: false,
     };
 
@@ -127,7 +132,9 @@ export function DataTable<TData extends DataTableRowData>({
   }, [table.state.rowSelection]);
 
   if (isLoading) {
-    return <DataTableSkeleton columns={fullColumns.length} className={className} />;
+    return (
+      <DataTableSkeleton columns={fullColumns.length} className={className} />
+    );
   }
 
   if (data.length === 0) {
@@ -135,18 +142,21 @@ export function DataTable<TData extends DataTableRowData>({
   }
 
   return (
-    <div className={cn("flex flex-col gap-4", className)} data-slot="data-table">
+    <div
+      className={cn("flex flex-col gap-4", className)}
+      data-slot="data-table"
+    >
       <div className="overflow-hidden rounded-xl border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
+                  <TableHead key={header.id} className="text-start">
                     {header.isPlaceholder ? null : header.column.getCanSort() ? (
                       <button
                         type="button"
-                        className="inline-flex items-center gap-1.5 select-none"
+                        className="inline-flex   gap-1.5 select-none"
                         onClick={header.column.getToggleSortingHandler()}
                       >
                         <table.FlexRender header={header} />
@@ -170,7 +180,10 @@ export function DataTable<TData extends DataTableRowData>({
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id} data-state={row.getIsSelected() ? "selected" : undefined}>
+              <TableRow
+                key={row.id}
+                data-state={row.getIsSelected() ? "selected" : undefined}
+              >
                 {row.getAllCells().map((cell) => (
                   <TableCell key={cell.id}>
                     <table.FlexRender cell={cell} />
@@ -220,7 +233,10 @@ function DataTableSkeleton({
   className?: string;
 }) {
   return (
-    <div className={cn("flex flex-col gap-4", className)} data-slot="data-table-skeleton">
+    <div
+      className={cn("flex flex-col gap-4", className)}
+      data-slot="data-table-skeleton"
+    >
       <div className="overflow-hidden rounded-xl border">
         <Table>
           <TableHeader>

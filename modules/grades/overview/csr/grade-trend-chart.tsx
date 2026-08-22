@@ -1,6 +1,14 @@
 "use client";
 
-import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 import { ChartCard } from "@/components/ui-system/chart-card";
 import useTranslate from "@/hooks/useTranslate";
@@ -25,8 +33,14 @@ export function GradeTrendChart({ data }: GradeTrendChartProps) {
     >
       <div style={{ height: 240 }}>
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
-            <CartesianGrid vertical={false} style={{ stroke: "var(--border)" }} />
+          <LineChart
+            data={data}
+            margin={{ top: 8, right: 8, left: -20, bottom: 0 }}
+          >
+            <CartesianGrid
+              vertical={false}
+              style={{ stroke: "var(--border)" }}
+            />
             <XAxis
               dataKey="label"
               axisLine={false}
@@ -40,11 +54,15 @@ export function GradeTrendChart({ data }: GradeTrendChartProps) {
               style={{ fill: "var(--muted-foreground)", fontSize: 12 }}
             />
             <Tooltip
+              cursor={{ fill: "var(--accent)" }}
               contentStyle={{
                 backgroundColor: "var(--card)",
                 borderColor: "var(--border)",
                 borderRadius: 8,
                 fontSize: 12,
+              }}
+              itemStyle={{
+                color: "var(--card-foreground)",
               }}
             />
             <Line

@@ -7,13 +7,17 @@ import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import type { AssignmentForStudent } from "@/lib/types/assignment";
+import type { MySubmission } from "@/lib/types/submission";
+import { SubmissionPanel } from "../../components/SubmissionPanel";
 
 interface ClassroomAssignmentDetailViewProps {
   assignment: AssignmentForStudent | null;
+  submission: MySubmission | null;
 }
 
 export const ClassroomAssignmentDetailView = ({
   assignment,
+  submission,
 }: ClassroomAssignmentDetailViewProps) => {
   const t = useTranslations("classroom.assignment");
 
@@ -73,6 +77,12 @@ export const ClassroomAssignmentDetailView = ({
           </CardContent>
         )}
       </Card>
+
+      <SubmissionPanel
+        assignmentId={assignment.id}
+        totalPoints={assignment.totalPoints}
+        submission={submission}
+      />
     </div>
   );
 };

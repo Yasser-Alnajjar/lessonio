@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import type { AssignmentWithStats } from "@/lib/types/assignment";
 
@@ -40,9 +41,12 @@ export function TeacherAssignmentCard({
         <CardHeader className="flex-row items-start gap-3 space-y-0">
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <h3 className="truncate text-sm font-medium text-foreground">
+              <Link
+                href={`/teaching/grading/${item.id}`}
+                className="truncate text-sm font-medium text-foreground hover:underline"
+              >
                 {item.title}
-              </h3>
+              </Link>
               <Badge
                 variant={item.status === "published" ? "default" : "secondary"}
                 className="shrink-0 text-[10px]"

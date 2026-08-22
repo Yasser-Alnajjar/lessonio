@@ -56,18 +56,15 @@ export function WeeklySummaryCard({ summary }: WeeklySummaryCardProps) {
               style={{ fill: "var(--muted-foreground)", fontSize: 12 }}
             />
             <Tooltip
-              cursor={{ fill: "var(--muted)", opacity: 0.35 }}
-              content={({ active, payload, label }) => {
-                if (!active || !payload?.length) return null;
-
-                return (
-                  <div className="rounded-lg border border-border bg-popover px-3 py-2 text-xs text-popover-foreground shadow-md">
-                    <p className="mb-1 font-medium">{label}</p>
-                    <p className="text-muted-foreground">
-                      {t("minutes", { minutes: `${payload[0]?.value}` })}
-                    </p>
-                  </div>
-                );
+              cursor={{ fill: "var(--accent)" }}
+              contentStyle={{
+                backgroundColor: "var(--card)",
+                borderColor: "var(--border)",
+                borderRadius: 8,
+                fontSize: 12,
+              }}
+              itemStyle={{
+                color: "var(--card-foreground)",
               }}
             />
             <Bar

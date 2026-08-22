@@ -678,6 +678,40 @@
         "emptyDescription": "Create your first assignment for one of your classes.",
         "emptyAction": "New assignment"
       }
+    },
+    "grading": {
+      "notFound": "This assignment couldn't be found.",
+      "backToAssignments": "Back to assignments",
+      "emptyTitle": "No students yet",
+      "emptyDescription": "Students who join this class will appear here once the assignment is published.",
+      "table": {
+        "student": "Student",
+        "status": "Status",
+        "submittedAtHeader": "Submitted",
+        "score": "Score",
+        "scoreValue": "{score} pts",
+        "grade": "Grade",
+        "assigned": "Assigned",
+        "submitted": "Submitted",
+        "graded": "Graded",
+        "unnamedStudent": "Unnamed student"
+      },
+      "dialog": {
+        "title": "Grade submission",
+        "unnamedStudent": "Unnamed student",
+        "scoreLabel": "Score (out of {totalPoints})",
+        "feedbackLabel": "Feedback (optional)",
+        "feedbackPlaceholder": "Notes for the student",
+        "cancel": "Cancel",
+        "submitting": "Saving…",
+        "submit": "Save grade",
+        "noSubmission": "This student hasn't submitted yet.",
+        "errors": {
+          "scoreInvalid": "Enter a score of 0 or more.",
+          "scoreMax": "Score can't exceed the assignment's total points.",
+          "feedbackMax": "Feedback is too long."
+        }
+      }
     }
   },
   "classroom": {
@@ -729,7 +763,21 @@
       "notFound": "This assignment couldn't be found.",
       "backToAssignments": "Back to assignments",
       "due": "Due {date}",
-      "points": "{points, plural, =1 {# point} other {# points}}"
+      "points": "{points, plural, =1 {# point} other {# points}}",
+      "submission": {
+        "yourSubmission": "Your submission",
+        "gradedScore": "{score}/{totalPoints}",
+        "feedbackLabel": "Feedback from your teacher",
+        "submittedAt": "Submitted {date}",
+        "contentPlaceholder": "Write your submission here",
+        "submitting": "Submitting…",
+        "resubmit": "Resubmit",
+        "submit": "Submit",
+        "errors": {
+          "contentRequired": "Enter your submission before sending it.",
+          "contentMax": "Your submission is too long."
+        }
+      }
     }
   },
   "lessons": {

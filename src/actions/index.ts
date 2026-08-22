@@ -18,6 +18,7 @@ import { searchActions } from "./search";
 import { settingsActions } from "./settings";
 import { statisticsActions } from "./statistics";
 import { studySessionsActions } from "./study-sessions";
+import { submissionsActions } from "./submissions";
 import { subjectsActions } from "./subjects";
 import { tagsActions } from "./tags";
 import { teacherClassesActions } from "./teacher-classes";
@@ -50,4 +51,5 @@ export const Actions = {
   TeacherClasses: teacherClassesActions,
   Enrollments: enrollmentsActions,
   Assignments: assignmentsActions,
+  Submissions: submissionsActions,
 };

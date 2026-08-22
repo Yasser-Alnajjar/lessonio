@@ -50,6 +50,8 @@ export interface DataTableRowAction<TData> {
   label: string;
   onClick: (row: TData) => void;
   variant?: "default" | "destructive";
+  /** Omits this action from a given row's menu — e.g. "Grade" before a student has submitted. */
+  isHidden?: (row: TData) => boolean;
 }
 
 export interface DataTableProps<TData extends DataTableRowData> {

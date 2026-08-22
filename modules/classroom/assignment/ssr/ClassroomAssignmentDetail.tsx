@@ -9,7 +9,15 @@ export const ClassroomAssignmentDetail = async ({
   params,
 }: ClassroomAssignmentDetailProps) => {
   const { assignmentId } = await params;
-  const { data: assignment } = await Actions.Assignments.getById(assignmentId);
+  const [{ data: assignment }, { data: submission }] = await Promise.all([
+    Actions.Assignments.getById(assignmentId),
+    Actions.Submissions.getMine(assignmentId),
+  ]);
 
-  return <ClassroomAssignmentDetailView assignment={assignment} />;
+  return (
+    <ClassroomAssignmentDetailView
+      assignment={assignment}
+      submission={submission}
+    />
+  );
 };

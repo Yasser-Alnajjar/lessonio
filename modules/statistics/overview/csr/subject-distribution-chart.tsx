@@ -1,6 +1,13 @@
 "use client";
 
-import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
+import {
+  Cell,
+  Legend,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+} from "recharts";
 
 import { ChartCard } from "@/components/ui-system/chart-card";
 import useTranslate from "@/hooks/useTranslate";
@@ -10,7 +17,9 @@ interface SubjectDistributionChartProps {
   data: SubjectDistributionPoint[];
 }
 
-export function SubjectDistributionChart({ data }: SubjectDistributionChartProps) {
+export function SubjectDistributionChart({
+  data,
+}: SubjectDistributionChartProps) {
   const t = useTranslate("statistics.charts.subjectDistribution");
   const tCommon = useTranslate("common");
   const hasData = data.some((point) => point.value > 0);

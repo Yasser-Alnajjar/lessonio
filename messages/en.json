@@ -351,6 +351,7 @@
     "recentActivity": {
       "title": "Recent activity",
       "empty": "Your recent activity will show up here.",
+      "seeMore": "See more",
       "kinds": {
         "lesson_completed": "Completed",
         "note_added": "Added a note to",

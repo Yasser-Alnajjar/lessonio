@@ -351,6 +351,7 @@
     "recentActivity": {
       "title": "النشاط الأخير",
       "empty": "سيظهر نشاطك الأخير هنا.",
+      "seeMore": "اظهار المزيد",
       "kinds": {
         "lesson_completed": "أكملت",
         "note_added": "أضفت ملاحظة إلى",

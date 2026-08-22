@@ -72,8 +72,6 @@ export const DashboardOverviewView = ({ data }: DashboardOverviewViewProps) => {
         <RecentActivityCard items={recentActivity} />
       </div>
 
-      <QuickActionsCard />
-
       {assignedWork.length > 0 && (
         <AssignedWorkCard
           title={t("assignedWork.title")}
@@ -81,6 +79,7 @@ export const DashboardOverviewView = ({ data }: DashboardOverviewViewProps) => {
           assignments={assignedWork}
         />
       )}
+      <QuickActionsCard />
     </div>
   );
 };

@@ -36,9 +36,11 @@ export function createClassSchema(t: Translator) {
       .min(1, t("errors.daysRequired"))
       .refine(
         (entries) =>
-          new Set(entries.map((entry) => entry.dayOfWeek)).size === entries.length,
+          new Set(entries.map((entry) => entry.dayOfWeek)).size ===
+          entries.length,
         { message: t("errors.duplicateDay") },
       ),
     isActive: z.boolean().optional(),
+    teacherClassId: z.uuid().nullable().optional(),
   });
 }

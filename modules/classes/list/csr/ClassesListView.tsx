@@ -18,6 +18,7 @@ import useTranslate from "@/hooks/useTranslate";
 import { ATTENDANCE_STATUSES } from "@/lib/types/class-occurrence";
 import type { ClassOccurrenceWithRelations } from "@/lib/types/class-occurrence";
 import type { ClassWithSubject } from "@/lib/types/class";
+import type { EnrolledClass } from "@/lib/types/enrollment";
 import type { Subject } from "@/lib/types/subject";
 import { ClassActionsMenu } from "../../components/ClassActionsMenu";
 import { ClassFormDialog } from "../../components/ClassFormDialog";
@@ -30,6 +31,7 @@ interface ClassesListViewProps {
   upcoming: ClassOccurrenceWithRelations[];
   classes: ClassWithSubject[];
   subjects: Subject[];
+  enrolledClasses: EnrolledClass[];
 }
 
 interface FormState {
@@ -42,6 +44,7 @@ export const ClassesListView = ({
   upcoming,
   classes,
   subjects,
+  enrolledClasses,
 }: ClassesListViewProps) => {
   const t = useTranslate("classes");
   const router = useRouter();
@@ -265,6 +268,7 @@ export const ClassesListView = ({
         onOpenChange={(open) => setFormState((prev) => ({ ...prev, open }))}
         item={formState.item}
         subjects={subjects}
+        enrolledClasses={enrolledClasses}
         onSaved={() => router.refresh()}
       />
 

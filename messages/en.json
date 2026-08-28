@@ -477,7 +477,8 @@
       "active": "Active",
       "inactive": "Paused",
       "hoursSuffix": "h",
-      "minutesSuffix": "m"
+      "minutesSuffix": "m",
+      "linkedClass": "Linked to {name}"
     },
     "status": {
       "attendance": {
@@ -513,6 +514,9 @@
       "locationLabel": "Location",
       "locationPlaceholder": "e.g. ABC Center",
       "activeLabel": "Active",
+      "linkedClassLabel": "Link to a teacher's class (optional)",
+      "linkedClassNone": "Not linked",
+      "linkedClassHint": "Just for your own display — this doesn't change who can see this class.",
       "cancel": "Cancel",
       "submitting": "Saving...",
       "submitCreate": "Create class",
@@ -1268,7 +1272,9 @@
       "homework_due": "Homework due",
       "daily_reminder": "Daily reminder",
       "upcoming_class": "Upcoming class",
-      "review_reminder": "Review reminder"
+      "review_reminder": "Review reminder",
+      "assignment_assigned": "New assignment",
+      "assignment_graded": "Assignment graded"
     },
     "bell": {
       "label": "Notifications",
@@ -1382,7 +1388,8 @@
         "cancel": "Cancel",
         "confirm": "Delete my account",
         "deleting": "Deleting...",
-        "genericError": "Something went wrong. Please try again."
+        "genericError": "Something went wrong. Please try again.",
+        "teacherHasClasses": "You still have classes with enrolled students. Delete or transfer them first — deleting your account would also delete their submitted and graded work."
       }
     },
     "grades": {

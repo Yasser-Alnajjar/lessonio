@@ -84,6 +84,18 @@ export async function gradeSubmission(
     return { success: false, error: error.message };
   }
 
+  // Best-effort: a notification failure must never block the grade itself.
+  const { error: notifyError } = await supabase.rpc(
+    "notify_submission_graded",
+    { p_submission_id: submissionId },
+  );
+  if (notifyError) {
+    console.error("[gradeSubmission] notify_submission_graded failed", {
+      submissionId,
+      error: notifyError,
+    });
+  }
+
   revalidatePath("/", "layout");
   return { success: true, error: null };
 }

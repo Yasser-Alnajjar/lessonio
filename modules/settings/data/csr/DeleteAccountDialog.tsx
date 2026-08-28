@@ -41,6 +41,8 @@ export function DeleteAccountDialog({
       if (result.success) {
         router.push("/auth/login");
         router.refresh();
+      } else if (result.error === "teacher_has_classes") {
+        setError(t("teacherHasClasses"));
       } else {
         setError(result.error ?? t("genericError"));
       }

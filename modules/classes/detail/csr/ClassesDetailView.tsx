@@ -14,6 +14,7 @@ import { Link, useRouter } from "@/i18n/navigation";
 import { WEEKDAY_LABEL_KEYS } from "@/lib/constants/classes";
 import type { ClassWithSubject } from "@/lib/types/class";
 import type { ClassOccurrenceWithRelations } from "@/lib/types/class-occurrence";
+import type { EnrolledClass } from "@/lib/types/enrollment";
 import type { Subject } from "@/lib/types/subject";
 import { ClassFormDialog } from "../../components/ClassFormDialog";
 import { ClassOccurrenceStatusControls } from "../../components/ClassOccurrenceStatusControls";
@@ -23,12 +24,14 @@ interface ClassesDetailViewProps {
   data: ClassWithSubject | null;
   occurrences: ClassOccurrenceWithRelations[];
   subjects: Subject[];
+  enrolledClasses: EnrolledClass[];
 }
 
 export const ClassesDetailView = ({
   data,
   occurrences,
   subjects,
+  enrolledClasses,
 }: ClassesDetailViewProps) => {
   const t = useTranslations("classes.detail");
   const tDays = useTranslations("classes.days");
@@ -176,6 +179,7 @@ export const ClassesDetailView = ({
         onOpenChange={setEditOpen}
         item={data}
         subjects={subjects}
+        enrolledClasses={enrolledClasses}
         onSaved={() => router.refresh()}
       />
 

@@ -8,12 +8,17 @@ import { ClassesListView } from "../csr/ClassesListView";
  * classes listed underneath it.
  */
 export const ClassesList = async () => {
-  const [{ data: agenda }, { data: classes }, { data: subjects }] =
-    await Promise.all([
-      Actions.ClassOccurrences.getAgenda(),
-      Actions.Classes.getAll(),
-      Actions.Subjects.getAll(),
-    ]);
+  const [
+    { data: agenda },
+    { data: classes },
+    { data: subjects },
+    { data: enrolledClasses },
+  ] = await Promise.all([
+    Actions.ClassOccurrences.getAgenda(),
+    Actions.Classes.getAll(),
+    Actions.Subjects.getAll(),
+    Actions.Enrollments.getMyClasses(),
+  ]);
 
   return (
     <ClassesListView
@@ -21,6 +26,7 @@ export const ClassesList = async () => {
       upcoming={agenda?.upcoming ?? []}
       classes={classes ?? []}
       subjects={subjects ?? []}
+      enrolledClasses={enrolledClasses ?? []}
     />
   );
 };

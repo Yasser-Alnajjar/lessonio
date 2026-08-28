@@ -22,11 +22,9 @@ const SIGNED_OUT_ONLY_SEGMENTS = new Set<string>([
 ]);
 
 /**
- * Segment prefix -> the role required under it. Every prefix here needs the
- * same `profiles` fetch as the null-role check, so `isRoleRelevant()` below
- * folds them into one predicate. Gating on role alone, never an enrollment
- * count — an unenrolled student still loads every `classroom/*` route
- * normally.
+ * Segment prefix -> the role required under it. Gating on role alone, never
+ * an enrollment count — an unenrolled student still loads every
+ * `classroom/*` route normally.
  */
 const ROLE_PREFIXES: Record<string, AppRole> = {
   teaching: "teacher",
@@ -37,10 +35,9 @@ const ONBOARDING_SEGMENT = "onboarding/role";
 const ROLE_NEUTRAL_ENTRY = "home";
 
 /**
- * Whether resolving this request needs `profiles.role` at all. Ordinary
- * student routes (lessons, subjects, ...) never hit this, so they cost
- * exactly what they cost before role existed — the perf tradeoff behind
- * deferring the JWT custom-claim hook to Phase 5.
+ * Whether resolving this request needs a role at all. Ordinary student
+ * routes (lessons, subjects, ...) never hit this, so they cost exactly what
+ * they cost before role existed.
  */
 function isRoleRelevant(segment: string): boolean {
   if (segment === ROLE_NEUTRAL_ENTRY || segment === ONBOARDING_SEGMENT)
@@ -71,6 +68,62 @@ function isSafeNextPath(path: string): boolean {
   return (
     path.startsWith("/") && !path.startsWith("//") && !path.includes("://")
   );
+}
+
+function isAppRole(value: unknown): value is AppRole {
+  return value === "student" || value === "teacher";
+}
+
+type SupabaseMiddlewareClient = ReturnType<typeof createServerClient<Database>>;
+
+/**
+ * Resolves the signed-in user's role for a role-relevant request.
+ *
+ * Prefers the `user_role` JWT claim the custom access token hook (see
+ * `supabase/migrations/20260826130000_custom_access_token_hook.sql`) stamps
+ * onto the token once enabled in the Supabase Dashboard — that costs
+ * nothing beyond the token verification `updateSession()` already did via
+ * `getClaims()`. The hook stamps a genuinely unset role as JSON `null`,
+ * distinguishable from the claim being entirely absent (the hook isn't
+ * enabled yet, or this token predates it), which is the fallback case: the
+ * original `profiles` query, so this file degrades correctly whether or not
+ * the Dashboard step has been done.
+ */
+async function resolveRole(
+  supabase: SupabaseMiddlewareClient,
+  userId: string,
+  claims: Record<string, unknown> | null,
+  segment: string,
+): Promise<{ value: AppRole | null } | { error: true }> {
+  const claimedRole = claims?.user_role;
+
+  if (isAppRole(claimedRole)) {
+    return { value: claimedRole };
+  }
+  if (claimedRole === null) {
+    return { value: null };
+  }
+
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", userId)
+    .maybeSingle();
+
+  // A failed lookup (network blip, pooler timeout, RLS/auth mismatch, ...)
+  // is not the same as "row has no role" — treating it as null would send
+  // a user who genuinely has a role into onboarding whenever this query
+  // happens to fail. Fail open and log instead of misredirecting.
+  if (profileError) {
+    console.error("[middleware] profiles role lookup failed", {
+      userId,
+      segment,
+      error: profileError,
+    });
+    return { error: true };
+  }
+
+  return { value: (profile?.role ?? null) as AppRole | null };
 }
 
 /**
@@ -107,18 +160,23 @@ export async function updateSession(
     },
   );
 
-  // getUser() (not getSession()) revalidates the token against Supabase Auth
-  // on every call — required for middleware to trust the result.
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // getClaims() (not getSession()) is what makes this trustworthy in
+  // middleware: for this project's HS256-signed tokens it falls back to an
+  // Auth-server getUser() call internally, the same revalidation getUser()
+  // itself did — so identity verification costs exactly what it did before,
+  // and the decoded payload (including a `user_role` claim, once the access
+  // token hook is enabled) comes back as a side effect instead of requiring
+  // a second round trip.
+  const { data: claimsData } = await supabase.auth.getClaims();
+  const claims = claimsData?.claims ?? null;
+  const userId = claims?.sub ?? null;
 
   const pathname = request.nextUrl.pathname;
   const localePrefix = getLocalePrefix(pathname);
   const segment = stripLocale(pathname, localePrefix);
 
   if (
-    !user &&
+    !userId &&
     !PUBLIC_SEGMENTS.has(segment) &&
     !SIGNED_OUT_ONLY_SEGMENTS.has(segment)
   ) {
@@ -131,27 +189,11 @@ export async function updateSession(
     return NextResponse.redirect(url);
   }
 
-  if (user && isRoleRelevant(segment)) {
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .maybeSingle();
+  if (userId && isRoleRelevant(segment)) {
+    const resolved = await resolveRole(supabase, userId, claims, segment);
+    if ("error" in resolved) return response;
 
-    // A failed lookup (network blip, pooler timeout, RLS/auth mismatch, ...)
-    // is not the same as "row has no role" — treating it as null would send
-    // a user who genuinely has a role into onboarding whenever this query
-    // happens to fail. Fail open and log instead of misredirecting.
-    if (profileError) {
-      console.error("[middleware] profiles role lookup failed", {
-        userId: user.id,
-        segment,
-        error: profileError,
-      });
-      return response;
-    }
-
-    const role = (profile?.role ?? null) as AppRole | null;
+    const role = resolved.value;
 
     // A null role means onboarding was never finished (only reachable via
     // OAuth — see set_my_role() in the profiles_role migration). Every other
@@ -159,7 +201,7 @@ export async function updateSession(
     // must run first and short-circuit the rest.
     if (role === null && segment !== ONBOARDING_SEGMENT) {
       console.warn("[middleware] sending user to onboarding: no role found", {
-        userId: user.id,
+        userId,
         segment,
       });
       const url = request.nextUrl.clone();

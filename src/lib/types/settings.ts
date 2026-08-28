@@ -22,6 +22,8 @@ export const DEFAULT_NOTIFICATION_PREFERENCES: NotificationPreferences = {
     daily_reminder: true,
     upcoming_class: true,
     review_reminder: true,
+    assignment_assigned: true,
+    assignment_graded: true,
   },
 };
 

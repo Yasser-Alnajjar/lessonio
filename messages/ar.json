@@ -477,7 +477,8 @@
       "active": "نشطة",
       "inactive": "متوقفة",
       "hoursSuffix": "س",
-      "minutesSuffix": "د"
+      "minutesSuffix": "د",
+      "linkedClass": "مرتبطة بـ {name}"
     },
     "status": {
       "attendance": {
@@ -513,6 +514,9 @@
       "locationLabel": "المكان",
       "locationPlaceholder": "مثال: مركز ABC",
       "activeLabel": "نشطة",
+      "linkedClassLabel": "ربط بصف أحد المعلمين (اختياري)",
+      "linkedClassNone": "غير مرتبطة",
+      "linkedClassHint": "لعرضك الخاص فقط — لا يغيّر هذا من يمكنه رؤية هذه الحصة.",
       "cancel": "إلغاء",
       "submitting": "جارٍ الحفظ...",
       "submitCreate": "إنشاء الحصة",
@@ -1268,7 +1272,9 @@
       "homework_due": "واجب مستحق",
       "daily_reminder": "تذكير يومي",
       "upcoming_class": "حصة قادمة",
-      "review_reminder": "تذكير بالمراجعة"
+      "review_reminder": "تذكير بالمراجعة",
+      "assignment_assigned": "واجب جديد",
+      "assignment_graded": "تم تصحيح الواجب"
     },
     "bell": {
       "label": "الإشعارات",
@@ -1382,7 +1388,8 @@
         "cancel": "إلغاء",
         "confirm": "حذف حسابي",
         "deleting": "جارٍ الحذف...",
-        "genericError": "حدث خطأ ما. حاول مرة أخرى."
+        "genericError": "حدث خطأ ما. حاول مرة أخرى.",
+        "teacherHasClasses": "ما زال لديك صفوف بها طلاب مسجّلون. احذفها أو انقل ملكيتها أولاً — حذف حسابك سيحذف أيضًا ما قدّموه وما تم تصحيحه من واجبات."
       }
     },
     "grades": {

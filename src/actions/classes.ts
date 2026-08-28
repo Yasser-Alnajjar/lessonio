@@ -32,6 +32,7 @@ function mapClassRow(row: ClassRow): Class {
     // column already holds well-formed ClassMeeting objects.
     meetings: row.meetings as unknown as ClassMeeting[],
     isActive: row.is_active,
+    teacherClassId: row.teacher_class_id,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -40,6 +41,7 @@ function mapClassRow(row: ClassRow): Class {
 function withSubject(
   klass: Class,
   subjectsById: Map<string, SubjectSummary>,
+  teacherClassNamesById: Map<string, string>,
 ): ClassWithSubject {
   const subject = subjectsById.get(klass.subjectId);
   return {
@@ -47,6 +49,9 @@ function withSubject(
     subjectName: subject?.name ?? "Unknown subject",
     subjectColor: subject?.color ?? "#94a3b8",
     subjectIcon: subject?.icon ?? "book-open",
+    linkedTeacherClassName: klass.teacherClassId
+      ? (teacherClassNamesById.get(klass.teacherClassId) ?? null)
+      : null,
   };
 }
 
@@ -68,6 +73,25 @@ async function fetchSubjectsByIds(
       { name: row.name, color: row.color, icon: row.icon as SubjectIcon },
     ]),
   );
+}
+
+/**
+ * Fetches the names of a set of linked teacher_classes rows in one bulk
+ * query — no N+1s. Most students never link a class, so this is skipped
+ * entirely when nothing needs it.
+ */
+async function fetchTeacherClassNamesByIds(
+  supabase: SupabaseServerClient,
+  teacherClassIds: string[],
+): Promise<Map<string, string>> {
+  if (teacherClassIds.length === 0) return new Map();
+
+  const { data: rows } = await supabase
+    .from("teacher_classes")
+    .select("id, name")
+    .in("id", teacherClassIds);
+
+  return new Map((rows ?? []).map((row) => [row.id, row.name]));
 }
 
 /**
@@ -104,13 +128,23 @@ export const classesActions = {
       return { data: [], error: null };
     }
 
-    const subjectsById = await fetchSubjectsByIds(
-      supabase,
-      [...new Set(classes.map((klass) => klass.subjectId))],
-    );
+    const [subjectsById, teacherClassNamesById] = await Promise.all([
+      fetchSubjectsByIds(supabase, [
+        ...new Set(classes.map((klass) => klass.subjectId)),
+      ]),
+      fetchTeacherClassNamesByIds(supabase, [
+        ...new Set(
+          classes
+            .map((klass) => klass.teacherClassId)
+            .filter((id): id is string => id !== null),
+        ),
+      ]),
+    ]);
 
     return {
-      data: classes.map((klass) => withSubject(klass, subjectsById)),
+      data: classes.map((klass) =>
+        withSubject(klass, subjectsById, teacherClassNamesById),
+      ),
       error: null,
     };
   },
@@ -138,10 +172,16 @@ export const classesActions = {
     }
 
     const klass = mapClassRow(row);
-    const subjectsById = await fetchSubjectsByIds(supabase, [klass.subjectId]);
+    const [subjectsById, teacherClassNamesById] = await Promise.all([
+      fetchSubjectsByIds(supabase, [klass.subjectId]),
+      fetchTeacherClassNamesByIds(
+        supabase,
+        klass.teacherClassId ? [klass.teacherClassId] : [],
+      ),
+    ]);
 
     return {
-      data: withSubject(klass, subjectsById),
+      data: withSubject(klass, subjectsById, teacherClassNamesById),
       error: null,
     };
   },

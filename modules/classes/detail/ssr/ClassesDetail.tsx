@@ -13,18 +13,24 @@ interface ClassesDetailProps {
 export const ClassesDetail = async ({ params }: ClassesDetailProps) => {
   const { classId } = await params;
 
-  const [{ data: klass }, { data: occurrences }, { data: subjects }] =
-    await Promise.all([
-      Actions.Classes.getById(classId),
-      Actions.ClassOccurrences.getAll({ classId }),
-      Actions.Subjects.getAll(),
-    ]);
+  const [
+    { data: klass },
+    { data: occurrences },
+    { data: subjects },
+    { data: enrolledClasses },
+  ] = await Promise.all([
+    Actions.Classes.getById(classId),
+    Actions.ClassOccurrences.getAll({ classId }),
+    Actions.Subjects.getAll(),
+    Actions.Enrollments.getMyClasses(),
+  ]);
 
   return (
     <ClassesDetailView
       data={klass}
       occurrences={occurrences ?? []}
       subjects={subjects ?? []}
+      enrolledClasses={enrolledClasses ?? []}
     />
   );
 };

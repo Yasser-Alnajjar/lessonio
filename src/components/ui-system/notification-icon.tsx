@@ -1,6 +1,13 @@
 "use client";
 
-import { BellRing, CalendarClock, ClipboardList, RotateCcw, Users } from "lucide-react";
+import {
+  BellRing,
+  CalendarClock,
+  CheckCircle2,
+  ClipboardList,
+  RotateCcw,
+  Users,
+} from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import type { NotificationType } from "@/lib/types/notification";
@@ -28,6 +35,14 @@ const TYPE_META: Record<
   },
   review_reminder: {
     icon: RotateCcw,
+    className: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+  },
+  assignment_assigned: {
+    icon: ClipboardList,
+    className: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400",
+  },
+  assignment_graded: {
+    icon: CheckCircle2,
     className: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
   },
 };

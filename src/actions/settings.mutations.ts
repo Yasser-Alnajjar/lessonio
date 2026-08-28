@@ -13,7 +13,10 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import type { ActionResult, MutationResult } from "@/lib/types/common";
 import type { GradeScaleEntry } from "@/lib/types/grade";
-import type { NotificationPreferences, UserDataExport } from "@/lib/types/settings";
+import type {
+  NotificationPreferences,
+  UserDataExport,
+} from "@/lib/types/settings";
 
 const MAX_GRADE_POINTS = 4.3;
 
@@ -37,7 +40,9 @@ function isValidGradeScale(scale: GradeScaleEntry[]): boolean {
   });
 }
 
-export async function updateGradeScale(scale: GradeScaleEntry[]): Promise<MutationResult> {
+export async function updateGradeScale(
+  scale: GradeScaleEntry[],
+): Promise<MutationResult> {
   const supabase = await createClient();
   const { data: authData, error: authError } = await supabase.auth.getUser();
 
@@ -200,6 +205,26 @@ export async function deleteAccount(): Promise<MutationResult> {
 
   if (authError || !authData.user) {
     return { success: false, error: "You must be signed in." };
+  }
+
+  // A teacher's account cascades teacher_classes -> assignments ->
+  // assignment_submissions on delete (see 20260823120000_teacher_classes.sql
+  // and 20260825120000_assignment_submissions.sql), which would destroy
+  // students' submitted and graded work along with it. Block instead of
+  // silently cascading — the teacher must delete their classes first, which
+  // makes the loss visible and deliberate rather than a side effect of
+  // deleting their own account. Independent students and teacher-connected
+  // students are never affected: this count is always zero for them.
+  const { count: classCount, error: classCountError } = await supabase
+    .from("teacher_classes")
+    .select("id", { count: "exact", head: true })
+    .eq("teacher_id", authData.user.id);
+
+  if (classCountError) {
+    return { success: false, error: classCountError.message };
+  }
+  if (classCount && classCount > 0) {
+    return { success: false, error: "teacher_has_classes" };
   }
 
   const admin = createAdminClient();

@@ -11,7 +11,12 @@ import {
   upcomingClassCopy,
   upcomingLessonCopy,
 } from "@/lib/notifications/copy";
-import { addDays, daysBetween, localClock, localIsoDate } from "@/lib/notifications/dates";
+import {
+  addDays,
+  daysBetween,
+  localClock,
+  localIsoDate,
+} from "@/lib/notifications/dates";
 import { renderNotificationEmail } from "@/lib/notifications/email-template";
 import { parseNotificationPreferences } from "@/lib/notifications/preferences";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -21,8 +26,10 @@ import type { NotificationType } from "@/lib/types/notification";
 import type { AppLocale } from "@/i18n/routing";
 
 type AdminClient = ReturnType<typeof createAdminClient>;
-type NotificationInsert = Database["public"]["Tables"]["notifications"]["Insert"];
-type ClassOccurrenceInsert = Database["public"]["Tables"]["class_occurrences"]["Insert"];
+type NotificationInsert =
+  Database["public"]["Tables"]["notifications"]["Insert"];
+type ClassOccurrenceInsert =
+  Database["public"]["Tables"]["class_occurrences"]["Insert"];
 
 /** Lessons this far ahead of a user's local "today" produce an upcoming-lesson notice. */
 const UPCOMING_LESSON_DAYS = 1;
@@ -51,7 +58,9 @@ export interface NotificationsJobSummary {
   errors: string[];
 }
 
-function groupByUser<T extends { user_id: string }>(rows: T[]): Map<string, T[]> {
+function groupByUser<T extends { user_id: string }>(
+  rows: T[],
+): Map<string, T[]> {
   const grouped = new Map<string, T[]>();
 
   for (const row of rows) {
@@ -87,18 +96,26 @@ function groupByUser<T extends { user_id: string }>(rows: T[]): Map<string, T[]>
  */
 export async function runScheduledNotificationsJob(): Promise<NotificationsJobSummary> {
   const supabase = createAdminClient();
-  const summary: NotificationsJobSummary = { scanned: 0, created: 0, emailed: 0, errors: [] };
+  const summary: NotificationsJobSummary = {
+    scanned: 0,
+    created: 0,
+    emailed: 0,
+    errors: [],
+  };
 
   const cutoff = new Date(Date.now() - REFRESH_INTERVAL_MS).toISOString();
   const staleFilter = `notifications_generated_at.is.null,notifications_generated_at.lt.${cutoff}`;
 
-  const [{ data: staleRows, error: settingsError }, { data: profileRows }] = await Promise.all([
-    supabase
-      .from("settings")
-      .select("user_id, locale, notification_preferences, notifications_generated_at")
-      .or(staleFilter),
-    supabase.from("profiles").select("id, timezone"),
-  ]);
+  const [{ data: staleRows, error: settingsError }, { data: profileRows }] =
+    await Promise.all([
+      supabase
+        .from("settings")
+        .select(
+          "user_id, locale, notification_preferences, notifications_generated_at",
+        )
+        .or(staleFilter),
+      supabase.from("profiles").select("id, timezone, role"),
+    ]);
 
   if (settingsError) {
     summary.errors.push(`settings: ${settingsError.message}`);
@@ -109,11 +126,21 @@ export async function runScheduledNotificationsJob(): Promise<NotificationsJobSu
   summary.scanned = staleUsers.length;
   if (staleUsers.length === 0) return summary;
 
-  const timezones = new Map((profileRows ?? []).map((row) => [row.id, row.timezone]));
+  const timezones = new Map(
+    (profileRows ?? []).map((row) => [row.id, row.timezone]),
+  );
+  const roles = new Map((profileRows ?? []).map((row) => [row.id, row.role]));
 
   // Claim every stale user up front: an .in() + still-stale filter, so a
   // bell poll racing this sweep for the same user leaves exactly one of them
-  // holding the row.
+  // holding the row. Teachers are claimed too (their throttle stamp still
+  // needs refreshing, or they'd get rescanned every tick forever) but are
+  // filtered out below, before the expensive per-type queries — a teacher
+  // structurally has none of lessons/homework/classes/reviews, so scanning
+  // for them was always wasted work, and unconditionally adding a
+  // "daily_reminder" at the end of the loop was actively wrong: it produced
+  // a spurious "nothing scheduled today" notification for every teacher on
+  // every stale cycle.
   const { data: claimedRows } = await supabase
     .from("settings")
     .update({ notifications_generated_at: new Date().toISOString() })
@@ -125,7 +152,10 @@ export async function runScheduledNotificationsJob(): Promise<NotificationsJobSu
     .select("user_id");
 
   const claimedIds = new Set((claimedRows ?? []).map((row) => row.user_id));
-  const users = staleUsers.filter((row) => claimedIds.has(row.user_id));
+  const users = staleUsers.filter(
+    (row) =>
+      claimedIds.has(row.user_id) && roles.get(row.user_id) !== "teacher",
+  );
   if (users.length === 0) return summary;
 
   const now = new Date();
@@ -173,13 +203,17 @@ export async function runScheduledNotificationsJob(): Promise<NotificationsJobSu
       .order("date", { ascending: false }),
     supabase
       .from("class_occurrences")
-      .select("id, user_id, subject_id, start_time, date, classes (teacher, location)")
+      .select(
+        "id, user_id, subject_id, start_time, date, classes (teacher, location)",
+      )
       .in("user_id", userIds)
       .gte("date", windowStart)
       .lte("date", lessonWindowEnd),
   ]);
 
-  const subjectNames = new Map((subjectRows ?? []).map((row) => [row.id, row.name]));
+  const subjectNames = new Map(
+    (subjectRows ?? []).map((row) => [row.id, row.name]),
+  );
   const lessonsByUser = groupByUser(lessonRows ?? []);
   const homeworkByUser = groupByUser(homeworkRows ?? []);
   const reviewsByUser = groupByUser(reviewRows ?? []);
@@ -187,13 +221,15 @@ export async function runScheduledNotificationsJob(): Promise<NotificationsJobSu
 
   const emailRecipients = new Map<string, string>();
   const wantsEmail = users.some(
-    (row) => parseNotificationPreferences(row.notification_preferences).enabledInEmail,
+    (row) =>
+      parseNotificationPreferences(row.notification_preferences).enabledInEmail,
   );
 
   if (wantsEmail) {
-    const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers({
-      perPage: 1000,
-    });
+    const { data: authUsers, error: authError } =
+      await supabase.auth.admin.listUsers({
+        perPage: 1000,
+      });
 
     if (authError) {
       summary.errors.push(`auth.listUsers: ${authError.message}`);
@@ -206,15 +242,22 @@ export async function runScheduledNotificationsJob(): Promise<NotificationsJobSu
 
   for (const settings of users) {
     const userId = settings.user_id;
-    const preferences = parseNotificationPreferences(settings.notification_preferences);
+    const preferences = parseNotificationPreferences(
+      settings.notification_preferences,
+    );
     const locale = resolveLocale(settings.locale);
     const timezone = timezones.get(userId) ?? null;
     const today = localIsoDate(now, timezone);
     const subjectNameOf = (id: string) =>
-      subjectNames.get(id) ?? (locale === "ar" ? "مادة غير معروفة" : "Unknown subject");
+      subjectNames.get(id) ??
+      (locale === "ar" ? "مادة غير معروفة" : "Unknown subject");
 
     const pending: NotificationInsert[] = [];
-    const add = (type: NotificationType, dedupeKey: string, copy: NotificationCopy) => {
+    const add = (
+      type: NotificationType,
+      dedupeKey: string,
+      copy: NotificationCopy,
+    ) => {
       if (!preferences.types[type]) return;
       pending.push({
         user_id: userId,
@@ -226,10 +269,12 @@ export async function runScheduledNotificationsJob(): Promise<NotificationsJobSu
       });
     };
 
-    const lessonsForUser = (lessonsByUser.get(userId) ?? []).filter((lesson) => {
-      const daysAway = daysBetween(today, lesson.date);
-      return daysAway >= 0 && daysAway <= UPCOMING_LESSON_DAYS;
-    });
+    const lessonsForUser = (lessonsByUser.get(userId) ?? []).filter(
+      (lesson) => {
+        const daysAway = daysBetween(today, lesson.date);
+        return daysAway >= 0 && daysAway <= UPCOMING_LESSON_DAYS;
+      },
+    );
 
     for (const lesson of lessonsForUser) {
       add(
@@ -281,9 +326,12 @@ export async function runScheduledNotificationsJob(): Promise<NotificationsJobSu
     );
 
     for (const occurrence of classesToday) {
-      const [hours = 0, minutes = 0] = occurrence.start_time.split(":").map(Number);
+      const [hours = 0, minutes = 0] = occurrence.start_time
+        .split(":")
+        .map(Number);
       const minutesUntil = hours * 60 + minutes - clock.minutesOfDay;
-      if (minutesUntil < 0 || minutesUntil > UPCOMING_CLASS_LEAD_MINUTES) continue;
+      if (minutesUntil < 0 || minutesUntil > UPCOMING_CLASS_LEAD_MINUTES)
+        continue;
 
       add(
         "upcoming_class",
@@ -297,12 +345,17 @@ export async function runScheduledNotificationsJob(): Promise<NotificationsJobSu
       );
     }
 
-    const lessonsToday = lessonsForUser.filter((lesson) => lesson.date === today).length;
+    const lessonsToday = lessonsForUser.filter(
+      (lesson) => lesson.date === today,
+    ).length;
 
     add(
       "daily_reminder",
       `daily_reminder:${today}`,
-      dailyReminderCopy(locale, { lessonCount: lessonsToday, dueCount: dueSoon.length }),
+      dailyReminderCopy(locale, {
+        lessonCount: lessonsToday,
+        dueCount: dueSoon.length,
+      }),
     );
 
     if (pending.length === 0) continue;
@@ -312,7 +365,10 @@ export async function runScheduledNotificationsJob(): Promise<NotificationsJobSu
     // genuinely new — exactly the set that should trigger an email.
     const { data: inserted, error: insertError } = await supabase
       .from("notifications")
-      .upsert(pending, { onConflict: "user_id,dedupe_key", ignoreDuplicates: true })
+      .upsert(pending, {
+        onConflict: "user_id,dedupe_key",
+        ignoreDuplicates: true,
+      })
       .select("id, type, title, body, link_path");
 
     if (insertError) {
@@ -328,7 +384,12 @@ export async function runScheduledNotificationsJob(): Promise<NotificationsJobSu
     const recipient = emailRecipients.get(userId);
     if (!recipient) continue;
 
-    summary.emailed += await emailNotifications(supabase, recipient, locale, created);
+    summary.emailed += await emailNotifications(
+      supabase,
+      recipient,
+      locale,
+      created,
+    );
   }
 
   return summary;
@@ -365,7 +426,9 @@ async function materializeTodayOccurrences(
     // The `classes_meetings_valid` DB constraint guarantees this JSONB
     // column already holds well-formed ClassMeeting objects.
     const meetings = klass.meetings as unknown as ClassMeeting[];
-    const meeting = meetings.find((candidate) => candidate.dayOfWeek === weekday);
+    const meeting = meetings.find(
+      (candidate) => candidate.dayOfWeek === weekday,
+    );
     if (!meeting) continue;
 
     rows.push({
@@ -406,7 +469,10 @@ async function emailNotifications(
   const delivered: string[] = [];
 
   for (const notification of notifications) {
-    const label = notificationTypeLabel(notification.type as NotificationType, locale);
+    const label = notificationTypeLabel(
+      notification.type as NotificationType,
+      locale,
+    );
     const result = await sendEmail({
       to: recipient,
       subject: `${label} — ${notification.title}`,

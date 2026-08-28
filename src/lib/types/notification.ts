@@ -6,6 +6,8 @@ export const NOTIFICATION_TYPES = [
   "daily_reminder",
   "upcoming_class",
   "review_reminder",
+  "assignment_assigned",
+  "assignment_graded",
 ] as const;
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number];
 

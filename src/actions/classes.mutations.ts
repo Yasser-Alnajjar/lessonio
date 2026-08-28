@@ -55,6 +55,9 @@ export async function createClass(
     // for named interfaces.
     meetings: input.meetings as unknown as Json,
     ...(input.isActive !== undefined ? { is_active: input.isActive } : {}),
+    ...(input.teacherClassId !== undefined
+      ? { teacher_class_id: input.teacherClassId }
+      : {}),
   });
 
   if (error) {
@@ -82,6 +85,8 @@ export async function updateClass(
   if (input.meetings !== undefined)
     patch.meetings = input.meetings as unknown as Json;
   if (input.isActive !== undefined) patch.is_active = input.isActive;
+  if (input.teacherClassId !== undefined)
+    patch.teacher_class_id = input.teacherClassId;
 
   if (Object.keys(patch).length === 0) {
     return { success: true, error: null };

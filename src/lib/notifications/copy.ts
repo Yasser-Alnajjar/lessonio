@@ -50,7 +50,9 @@ interface UpcomingClassParams {
 }
 
 export function resolveLocale(value: string | null | undefined): AppLocale {
-  return locales.includes(value as AppLocale) ? (value as AppLocale) : defaultLocale;
+  return locales.includes(value as AppLocale)
+    ? (value as AppLocale)
+    : defaultLocale;
 }
 
 export function upcomingLessonCopy(
@@ -78,7 +80,11 @@ export function homeworkDueCopy(
 ): NotificationCopy {
   if (locale === "ar") {
     const when =
-      daysUntilDue <= 0 ? "اليوم" : daysUntilDue === 1 ? "غدًا" : `خلال ${daysUntilDue} أيام`;
+      daysUntilDue <= 0
+        ? "اليوم"
+        : daysUntilDue === 1
+          ? "غدًا"
+          : `خلال ${daysUntilDue} أيام`;
 
     return {
       title: daysUntilDue <= 0 ? "واجب مستحق اليوم" : "واجب قارب موعده",
@@ -88,7 +94,11 @@ export function homeworkDueCopy(
   }
 
   const when =
-    daysUntilDue <= 0 ? "today" : daysUntilDue === 1 ? "tomorrow" : `in ${daysUntilDue} days`;
+    daysUntilDue <= 0
+      ? "today"
+      : daysUntilDue === 1
+        ? "tomorrow"
+        : `in ${daysUntilDue} days`;
 
   return {
     title: daysUntilDue <= 0 ? "Homework due today" : "Homework due soon",
@@ -108,13 +118,17 @@ export function dailyReminderCopy(
 
     return {
       title: "ملخص اليوم",
-      body: parts.length > 0 ? `لديك ${parts.join(" و")} اليوم.` : "لا شيء مجدول اليوم — وقت ممتاز للمراجعة.",
+      body:
+        parts.length > 0
+          ? `لديك ${parts.join(" و")} اليوم.`
+          : "لا شيء مجدول اليوم — وقت ممتاز للمراجعة.",
       linkPath: "/dashboard/overview",
     };
   }
 
   const parts: string[] = [];
-  if (lessonCount > 0) parts.push(`${lessonCount} lesson${lessonCount === 1 ? "" : "s"}`);
+  if (lessonCount > 0)
+    parts.push(`${lessonCount} lesson${lessonCount === 1 ? "" : "s"}`);
   if (dueCount > 0) parts.push(`${dueCount} homework due`);
 
   return {
@@ -156,12 +170,17 @@ export function upcomingClassCopy(
     const when = minutesUntil <= 0 ? "الآن" : `خلال ${minutesUntil} دقيقة`;
     return {
       title: "حصة قادمة",
-      body: details ? `${subjectName} تبدأ ${when} — ${details}.` : `${subjectName} تبدأ ${when}.`,
+      body: details
+        ? `${subjectName} تبدأ ${when} — ${details}.`
+        : `${subjectName} تبدأ ${when}.`,
       linkPath: "/classes/list",
     };
   }
 
-  const when = minutesUntil <= 0 ? "now" : `in ${minutesUntil} minute${minutesUntil === 1 ? "" : "s"}`;
+  const when =
+    minutesUntil <= 0
+      ? "now"
+      : `in ${minutesUntil} minute${minutesUntil === 1 ? "" : "s"}`;
   return {
     title: "Upcoming class",
     body: details
@@ -179,6 +198,8 @@ const TYPE_LABELS: Record<AppLocale, Record<NotificationType, string>> = {
     daily_reminder: "Daily reminder",
     upcoming_class: "Upcoming class",
     review_reminder: "Review reminder",
+    assignment_assigned: "New assignment",
+    assignment_graded: "Assignment graded",
   },
   ar: {
     upcoming_lesson: "درس قادم",
@@ -186,9 +207,14 @@ const TYPE_LABELS: Record<AppLocale, Record<NotificationType, string>> = {
     daily_reminder: "تذكير يومي",
     upcoming_class: "حصة قادمة",
     review_reminder: "تذكير بالمراجعة",
+    assignment_assigned: "واجب جديد",
+    assignment_graded: "تم تصحيح الواجب",
   },
 };
 
-export function notificationTypeLabel(type: NotificationType, locale: AppLocale): string {
+export function notificationTypeLabel(
+  type: NotificationType,
+  locale: AppLocale,
+): string {
   return TYPE_LABELS[locale][type];
 }

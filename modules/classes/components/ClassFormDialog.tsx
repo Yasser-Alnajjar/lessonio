@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
-import { useMutation } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocale, useTranslations } from "next-intl";
 import { Plus, Trash2 } from "lucide-react";
@@ -43,24 +42,28 @@ import type {
   CreateClassInput,
   CreateClassMeetingInput,
 } from "@/lib/types/class";
+import type { EnrolledClass } from "@/lib/types/enrollment";
 import type { Subject } from "@/lib/types/subject";
+
+const NO_LINKED_CLASS = "none";
 
 export interface ClassFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   item?: ClassWithSubject | null;
   subjects: Subject[];
+  enrolledClasses?: EnrolledClass[];
   onSaved?: () => void;
 }
 
 function defaultMeeting(): CreateClassMeetingInput {
-  return { dayOfWeek: WEEKDAYS[0], startTime: "16:00", durationMinutes: 60 };
+  return {
+    dayOfWeek: WEEKDAYS[0],
+    startTime: "16:00",
+    durationMinutes: 60,
+  };
 }
 
-/**
- * A class recurs weekly for as long as it exists, so there is no start or end
- * date to collect here — `isActive` is what pauses it.
- */
 function defaultValues(subjects: Subject[]): CreateClassInput {
   return {
     subjectId: subjects[0]?.id ?? "",
@@ -68,6 +71,7 @@ function defaultValues(subjects: Subject[]): CreateClassInput {
     location: "",
     meetings: [defaultMeeting()],
     isActive: true,
+    teacherClassId: null,
   };
 }
 
@@ -76,6 +80,7 @@ export function ClassFormDialog({
   onOpenChange,
   item,
   subjects,
+  enrolledClasses = [],
   onSaved,
 }: ClassFormDialogProps) {
   const t = useTranslations("classes.form");
@@ -83,7 +88,9 @@ export function ClassFormDialog({
   const locale = useLocale();
   const isArabic = locale === "ar";
   const isEdit = Boolean(item);
+
   const [formError, setFormError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const schema = useMemo(() => createClassSchema(t), [t]);
 
@@ -98,10 +105,13 @@ export function ClassFormDialog({
   });
 
   const [wasOpen, setWasOpen] = useState(open);
+
   if (open !== wasOpen) {
     setWasOpen(open);
+
     if (open) {
       setFormError(null);
+
       form.reset(
         item
           ? {
@@ -114,28 +124,35 @@ export function ClassFormDialog({
                 durationMinutes: meeting.durationMinutes,
               })),
               isActive: item.isActive,
+              teacherClassId: item.teacherClassId,
             }
           : defaultValues(subjects),
       );
     }
   }
 
-  const mutation = useMutation({
-    mutationFn: (values: CreateClassInput) =>
-      isEdit && item ? updateClass(item.id, values) : createClass(values),
-    onSuccess: (result) => {
+  const onSubmit = form.handleSubmit(async (values) => {
+    setFormError(null);
+    setIsSubmitting(true);
+
+    try {
+      const result =
+        isEdit && item
+          ? await updateClass(item.id, values)
+          : await createClass(values);
+
       if (!result.success) {
         setFormError(result.error);
         return;
       }
+
       onOpenChange(false);
       onSaved?.();
-    },
-  });
-
-  const onSubmit = form.handleSubmit((values) => {
-    setFormError(null);
-    mutation.mutate(values);
+    } catch {
+      setFormError(t("genericError"));
+    } finally {
+      setIsSubmitting(false);
+    }
   });
 
   const meetingsError =
@@ -143,7 +160,14 @@ export function ClassFormDialog({
     form.formState.errors.meetings?.message;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={(nextOpen) => {
+        if (!isSubmitting) {
+          onOpenChange(nextOpen);
+        }
+      }}
+    >
       <DialogContent
         className="max-h-[90vh] overflow-y-auto sm:max-w-lg"
         dir={isArabic ? "rtl" : "ltr"}
@@ -152,6 +176,7 @@ export function ClassFormDialog({
           <DialogTitle className="w-fit">
             {isEdit ? t("editTitle") : t("createTitle")}
           </DialogTitle>
+
           <DialogDescription className="w-fit">
             {isEdit ? t("editDescription") : t("createDescription")}
           </DialogDescription>
@@ -165,6 +190,7 @@ export function ClassFormDialog({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t("subjectLabel")}</FormLabel>
+
                   <Select
                     value={field.value}
                     onValueChange={field.onChange}
@@ -175,6 +201,7 @@ export function ClassFormDialog({
                         <SelectValue placeholder={t("subjectPlaceholder")} />
                       </SelectTrigger>
                     </FormControl>
+
                     <SelectContent>
                       {subjects.map((subject) => (
                         <SelectItem key={subject.id} value={subject.id}>
@@ -187,6 +214,7 @@ export function ClassFormDialog({
                       ))}
                     </SelectContent>
                   </Select>
+
                   <FormMessage />
                 </FormItem>
               )}
@@ -208,6 +236,7 @@ export function ClassFormDialog({
                         <FormLabel className="text-xs font-normal text-muted-foreground">
                           {t("dayLabel")}
                         </FormLabel>
+
                         <Select
                           value={String(field.value)}
                           onValueChange={(value) =>
@@ -220,6 +249,7 @@ export function ClassFormDialog({
                               <SelectValue />
                             </SelectTrigger>
                           </FormControl>
+
                           <SelectContent>
                             {WEEKDAYS.map((day) => (
                               <SelectItem key={day} value={String(day)}>
@@ -228,6 +258,7 @@ export function ClassFormDialog({
                             ))}
                           </SelectContent>
                         </Select>
+
                         <FormMessage />
                       </FormItem>
                     )}
@@ -241,9 +272,11 @@ export function ClassFormDialog({
                         <FormLabel className="text-xs font-normal text-muted-foreground">
                           {t("startTimeLabel")}
                         </FormLabel>
+
                         <FormControl>
                           <Input type="time" {...field} />
                         </FormControl>
+
                         <FormMessage />
                       </FormItem>
                     )}
@@ -257,6 +290,7 @@ export function ClassFormDialog({
                         <FormLabel className="text-xs font-normal text-muted-foreground">
                           {t("durationLabel")}
                         </FormLabel>
+
                         <FormControl>
                           <Input
                             type="number"
@@ -267,6 +301,7 @@ export function ClassFormDialog({
                             }
                           />
                         </FormControl>
+
                         <FormMessage />
                       </FormItem>
                     )}
@@ -277,7 +312,7 @@ export function ClassFormDialog({
                     variant="ghost"
                     size="icon"
                     aria-label={t("removeDay")}
-                    disabled={fields.length === 1}
+                    disabled={fields.length === 1 || isSubmitting}
                     className="mt-1 shrink-0 self-end sm:self-start"
                     onClick={() => remove(index)}
                   >
@@ -300,6 +335,7 @@ export function ClassFormDialog({
                 variant="outline"
                 size="sm"
                 className="w-fit"
+                disabled={isSubmitting}
                 onClick={() => append(defaultMeeting())}
               >
                 <Plus />
@@ -321,6 +357,7 @@ export function ClassFormDialog({
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="location"
@@ -347,15 +384,65 @@ export function ClassFormDialog({
                   <FormLabel className="cursor-pointer">
                     {t("activeLabel")}
                   </FormLabel>
+
                   <FormControl>
                     <Switch
                       checked={field.value ?? true}
                       onCheckedChange={field.onChange}
+                      disabled={isSubmitting}
                     />
                   </FormControl>
                 </FormItem>
               )}
             />
+
+            {enrolledClasses.length > 0 && (
+              <FormField
+                control={form.control}
+                name="teacherClassId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("linkedClassLabel")}</FormLabel>
+
+                    <Select
+                      value={field.value ?? NO_LINKED_CLASS}
+                      onValueChange={(value) =>
+                        field.onChange(value === NO_LINKED_CLASS ? null : value)
+                      }
+                      dir={isArabic ? "rtl" : "ltr"}
+                      disabled={isSubmitting}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="w-full">
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+
+                      <SelectContent>
+                        <SelectItem value={NO_LINKED_CLASS}>
+                          {t("linkedClassNone")}
+                        </SelectItem>
+
+                        {enrolledClasses.map((klass) => (
+                          <SelectItem
+                            key={klass.teacherClassId}
+                            value={klass.teacherClassId}
+                          >
+                            {klass.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    <p className="text-xs text-muted-foreground">
+                      {t("linkedClassHint")}
+                    </p>
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
 
             {formError && (
               <p role="alert" className="text-sm font-medium text-destructive">
@@ -367,16 +454,19 @@ export function ClassFormDialog({
               <Button
                 type="button"
                 variant="outline"
+                disabled={isSubmitting}
                 onClick={() => onOpenChange(false)}
               >
                 {t("cancel")}
               </Button>
+
               <Button
                 type="submit"
-                disabled={mutation.isPending || subjects.length === 0}
+                disabled={isSubmitting || subjects.length === 0}
               >
-                {mutation.isPending && <LessonioSpinner />}
-                {mutation.isPending
+                {isSubmitting && <LessonioSpinner />}
+
+                {isSubmitting
                   ? t("submitting")
                   : isEdit
                     ? t("submitEdit")

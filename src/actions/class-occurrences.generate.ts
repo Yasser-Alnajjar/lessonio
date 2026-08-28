@@ -178,14 +178,18 @@ export async function resetClassOccurrencesMaterializedAt(
 }
 
 /**
- * Called after a class is edited or deactivated: removes the *future,
+ * Called after a class is edited or deactivated: removes the *today-or-later,
  * untouched* occurrences it generated, so the next
  * `ensureClassOccurrencesForUser()` re-materializes them from the new shape.
  * An occurrence counts as untouched only when nothing has been recorded
  * against it — attendance still unset, no exam status, and no lesson linked
  * back to it — so a class the student already marked attended (or tied a
- * lesson to) is never silently deleted. Past occurrences are never touched,
- * recorded or not.
+ * lesson to) is never silently deleted. Today is included (not just strictly
+ * future dates): `start_time`/`duration_minutes`/`subject_id` are snapshotted
+ * onto the occurrence at materialization time, so without this, editing a
+ * class today leaves its still-untouched "Today" card showing the old
+ * values until the day rolls over. Strictly-past occurrences are never
+ * touched, recorded or not.
  *
  * Deleting a class needs no call here: the occurrences cascade with it.
  */
@@ -199,7 +203,7 @@ export async function deleteFutureUntouchedOccurrences(
     .from("class_occurrences")
     .select("id")
     .eq("class_id", classId)
-    .gt("date", todayIso)
+    .gte("date", todayIso)
     .is("attendance_status", null)
     .eq("exam_status", "none");
 

@@ -37,12 +37,22 @@ export interface Class extends AuditFields {
   location: string | null;
   meetings: ClassMeeting[];
   isActive: boolean;
+  /**
+   * Optional link to a `teacher_classes` row the student is enrolled in —
+   * purely informational, set by the student themselves. Never implies the
+   * reverse: most `Class` rows have this `null`, including every one that
+   * existed before a student ever joined a teacher's class. See
+   * `supabase/migrations/20260826140000_classes_teacher_link.sql`.
+   */
+  teacherClassId: UUID | null;
 }
 
 export interface ClassWithSubject extends Class {
   subjectName: string;
   subjectColor: string;
   subjectIcon: SubjectIcon;
+  /** Name of the linked teacher_classes row, resolved for display; null unless teacherClassId is set. */
+  linkedTeacherClassName: string | null;
 }
 
 export interface CreateClassMeetingInput {
@@ -66,6 +76,8 @@ export interface CreateClassInput {
   meetings: CreateClassMeetingInput[];
   /** Defaults to `true` (the DB column default) when omitted. */
   isActive?: boolean;
+  /** Omitted or `undefined` leaves it unset/unchanged; `null` explicitly clears an existing link. */
+  teacherClassId?: UUID | null;
 }
 
 export type UpdateClassInput = Partial<CreateClassInput>;

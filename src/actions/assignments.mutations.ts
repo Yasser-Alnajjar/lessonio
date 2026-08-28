@@ -97,6 +97,19 @@ export async function publishAssignment(id: string): Promise<MutationResult> {
     return { success: false, error: error.message };
   }
 
+  // Best-effort: a notification failure must never block the publish itself
+  // (the assignment is already live for students either way).
+  const { error: notifyError } = await supabase.rpc(
+    "notify_assignment_published",
+    { p_assignment_id: id },
+  );
+  if (notifyError) {
+    console.error("[publishAssignment] notify_assignment_published failed", {
+      assignmentId: id,
+      error: notifyError,
+    });
+  }
+
   revalidatePath("/", "layout");
   return { success: true, error: null };
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { format, parse } from "date-fns";
-import { MapPin, User } from "lucide-react";
+import { Link2, MapPin, User } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { Badge } from "@/components/ui/badge";
@@ -122,6 +122,12 @@ export function RecurringClassCard({
                 </span>
               )}
             </div>
+          )}
+          {item.linkedTeacherClassName && (
+            <span className="mt-1 inline-flex w-fit items-center gap-1">
+              <Link2 className="size-3.5" />
+              {t("linkedClass", { name: item.linkedTeacherClassName })}
+            </span>
           )}
         </CardContent>
       </Card>

@@ -49,7 +49,7 @@ export default async function AppLayout({ children }: AppLayoutProps) {
             }
           />
         </header>
-        <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-4">
+        <main className="mx-auto min-w-0 w-full max-w-7xl flex-1 px-4 py-4">
           {children}
         </main>
       </SidebarInset>

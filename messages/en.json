@@ -288,6 +288,7 @@
       "submit": "Update password",
       "submitting": "Updating…",
       "success": "Password updated. Redirecting to log in…",
+      "invalidLink": "This password reset link is invalid or has expired. Please request a new one.",
       "errors": {
         "passwordMin": "Password must be at least 8 characters.",
         "confirmPasswordMin": "Confirm your password.",

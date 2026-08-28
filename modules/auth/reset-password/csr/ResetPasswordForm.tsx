@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { CheckCircle2, KeyRound } from "lucide-react";
 
@@ -34,6 +35,9 @@ const REDIRECT_DELAY_MS = 1500;
 export const ResetPasswordForm = () => {
   const t = useTranslations("auth.resetPassword");
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token");
+  const email = searchParams.get("email");
   const [formError, setFormError] = useState<string | null>(null);
   const [succeeded, setSucceeded] = useState(false);
 
@@ -55,9 +59,10 @@ export const ResetPasswordForm = () => {
   }, [succeeded, router]);
 
   const onSubmit = form.handleSubmit((values) => {
+    if (!token || !email) return;
     setFormError(null);
     startTransition(async () => {
-      const result = await resetPassword(values);
+      const result = await resetPassword(values, { token, email });
       if (!result.success) {
         setFormError(result.error);
         return;
@@ -65,6 +70,23 @@ export const ResetPasswordForm = () => {
       setSucceeded(true);
     });
   });
+
+  // Laravel's reset link is `/auth/reset-password?token=...&email=...`
+  // (API_CONTRACT.md AUTH-008) — without both, there's nothing to submit.
+  if (!token || !email) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("title")}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p role="alert" className="text-destructive text-sm font-medium">
+            {t("invalidLink")}
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>

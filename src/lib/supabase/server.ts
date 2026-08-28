@@ -10,10 +10,11 @@ import type { Database } from "@/lib/types/database";
  * Creates a new server-side Supabase client scoped to the current request's
  * cookies. Must be created fresh per request — never module-level singleton.
  *
- * `setAll` can fail when called from a Server Component (not a Server
- * Action or Route Handler) because Next.js forbids setting cookies there.
- * That's fine as long as `proxy.ts` refreshes the session on every request
- * via `updateSession` — see `src/lib/supabase/middleware.ts`.
+ * Auth moved to Laravel/NextAuth (`src/auth.ts`); this client remains only
+ * for the business-domain queries not yet ported off Supabase. No session
+ * cookie ever gets set here anymore, so `setAll` failing on a Server
+ * Component render (Next.js forbids setting cookies there) is harmless —
+ * it's caught and ignored below.
  */
 export async function createClient() {
   const cookieStore = await cookies();
@@ -32,8 +33,8 @@ export async function createClient() {
               cookieStore.set(name, value, options);
             });
           } catch {
-            // Called from a Server Component render — safe to ignore since
-            // the middleware's updateSession keeps the session fresh.
+            // Called from a Server Component render — safe to ignore, see
+            // the file header comment above.
           }
         },
       },

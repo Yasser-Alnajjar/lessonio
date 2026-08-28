@@ -9,6 +9,7 @@ import "@fontsource-variable/fraunces/full.css";
 
 import { routing, localeDirections, type AppLocale } from "@/i18n/routing";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { SessionProvider } from "@/components/providers/session-provider";
 import { OfflineBanner } from "@/components/shared/offline-banner";
 import "../globals.css";
 import { cn } from "@/lib/utils";
@@ -75,15 +76,17 @@ export default async function LocaleLayout({
         )}
       >
         <NextIntlClientProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <OfflineBanner />
-            {children}
-          </ThemeProvider>
+          <SessionProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <OfflineBanner />
+              {children}
+            </ThemeProvider>
+          </SessionProvider>
         </NextIntlClientProvider>
       </body>
     </html>

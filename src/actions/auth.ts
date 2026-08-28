@@ -1,41 +1,32 @@
 import "server-only";
 
-import type { User as SupabaseUser } from "@supabase/supabase-js";
-
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@auth";
+import { axios } from "@/lib/client";
 import type { ActionResult } from "@/lib/types/common";
 import type { AppRole, User } from "@/lib/types/user";
-import type { Database } from "@/lib/types/database";
 import * as authMutations from "./auth.mutations";
 
-type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
+interface BackendUser {
+  id: string;
+  email: string;
+  fullName: string | null;
+  avatarUrl: string | null;
+  timezone: string | null;
+  role: AppRole | null;
+  createdAt: string;
+  updatedAt: string;
+}
 
-/**
- * Falls back to `user_metadata` only if the `profiles` row is missing —
- * it shouldn't be (see `handle_new_user()` in
- * supabase/migrations/20260807120002_profiles.sql), but a defensive default
- * is cheap and avoids a broken session for an edge case like a user created
- * before that trigger existed.
- */
-function mapUser(authUser: SupabaseUser, profile: ProfileRow | null): User {
-  const metadata = authUser.user_metadata;
-  const metaFullName =
-    typeof metadata.full_name === "string" ? metadata.full_name : null;
-  const metaAvatarUrl =
-    typeof metadata.avatar_url === "string" ? metadata.avatar_url : null;
-  const metaTimezone =
-    typeof metadata.timezone === "string" ? metadata.timezone : null;
-
+function mapUser(user: BackendUser): User {
   return {
-    id: authUser.id,
-    email: authUser.email ?? "",
-    fullName: profile?.full_name ?? metaFullName,
-    avatarUrl: profile?.avatar_url ?? metaAvatarUrl,
-    timezone: profile?.timezone ?? metaTimezone,
-    role: (profile?.role ?? null) as AppRole | null,
-    createdAt: profile?.created_at ?? authUser.created_at,
-    updatedAt:
-      profile?.updated_at ?? authUser.updated_at ?? authUser.created_at,
+    id: user.id,
+    email: user.email,
+    fullName: user.fullName,
+    avatarUrl: user.avatarUrl,
+    timezone: user.timezone,
+    role: user.role,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
   };
 }
 
@@ -47,20 +38,20 @@ function mapUser(authUser: SupabaseUser, profile: ProfileRow | null): User {
  */
 export const authActions = {
   async getSession(): Promise<ActionResult<User>> {
-    const supabase = await createClient();
-    const { data, error } = await supabase.auth.getUser();
+    // No NextAuth session at all — skip the round trip. AUTH-001 (`/auth/me`)
+    // also handles this itself (200 with `data: null`), but most SSR
+    // components on public pages hit this, so it's worth the short-circuit.
+    const session = await auth();
+    if (!session?.jwt?.accessToken) return { data: null, error: null };
 
-    if (error || !data.user) {
+    try {
+      const { data } = await axios.get<{ data: BackendUser | null }>(
+        "/api/v1/auth/me",
+      );
+      return { data: data.data ? mapUser(data.data) : null, error: null };
+    } catch {
       return { data: null, error: null };
     }
-
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", data.user.id)
-      .single();
-
-    return { data: mapUser(data.user, profile), error: null };
   },
 
   login: authMutations.login,

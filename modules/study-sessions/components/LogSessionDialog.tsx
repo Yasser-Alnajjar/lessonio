@@ -1,7 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMemo, useState, useTransition } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useWatch } from "react-hook-form";
 import { useLocale, useTranslations } from "next-intl";
@@ -132,8 +131,11 @@ export function LogSessionDialog({
       ? lessons
       : lessons.filter((lesson) => lesson.subjectId === subjectId);
 
-  const mutation = useMutation({
-    mutationFn: async (values: LogSessionFormValues) => {
+  const [isPending, startTransition] = useTransition();
+
+  const onSubmit = form.handleSubmit((values) => {
+    setFormError(null);
+    startTransition(async () => {
       const payload = {
         subjectId: values.subjectId || undefined,
         lessonId: values.lessonId || undefined,
@@ -141,14 +143,10 @@ export function LogSessionDialog({
         durationMinutes: values.durationMinutes,
       };
 
-      if (session) {
-        return updateStudySession(session.id, payload);
-      }
+      const result = session
+        ? await updateStudySession(session.id, payload)
+        : await logManualSession(payload);
 
-      return logManualSession(payload);
-    },
-
-    onSuccess: (result) => {
       if (!result.success) {
         setFormError(result.error);
         return;
@@ -156,12 +154,7 @@ export function LogSessionDialog({
 
       onOpenChange(false);
       onSaved?.();
-    },
-  });
-
-  const onSubmit = form.handleSubmit((values) => {
-    setFormError(null);
-    mutation.mutate(values);
+    });
   });
 
   return (
@@ -316,19 +309,19 @@ export function LogSessionDialog({
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
-                disabled={mutation.isPending}
+                disabled={isPending}
               >
                 {t("cancel")}
               </Button>
 
               <Button
                 type="submit"
-                disabled={mutation.isPending}
+                disabled={isPending}
                 className="gap-2"
               >
-                {mutation.isPending && <LessonioSpinner className="size-4" />}
+                {isPending && <LessonioSpinner className="size-4" />}
 
-                {mutation.isPending
+                {isPending
                   ? t("submitting")
                   : isEditMode
                     ? t("save")

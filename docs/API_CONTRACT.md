@@ -1,4 +1,4 @@
-# API Contract — Lessonio (`study-line`)
+# API Contract — Lessonio
 
 **Purpose.** This document specifies the complete backend contract for Lessonio so that a Laravel
 developer can rebuild the backend **without reading the Next.js codebase**. It is derived entirely
@@ -13,7 +13,7 @@ the middleware/auth layer.
 
 **Scope note.** The current app has **no REST API**. It has two HTTP route handlers and ~100 Next.js
 Server Actions / server-only modules that talk to Postgres through PostgREST. The endpoints below
-are *proposed*; the "Current Implementation" block on each one records what exists now.
+are _proposed_; the "Current Implementation" block on each one records what exists now.
 
 ---
 
@@ -97,15 +97,15 @@ see §13.
 
 Full detail in §12. Summary:
 
-| Aspect | Today (Supabase) | Laravel target |
-| --- | --- | --- |
-| Mechanism | Supabase Auth, JWT in httpOnly cookies, refreshed in middleware | Sanctum bearer token |
-| Roles | `profiles.role` ∈ `student` \| `teacher` \| `NULL` | same column, `EnsureRole` middleware |
-| Role in token | `user_role` claim via `custom_access_token_hook` | custom Sanctum claim |
-| Password rules | `min(8)` — **client-side only** | FormRequest `min:8` (new server enforcement) |
-| OAuth | Google (wired), Azure (typed, no UI) | Laravel Socialite |
-| Password reset | Supabase's own mailer | Laravel `ResetPassword` notification |
-| Email verification | not implemented in app code | out of scope unless enabled |
+| Aspect             | Today (Supabase)                                                | Laravel target                               |
+| ------------------ | --------------------------------------------------------------- | -------------------------------------------- |
+| Mechanism          | Supabase Auth, JWT in httpOnly cookies, refreshed in middleware | Sanctum bearer token                         |
+| Roles              | `profiles.role` ∈ `student` \| `teacher` \| `NULL`              | same column, `EnsureRole` middleware         |
+| Role in token      | `user_role` claim via `custom_access_token_hook`                | custom Sanctum claim                         |
+| Password rules     | `min(8)` — **client-side only**                                 | FormRequest `min:8` (new server enforcement) |
+| OAuth              | Google (wired), Azure (typed, no UI)                            | Laravel Socialite                            |
+| Password reset     | Supabase's own mailer                                           | Laravel `ResetPassword` notification         |
+| Email verification | not implemented in app code                                     | out of scope unless enabled                  |
 
 **There is no `admin` role.** `APP_ROLES = ["student", "teacher"]`.
 
@@ -125,22 +125,28 @@ base path — never hardcoded at call sites. This keeps a future `/api/v2` a one
 
 ### 3.2 Request conventions
 
-| Concern | Convention |
-| --- | --- |
-| Content type | `application/json` except attachment upload (`multipart/form-data`) |
-| Auth header | `Authorization: Bearer <token>` |
-| Locale | `Accept-Language: ar \| en` — drives server-generated notification copy |
-| Casing | **Request and response bodies are `camelCase`.** The database is `snake_case`; API Resources do the translation. This matches the existing domain types exactly (`src/lib/types/*.ts`). |
-| Dates | ISO 8601. Date-only fields are `YYYY-MM-DD`; datetimes are full ISO with timezone. |
-| IDs | UUID v4 strings throughout. |
+| Concern      | Convention                                                                                                                                                                              |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Content type | `application/json` except attachment upload (`multipart/form-data`)                                                                                                                     |
+| Auth header  | `Authorization: Bearer <token>`                                                                                                                                                         |
+| Locale       | `Accept-Language: ar \| en` — drives server-generated notification copy                                                                                                                 |
+| Casing       | **Request and response bodies are `camelCase`.** The database is `snake_case`; API Resources do the translation. This matches the existing domain types exactly (`src/lib/types/*.ts`). |
+| Dates        | ISO 8601. Date-only fields are `YYYY-MM-DD`; datetimes are full ISO with timezone.                                                                                                      |
+| IDs          | UUID v4 strings throughout.                                                                                                                                                             |
 
 ### 3.3 Response envelope
 
 The frontend consumes two envelopes today, defined in `src/lib/types/common.ts`:
 
 ```ts
-interface ActionResult<T>  { data: T | null;      error: string | null }
-interface MutationResult   { success: boolean;    error: string | null }
+interface ActionResult<T> {
+  data: T | null;
+  error: string | null;
+}
+interface MutationResult {
+  success: boolean;
+  error: string | null;
+}
 ```
 
 To keep the `src/actions/` swap mechanical, the API returns a **`data`-wrapped body** and the action
@@ -160,29 +166,29 @@ layer maps it into these envelopes:
 Three domains use bespoke tri-field envelopes today and should be **normalized** to the standard
 one during the port (the action layer reshapes them so components keep compiling):
 
-| Current type | File | Normalize to |
-| --- | --- | --- |
-| `UploadAttachmentResult` `{success, error, attachment}` | `attachments.mutations.ts:29` | `{data: Attachment}` |
-| `CreateNoteResult` `{success, error, note}` | `lesson-notes.mutations.ts:25` | `{data: LessonNote}` |
-| `CreateTagResult` `{success, error, tag}` | `tags.mutations.ts:15` | `{data: Tag}` |
+| Current type                                            | File                           | Normalize to         |
+| ------------------------------------------------------- | ------------------------------ | -------------------- |
+| `UploadAttachmentResult` `{success, error, attachment}` | `attachments.mutations.ts:29`  | `{data: Attachment}` |
+| `CreateNoteResult` `{success, error, note}`             | `lesson-notes.mutations.ts:25` | `{data: LessonNote}` |
+| `CreateTagResult` `{success, error, tag}`               | `tags.mutations.ts:15`         | `{data: Tag}`        |
 
 ### 3.4 Writes that must return a value
 
 Most mutations return `MutationResult`. These five return data and their endpoints must too:
 
-| Operation | Returns |
-| --- | --- |
-| `joinClass` | the joined class's UUID |
-| `rotateJoinCode` | the new 6-character code |
-| `exportData` | the full `UserDataExport` object |
-| `liveSearch` | `SearchResultItem[]` |
-| `getRecentNotifications` | `{items, unreadCount}` |
+| Operation                | Returns                          |
+| ------------------------ | -------------------------------- |
+| `joinClass`              | the joined class's UUID          |
+| `rotateJoinCode`         | the new 6-character code         |
+| `exportData`             | the full `UserDataExport` object |
+| `liveSearch`             | `SearchResultItem[]`             |
+| `getRecentNotifications` | `{items, unreadCount}`           |
 
 ### 3.5 Soft-empty reads — a required behavior
 
 **This is the single most important convention in this document.**
 
-Today, unauthenticated *reads* do not error. They return empty data:
+Today, unauthenticated _reads_ do not error. They return empty data:
 
 ```ts
 // src/actions/classes.ts — getAll()
@@ -190,7 +196,7 @@ if (error || !data.user) return { data: [], error: null };
 // getById() returns { data: null, error: null }
 ```
 
-Only *mutations* return `"You must be signed in."` A Laravel API that returns `401` on every read
+Only _mutations_ return `"You must be signed in."` A Laravel API that returns `401` on every read
 would break existing callers, several of which destructure `data` and render immediately.
 
 **Contract:** each read endpoint below states its unauthenticated behavior explicitly. Endpoints
@@ -207,9 +213,10 @@ oversight — revisit it only as a coordinated frontend change.
 ```jsonc
 {
   "message": "You are not authorized to update this class.",
-  "errors": {                       // present on 422 only
-    "title": ["The title field is required."]
-  }
+  "errors": {
+    // present on 422 only
+    "title": ["The title field is required."],
+  },
 }
 ```
 
@@ -218,21 +225,21 @@ frontend already renders.
 
 ### 4.2 Status codes
 
-| Status | Meaning | Current equivalent |
-| --- | --- | --- |
-| `200` | Success | `{success: true}` / `{data}` |
-| `201` | Resource created | — (today all writes return `{success: true}`) |
-| `204` | Deleted, no body | — |
-| `401` | Unauthenticated (mutations only — see §3.5) | `"You must be signed in."` |
-| `403` | Authenticated but not permitted | `"You do not have access to this action."`, or a Postgres `42501` |
-| `404` | Not found **or** not visible to this user | `"Class not found."` — RLS makes these indistinguishable today, and that must be preserved (§4.3) |
-| `409` | Conflict — unique violation | Postgres `23505` |
-| `422` | Validation failure | **nothing today** — see §4.4 |
-| `500` | Server error | raw Supabase `error.message` |
+| Status | Meaning                                     | Current equivalent                                                                                |
+| ------ | ------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `200`  | Success                                     | `{success: true}` / `{data}`                                                                      |
+| `201`  | Resource created                            | — (today all writes return `{success: true}`)                                                     |
+| `204`  | Deleted, no body                            | —                                                                                                 |
+| `401`  | Unauthenticated (mutations only — see §3.5) | `"You must be signed in."`                                                                        |
+| `403`  | Authenticated but not permitted             | `"You do not have access to this action."`, or a Postgres `42501`                                 |
+| `404`  | Not found **or** not visible to this user   | `"Class not found."` — RLS makes these indistinguishable today, and that must be preserved (§4.3) |
+| `409`  | Conflict — unique violation                 | Postgres `23505`                                                                                  |
+| `422`  | Validation failure                          | **nothing today** — see §4.4                                                                      |
+| `500`  | Server error                                | raw Supabase `error.message`                                                                      |
 
 ### 4.3 404 vs 403 — do not "fix" this
 
-Under RLS, a row you do not own is *invisible*, not forbidden. `SELECT … WHERE id = ?` simply
+Under RLS, a row you do not own is _invisible_, not forbidden. `SELECT … WHERE id = ?` simply
 returns zero rows, and the action reports `"Class not found."` Returning `403` in Laravel where
 Supabase returns "not found" would leak the existence of other users' records. **Policies must
 return 404 for rows outside the user's scope**, reserving 403 for operations the user is
@@ -241,7 +248,7 @@ authenticated for but structurally may not perform (a student calling a teacher 
 ### 4.4 Validation errors are new
 
 `src/actions/` imports Zod **zero times**. All 13 schemas in `src/lib/validations/` are
-*client-side form* schemas, built at render time from `useTranslations`. Nothing validates a payload
+_client-side form_ schemas, built at render time from `useTranslations`. Nothing validates a payload
 server-side today; the database CHECK constraints are the only backstop, and they surface as raw
 Postgres error strings.
 
@@ -265,14 +272,14 @@ because a few UI strings are asserted against today.
 `PaginatedResult<T>` is declared in `src/lib/types/common.ts` but **never used**. There are zero
 `.range()` calls in the codebase. Lists are bounded by fixed `.limit()` constants instead:
 
-| Constant | Value | Where |
-| --- | --- | --- |
-| Notification center | 50 | `notifications.ts` `CENTER_LIMIT` |
-| Notification bell | 10 | `notifications.mutations.ts` `RECENT_LIMIT` |
-| Search results | 8 | `src/lib/search/query.ts` default |
-| Recent activity | 8 per source | `dashboard.ts` |
-| Class agenda upcoming | 5 | `getAgenda(upcomingLimit = 5)` |
-| Cron user sweep | 1000 | `auth.admin.listUsers({perPage: 1000})` |
+| Constant              | Value        | Where                                       |
+| --------------------- | ------------ | ------------------------------------------- |
+| Notification center   | 50           | `notifications.ts` `CENTER_LIMIT`           |
+| Notification bell     | 10           | `notifications.mutations.ts` `RECENT_LIMIT` |
+| Search results        | 8            | `src/lib/search/query.ts` default           |
+| Recent activity       | 8 per source | `dashboard.ts`                              |
+| Class agenda upcoming | 5            | `getAgenda(upcomingLimit = 5)`              |
+| Cron user sweep       | 1000         | `auth.admin.listUsers({perPage: 1000})`     |
 
 **Everything else is unbounded** — `GET /lessons`, `/subjects`, `/homework`, `/exams`,
 `/study-sessions` all return the user's full history.
@@ -286,9 +293,11 @@ GET /api/v1/lessons?page=1&perPage=25
 
 ```jsonc
 {
-  "data": [ /* … */ ],
-  "meta":  { "total": 213, "page": 1, "perPage": 25, "lastPage": 9 },
-  "links": { "next": "/api/v1/lessons?page=2&perPage=25", "prev": null }
+  "data": [
+    /* … */
+  ],
+  "meta": { "total": 213, "page": 1, "perPage": 25, "lastPage": 9 },
+  "links": { "next": "/api/v1/lessons?page=2&perPage=25", "prev": null },
 }
 ```
 
@@ -310,16 +319,16 @@ All filters are optional and combine with AND. `tagIds` is a repeated parameter.
 No endpoint accepts a sort parameter today; each has a hardcoded order. Preserve these defaults
 exactly, since UI code assumes them:
 
-| Endpoint | Order |
-| --- | --- |
-| `GET /classes` | `created_at ASC` |
-| `GET /lessons` | `date DESC` |
-| `GET /homework` | `deadline ASC` |
-| `GET /exams` | `date DESC` |
-| `GET /study-sessions` | `started_at DESC` |
-| `GET /notifications` | `created_at DESC` |
-| `GET /class-occurrences` | `date ASC, start_time ASC` |
-| `GET /flashcards/due` | `due_date ASC` |
+| Endpoint                    | Order                                                        |
+| --------------------------- | ------------------------------------------------------------ |
+| `GET /classes`              | `created_at ASC`                                             |
+| `GET /lessons`              | `date DESC`                                                  |
+| `GET /homework`             | `deadline ASC`                                               |
+| `GET /exams`                | `date DESC`                                                  |
+| `GET /study-sessions`       | `started_at DESC`                                            |
+| `GET /notifications`        | `created_at DESC`                                            |
+| `GET /class-occurrences`    | `date ASC, start_time ASC`                                   |
+| `GET /flashcards/due`       | `due_date ASC`                                               |
 | Recent activity (dashboard) | `updated_at DESC` per source, merged and re-sorted in memory |
 
 A `sort` parameter may be added later; it is `INFERRED` and unused.
@@ -333,179 +342,179 @@ Complete inventory. `Auth` column: **N** = public, **Y** = authenticated. Role: 
 
 ### 6.1 Authentication & Users
 
-| ID | Method | Endpoint | Auth | Role | Current implementation | Laravel replacement | Status |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| AUTH-001 | GET | `/auth/me` | Y | — | `authActions.getSession()` — `auth.getUser()` + `profiles` select | `AuthController@me` | IMPLEMENTED |
-| AUTH-002 | POST | `/auth/login` | N | — | `login()` — `auth.signInWithPassword` | `AuthController@login` (Sanctum) | IMPLEMENTED |
-| AUTH-003 | POST | `/auth/register` | N | — | `register()` — `auth.signUp` w/ `{full_name, role}` metadata | `AuthController@register` | IMPLEMENTED |
-| AUTH-004 | POST | `/auth/logout` | Y | — | `logout()` — `auth.signOut` | `AuthController@logout` | IMPLEMENTED |
-| AUTH-005 | GET | `/auth/oauth/{provider}/redirect` | N | — | `signInWithOAuth()` — `auth.signInWithOAuth` | `OAuthController@redirect` (Socialite) | IMPLEMENTED |
-| AUTH-006 | GET | `/auth/oauth/{provider}/callback` | N | — | `src/app/api/auth/callback/route.ts` — `exchangeCodeForSession` | `OAuthController@callback` | IMPLEMENTED |
-| AUTH-007 | POST | `/auth/forgot-password` | N | — | `requestPasswordReset()` — `auth.resetPasswordForEmail` | `PasswordResetController@send` | IMPLEMENTED |
-| AUTH-008 | POST | `/auth/reset-password` | Y¹ | — | `resetPassword()` — `auth.updateUser({password})` | `PasswordResetController@reset` | IMPLEMENTED |
-| USER-001 | PATCH | `/users/me` | Y | — | `updateProfile()` — `profiles.update` | `ProfileController@update` | IMPLEMENTED |
-| USER-002 | POST | `/users/me/role` | Y | — | `setMyRole()` — RPC `set_my_role` | `ProfileController@setRole` | IMPLEMENTED |
-| USER-003 | DELETE | `/users/me` | Y | — | `deleteAccount()` — **service-role** `auth.admin.deleteUser` | `AccountController@destroy` | IMPLEMENTED |
+| ID       | Method | Endpoint                          | Auth | Role | Current implementation                                            | Laravel replacement                    | Status      |
+| -------- | ------ | --------------------------------- | ---- | ---- | ----------------------------------------------------------------- | -------------------------------------- | ----------- |
+| AUTH-001 | GET    | `/auth/me`                        | Y    | —    | `authActions.getSession()` — `auth.getUser()` + `profiles` select | `AuthController@me`                    | IMPLEMENTED |
+| AUTH-002 | POST   | `/auth/login`                     | N    | —    | `login()` — `auth.signInWithPassword`                             | `AuthController@login` (Sanctum)       | IMPLEMENTED |
+| AUTH-003 | POST   | `/auth/register`                  | N    | —    | `register()` — `auth.signUp` w/ `{full_name, role}` metadata      | `AuthController@register`              | IMPLEMENTED |
+| AUTH-004 | POST   | `/auth/logout`                    | Y    | —    | `logout()` — `auth.signOut`                                       | `AuthController@logout`                | IMPLEMENTED |
+| AUTH-005 | GET    | `/auth/oauth/{provider}/redirect` | N    | —    | `signInWithOAuth()` — `auth.signInWithOAuth`                      | `OAuthController@redirect` (Socialite) | IMPLEMENTED |
+| AUTH-006 | GET    | `/auth/oauth/{provider}/callback` | N    | —    | `src/app/api/auth/callback/route.ts` — `exchangeCodeForSession`   | `OAuthController@callback`             | IMPLEMENTED |
+| AUTH-007 | POST   | `/auth/forgot-password`           | N    | —    | `requestPasswordReset()` — `auth.resetPasswordForEmail`           | `PasswordResetController@send`         | IMPLEMENTED |
+| AUTH-008 | POST   | `/auth/reset-password`            | Y¹   | —    | `resetPassword()` — `auth.updateUser({password})`                 | `PasswordResetController@reset`        | IMPLEMENTED |
+| USER-001 | PATCH  | `/users/me`                       | Y    | —    | `updateProfile()` — `profiles.update`                             | `ProfileController@update`             | IMPLEMENTED |
+| USER-002 | POST   | `/users/me/role`                  | Y    | —    | `setMyRole()` — RPC `set_my_role`                                 | `ProfileController@setRole`            | IMPLEMENTED |
+| USER-003 | DELETE | `/users/me`                       | Y    | —    | `deleteAccount()` — **service-role** `auth.admin.deleteUser`      | `AccountController@destroy`            | IMPLEMENTED |
 
 ¹ AUTH-008 runs under the recovery session established by the emailed link, not a normal session.
 
 ### 6.2 Settings
 
-| ID | Method | Endpoint | Auth | Role | Current implementation | Laravel replacement | Status |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| SET-001 | GET | `/settings` | Y | — | `settingsActions.get()` — `settings` select | `SettingsController@show` | IMPLEMENTED |
-| SET-002 | PATCH | `/settings/notification-preferences` | Y | — | `updateNotificationPreferences()` — whole-object jsonb replace | `SettingsController@updateNotificationPreferences` | IMPLEMENTED |
-| SET-003 | PATCH | `/settings/grade-scale` | Y | — | `updateGradeScale()` — jsonb replace | `SettingsController@updateGradeScale` | IMPLEMENTED |
-| SET-004 | GET | `/settings/export` | Y | — | `exportData()` — reads 16 tables | `DataExportController@show` | IMPLEMENTED |
+| ID      | Method | Endpoint                             | Auth | Role | Current implementation                                         | Laravel replacement                                | Status      |
+| ------- | ------ | ------------------------------------ | ---- | ---- | -------------------------------------------------------------- | -------------------------------------------------- | ----------- |
+| SET-001 | GET    | `/settings`                          | Y    | —    | `settingsActions.get()` — `settings` select                    | `SettingsController@show`                          | IMPLEMENTED |
+| SET-002 | PATCH  | `/settings/notification-preferences` | Y    | —    | `updateNotificationPreferences()` — whole-object jsonb replace | `SettingsController@updateNotificationPreferences` | IMPLEMENTED |
+| SET-003 | PATCH  | `/settings/grade-scale`              | Y    | —    | `updateGradeScale()` — jsonb replace                           | `SettingsController@updateGradeScale`              | IMPLEMENTED |
+| SET-004 | GET    | `/settings/export`                   | Y    | —    | `exportData()` — reads 16 tables                               | `DataExportController@show`                        | IMPLEMENTED |
 
 ### 6.3 Subjects, Lessons, Notes, Attachments, Tags
 
-| ID | Method | Endpoint | Auth | Role | Current implementation | Laravel replacement | Status |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| SUBJ-001 | GET | `/subjects` | Y² | — | `subjectsActions.getAll()` + 4 stat queries | `SubjectController@index` | IMPLEMENTED |
-| SUBJ-002 | GET | `/subjects/{id}` | Y² | — | `subjectsActions.getById()` | `SubjectController@show` | IMPLEMENTED |
-| SUBJ-003 | POST | `/subjects` | Y | — | `createSubject()` | `SubjectController@store` | IMPLEMENTED |
-| SUBJ-004 | PATCH | `/subjects/{id}` | Y | — | `updateSubject()` | `SubjectController@update` | IMPLEMENTED |
-| SUBJ-005 | DELETE | `/subjects/{id}` | Y | — | `deleteSubject()` — hard delete | `SubjectController@destroy` | IMPLEMENTED |
-| LESSON-001 | GET | `/lessons` | Y² | — | `lessonsActions.getAll(filters?)` + bulk hydration | `LessonController@index` | IMPLEMENTED |
-| LESSON-002 | GET | `/lessons/{id}` | Y² | — | `lessonsActions.getById()` | `LessonController@show` | IMPLEMENTED |
-| LESSON-003 | POST | `/lessons` | Y | — | `createLesson()` + `lesson_tags` insert | `LessonController@store` | IMPLEMENTED |
-| LESSON-004 | PATCH | `/lessons/{id}` | Y | — | `updateLesson()` | `LessonController@update` | IMPLEMENTED |
-| LESSON-005 | POST | `/lessons/{id}/duplicate` | Y | — | `duplicateLesson()` | `LessonController@duplicate` | IMPLEMENTED |
-| LESSON-006 | POST | `/lessons/{id}/archive` | Y | — | `toggleArchiveLesson()` — read-modify-write | `LessonController@toggleArchive` | IMPLEMENTED |
-| LESSON-007 | DELETE | `/lessons/{id}` | Y | — | `deleteLesson()` | `LessonController@destroy` | IMPLEMENTED |
-| LESSON-008 | PATCH | `/lessons/{id}/reschedule` | Y | — | `rescheduleLesson()` in `calendar.mutations.ts` | `LessonController@reschedule` | IMPLEMENTED |
-| NOTE-001 | GET | `/lessons/{lessonId}/notes` | Y² | — | `notesActions.getAllForLesson()` | `LessonNoteController@index` | IMPLEMENTED |
-| NOTE-002 | POST | `/lessons/{lessonId}/notes` | Y | — | `createNote()` → returns the note | `LessonNoteController@store` | IMPLEMENTED |
-| NOTE-003 | PATCH | `/notes/{id}` | Y | — | `updateNote()` | `LessonNoteController@update` | IMPLEMENTED |
-| NOTE-004 | DELETE | `/notes/{id}` | Y | — | `deleteNote()` | `LessonNoteController@destroy` | IMPLEMENTED |
-| ATTACH-001 | GET | `/lessons/{lessonId}/attachments` | Y² | — | `attachmentsActions.getAllForLesson()` + `getPublicUrl` | `AttachmentController@index` | IMPLEMENTED |
-| ATTACH-002 | POST | `/lessons/{lessonId}/attachments` | Y | — | `uploadAttachment()` — storage upload + row insert | `AttachmentController@store` | IMPLEMENTED |
-| ATTACH-003 | DELETE | `/attachments/{id}` | Y | — | `deleteAttachment()` — row + object delete | `AttachmentController@destroy` | IMPLEMENTED |
-| TAG-001 | GET | `/tags` | Y² | — | `tagsActions.getAll()` | `TagController@index` | IMPLEMENTED |
-| TAG-002 | POST | `/tags` | Y | — | `createTag(name)` → returns the tag | `TagController@store` | IMPLEMENTED |
+| ID         | Method | Endpoint                          | Auth | Role | Current implementation                                  | Laravel replacement              | Status      |
+| ---------- | ------ | --------------------------------- | ---- | ---- | ------------------------------------------------------- | -------------------------------- | ----------- |
+| SUBJ-001   | GET    | `/subjects`                       | Y²   | —    | `subjectsActions.getAll()` + 4 stat queries             | `SubjectController@index`        | IMPLEMENTED |
+| SUBJ-002   | GET    | `/subjects/{id}`                  | Y²   | —    | `subjectsActions.getById()`                             | `SubjectController@show`         | IMPLEMENTED |
+| SUBJ-003   | POST   | `/subjects`                       | Y    | —    | `createSubject()`                                       | `SubjectController@store`        | IMPLEMENTED |
+| SUBJ-004   | PATCH  | `/subjects/{id}`                  | Y    | —    | `updateSubject()`                                       | `SubjectController@update`       | IMPLEMENTED |
+| SUBJ-005   | DELETE | `/subjects/{id}`                  | Y    | —    | `deleteSubject()` — hard delete                         | `SubjectController@destroy`      | IMPLEMENTED |
+| LESSON-001 | GET    | `/lessons`                        | Y²   | —    | `lessonsActions.getAll(filters?)` + bulk hydration      | `LessonController@index`         | IMPLEMENTED |
+| LESSON-002 | GET    | `/lessons/{id}`                   | Y²   | —    | `lessonsActions.getById()`                              | `LessonController@show`          | IMPLEMENTED |
+| LESSON-003 | POST   | `/lessons`                        | Y    | —    | `createLesson()` + `lesson_tags` insert                 | `LessonController@store`         | IMPLEMENTED |
+| LESSON-004 | PATCH  | `/lessons/{id}`                   | Y    | —    | `updateLesson()`                                        | `LessonController@update`        | IMPLEMENTED |
+| LESSON-005 | POST   | `/lessons/{id}/duplicate`         | Y    | —    | `duplicateLesson()`                                     | `LessonController@duplicate`     | IMPLEMENTED |
+| LESSON-006 | POST   | `/lessons/{id}/archive`           | Y    | —    | `toggleArchiveLesson()` — read-modify-write             | `LessonController@toggleArchive` | IMPLEMENTED |
+| LESSON-007 | DELETE | `/lessons/{id}`                   | Y    | —    | `deleteLesson()`                                        | `LessonController@destroy`       | IMPLEMENTED |
+| LESSON-008 | PATCH  | `/lessons/{id}/reschedule`        | Y    | —    | `rescheduleLesson()` in `calendar.mutations.ts`         | `LessonController@reschedule`    | IMPLEMENTED |
+| NOTE-001   | GET    | `/lessons/{lessonId}/notes`       | Y²   | —    | `notesActions.getAllForLesson()`                        | `LessonNoteController@index`     | IMPLEMENTED |
+| NOTE-002   | POST   | `/lessons/{lessonId}/notes`       | Y    | —    | `createNote()` → returns the note                       | `LessonNoteController@store`     | IMPLEMENTED |
+| NOTE-003   | PATCH  | `/notes/{id}`                     | Y    | —    | `updateNote()`                                          | `LessonNoteController@update`    | IMPLEMENTED |
+| NOTE-004   | DELETE | `/notes/{id}`                     | Y    | —    | `deleteNote()`                                          | `LessonNoteController@destroy`   | IMPLEMENTED |
+| ATTACH-001 | GET    | `/lessons/{lessonId}/attachments` | Y²   | —    | `attachmentsActions.getAllForLesson()` + `getPublicUrl` | `AttachmentController@index`     | IMPLEMENTED |
+| ATTACH-002 | POST   | `/lessons/{lessonId}/attachments` | Y    | —    | `uploadAttachment()` — storage upload + row insert      | `AttachmentController@store`     | IMPLEMENTED |
+| ATTACH-003 | DELETE | `/attachments/{id}`               | Y    | —    | `deleteAttachment()` — row + object delete              | `AttachmentController@destroy`   | IMPLEMENTED |
+| TAG-001    | GET    | `/tags`                           | Y²   | —    | `tagsActions.getAll()`                                  | `TagController@index`            | IMPLEMENTED |
+| TAG-002    | POST   | `/tags`                           | Y    | —    | `createTag(name)` → returns the tag                     | `TagController@store`            | IMPLEMENTED |
 
 ² Soft-empty when unauthenticated — see §3.5.
 
 ### 6.4 Classes, Occurrences, Calendar
 
-| ID | Method | Endpoint | Auth | Role | Current implementation | Laravel replacement | Status |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| CLASS-001 | GET | `/classes` | Y² | — | `classesActions.getAll()` + subject/teacher-class hydration | `ClassController@index` | IMPLEMENTED |
-| CLASS-002 | GET | `/classes/{id}` | Y² | — | `classesActions.getById()` | `ClassController@show` | IMPLEMENTED |
-| CLASS-003 | POST | `/classes` | Y | — | `createClass()` + materialization reset | `ClassController@store` | IMPLEMENTED |
-| CLASS-004 | PATCH | `/classes/{id}` | Y | — | `updateClass()` + purge future untouched occurrences | `ClassController@update` | IMPLEMENTED |
-| CLASS-005 | POST | `/classes/{id}/toggle-active` | Y | — | `toggleActiveClass()` — read-modify-write | `ClassController@toggleActive` | IMPLEMENTED |
-| CLASS-006 | DELETE | `/classes/{id}` | Y | — | `deleteClass()` — cascades to occurrences | `ClassController@destroy` | IMPLEMENTED |
-| OCCUR-001 | GET | `/class-occurrences` | Y² | — | `classOccurrencesActions.getAll(filters?)` | `ClassOccurrenceController@index` | IMPLEMENTED |
-| OCCUR-002 | GET | `/class-occurrences/{id}` | Y² | — | `classOccurrencesActions.getById()` | `ClassOccurrenceController@show` | IMPLEMENTED |
-| OCCUR-003 | GET | `/class-occurrences/agenda` | Y² | — | `getAgenda(upcomingLimit = 5)` | `ClassOccurrenceController@agenda` | IMPLEMENTED |
-| OCCUR-004 | PATCH | `/class-occurrences/{id}` | Y | — | `updateClassOccurrenceStatus()` | `ClassOccurrenceController@update` | IMPLEMENTED |
-| OCCUR-005 | — | *(internal)* | Y | — | `ensureClassOccurrencesForUser()` — lazy materialization | `ClassOccurrenceMaterializer` service | IMPLEMENTED |
-| CAL-001 | GET | `/calendar/{year}/{month}` | Y² | — | `calendarActions.getMonth(year, month)` | `CalendarController@month` | IMPLEMENTED |
+| ID        | Method | Endpoint                      | Auth | Role | Current implementation                                      | Laravel replacement                   | Status      |
+| --------- | ------ | ----------------------------- | ---- | ---- | ----------------------------------------------------------- | ------------------------------------- | ----------- |
+| CLASS-001 | GET    | `/classes`                    | Y²   | —    | `classesActions.getAll()` + subject/teacher-class hydration | `ClassController@index`               | IMPLEMENTED |
+| CLASS-002 | GET    | `/classes/{id}`               | Y²   | —    | `classesActions.getById()`                                  | `ClassController@show`                | IMPLEMENTED |
+| CLASS-003 | POST   | `/classes`                    | Y    | —    | `createClass()` + materialization reset                     | `ClassController@store`               | IMPLEMENTED |
+| CLASS-004 | PATCH  | `/classes/{id}`               | Y    | —    | `updateClass()` + purge future untouched occurrences        | `ClassController@update`              | IMPLEMENTED |
+| CLASS-005 | POST   | `/classes/{id}/toggle-active` | Y    | —    | `toggleActiveClass()` — read-modify-write                   | `ClassController@toggleActive`        | IMPLEMENTED |
+| CLASS-006 | DELETE | `/classes/{id}`               | Y    | —    | `deleteClass()` — cascades to occurrences                   | `ClassController@destroy`             | IMPLEMENTED |
+| OCCUR-001 | GET    | `/class-occurrences`          | Y²   | —    | `classOccurrencesActions.getAll(filters?)`                  | `ClassOccurrenceController@index`     | IMPLEMENTED |
+| OCCUR-002 | GET    | `/class-occurrences/{id}`     | Y²   | —    | `classOccurrencesActions.getById()`                         | `ClassOccurrenceController@show`      | IMPLEMENTED |
+| OCCUR-003 | GET    | `/class-occurrences/agenda`   | Y²   | —    | `getAgenda(upcomingLimit = 5)`                              | `ClassOccurrenceController@agenda`    | IMPLEMENTED |
+| OCCUR-004 | PATCH  | `/class-occurrences/{id}`     | Y    | —    | `updateClassOccurrenceStatus()`                             | `ClassOccurrenceController@update`    | IMPLEMENTED |
+| OCCUR-005 | —      | _(internal)_                  | Y    | —    | `ensureClassOccurrencesForUser()` — lazy materialization    | `ClassOccurrenceMaterializer` service | IMPLEMENTED |
+| CAL-001   | GET    | `/calendar/{year}/{month}`    | Y²   | —    | `calendarActions.getMonth(year, month)`                     | `CalendarController@month`            | IMPLEMENTED |
 
 ### 6.5 Teaching (teacher-facing)
 
-| ID | Method | Endpoint | Auth | Role | Current implementation | Laravel replacement | Status |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| TCLASS-001 | GET | `/teaching/classes` | Y | T | `teacherClassesActions.getAll()` | `TeacherClassController@index` | IMPLEMENTED |
-| TCLASS-002 | GET | `/teaching/classes/{id}` | Y | T | `teacherClassesActions.getById()` | `TeacherClassController@show` | IMPLEMENTED |
-| TCLASS-003 | GET | `/teaching/classes/{id}/roster` | Y | T | `teacherClassesActions.getRoster()` | `RosterController@index` | IMPLEMENTED |
-| TCLASS-004 | POST | `/teaching/classes` | Y | T | `createTeacherClass()` — RPC `create_teacher_class` | `TeacherClassController@store` | IMPLEMENTED |
-| TCLASS-005 | PATCH | `/teaching/classes/{id}` | Y | T | `updateTeacherClass()` | `TeacherClassController@update` | IMPLEMENTED |
-| TCLASS-006 | POST | `/teaching/classes/{id}/archive` | Y | T | `toggleArchivedTeacherClass()` | `TeacherClassController@toggleArchive` | IMPLEMENTED |
-| TCLASS-007 | DELETE | `/teaching/classes/{id}` | Y | T | `deleteTeacherClass()` | `TeacherClassController@destroy` | IMPLEMENTED |
-| TCLASS-008 | POST | `/teaching/classes/{id}/rotate-code` | Y | T | `rotateJoinCode()` — RPC `rotate_join_code` | `JoinCodeController@rotate` | IMPLEMENTED |
-| ENROLL-004 | DELETE | `/teaching/classes/{id}/roster/{studentId}` | Y | T | `removeStudent()` — sets `status='removed'` | `RosterController@destroy` | IMPLEMENTED |
-| ASSIGN-001 | GET | `/teaching/assignments` | Y | T | `assignmentsActions.getAll()` | `AssignmentController@index` | IMPLEMENTED |
-| ASSIGN-004 | POST | `/teaching/assignments` | Y | T | `createAssignment()` | `AssignmentController@store` | IMPLEMENTED |
-| ASSIGN-005 | PATCH | `/teaching/assignments/{id}` | Y | T | `updateAssignment()` — class is immutable | `AssignmentController@update` | IMPLEMENTED |
-| ASSIGN-006 | POST | `/teaching/assignments/{id}/publish` | Y | T | `publishAssignment()` + RPC `notify_assignment_published` | `AssignmentController@publish` | IMPLEMENTED |
-| ASSIGN-007 | POST | `/teaching/assignments/{id}/unpublish` | Y | T | `unpublishAssignment()` — no notification | `AssignmentController@unpublish` | IMPLEMENTED |
-| ASSIGN-008 | DELETE | `/teaching/assignments/{id}` | Y | T | `deleteAssignment()` | `AssignmentController@destroy` | IMPLEMENTED |
-| SUBMIT-001 | GET | `/teaching/assignments/{id}/submissions` | Y | T | `submissionsActions.getByAssignment()` — full roster join | `SubmissionController@index` | IMPLEMENTED |
-| SUBMIT-004 | PATCH | `/teaching/submissions/{id}/grade` | Y | T | `gradeSubmission()` + RPC `notify_submission_graded` | `SubmissionController@grade` | IMPLEMENTED |
+| ID         | Method | Endpoint                                    | Auth | Role | Current implementation                                    | Laravel replacement                    | Status      |
+| ---------- | ------ | ------------------------------------------- | ---- | ---- | --------------------------------------------------------- | -------------------------------------- | ----------- |
+| TCLASS-001 | GET    | `/teaching/classes`                         | Y    | T    | `teacherClassesActions.getAll()`                          | `TeacherClassController@index`         | IMPLEMENTED |
+| TCLASS-002 | GET    | `/teaching/classes/{id}`                    | Y    | T    | `teacherClassesActions.getById()`                         | `TeacherClassController@show`          | IMPLEMENTED |
+| TCLASS-003 | GET    | `/teaching/classes/{id}/roster`             | Y    | T    | `teacherClassesActions.getRoster()`                       | `RosterController@index`               | IMPLEMENTED |
+| TCLASS-004 | POST   | `/teaching/classes`                         | Y    | T    | `createTeacherClass()` — RPC `create_teacher_class`       | `TeacherClassController@store`         | IMPLEMENTED |
+| TCLASS-005 | PATCH  | `/teaching/classes/{id}`                    | Y    | T    | `updateTeacherClass()`                                    | `TeacherClassController@update`        | IMPLEMENTED |
+| TCLASS-006 | POST   | `/teaching/classes/{id}/archive`            | Y    | T    | `toggleArchivedTeacherClass()`                            | `TeacherClassController@toggleArchive` | IMPLEMENTED |
+| TCLASS-007 | DELETE | `/teaching/classes/{id}`                    | Y    | T    | `deleteTeacherClass()`                                    | `TeacherClassController@destroy`       | IMPLEMENTED |
+| TCLASS-008 | POST   | `/teaching/classes/{id}/rotate-code`        | Y    | T    | `rotateJoinCode()` — RPC `rotate_join_code`               | `JoinCodeController@rotate`            | IMPLEMENTED |
+| ENROLL-004 | DELETE | `/teaching/classes/{id}/roster/{studentId}` | Y    | T    | `removeStudent()` — sets `status='removed'`               | `RosterController@destroy`             | IMPLEMENTED |
+| ASSIGN-001 | GET    | `/teaching/assignments`                     | Y    | T    | `assignmentsActions.getAll()`                             | `AssignmentController@index`           | IMPLEMENTED |
+| ASSIGN-004 | POST   | `/teaching/assignments`                     | Y    | T    | `createAssignment()`                                      | `AssignmentController@store`           | IMPLEMENTED |
+| ASSIGN-005 | PATCH  | `/teaching/assignments/{id}`                | Y    | T    | `updateAssignment()` — class is immutable                 | `AssignmentController@update`          | IMPLEMENTED |
+| ASSIGN-006 | POST   | `/teaching/assignments/{id}/publish`        | Y    | T    | `publishAssignment()` + RPC `notify_assignment_published` | `AssignmentController@publish`         | IMPLEMENTED |
+| ASSIGN-007 | POST   | `/teaching/assignments/{id}/unpublish`      | Y    | T    | `unpublishAssignment()` — no notification                 | `AssignmentController@unpublish`       | IMPLEMENTED |
+| ASSIGN-008 | DELETE | `/teaching/assignments/{id}`                | Y    | T    | `deleteAssignment()`                                      | `AssignmentController@destroy`         | IMPLEMENTED |
+| SUBMIT-001 | GET    | `/teaching/assignments/{id}/submissions`    | Y    | T    | `submissionsActions.getByAssignment()` — full roster join | `SubmissionController@index`           | IMPLEMENTED |
+| SUBMIT-004 | PATCH  | `/teaching/submissions/{id}/grade`          | Y    | T    | `gradeSubmission()` + RPC `notify_submission_graded`      | `SubmissionController@grade`           | IMPLEMENTED |
 
 ### 6.6 Classroom (student-facing)
 
-| ID | Method | Endpoint | Auth | Role | Current implementation | Laravel replacement | Status |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| ENROLL-001 | GET | `/classroom/classes` | Y | S | `enrollmentsActions.getMyClasses()` | `EnrollmentController@index` | IMPLEMENTED |
-| ENROLL-002 | POST | `/classroom/classes/join` | Y | S | `joinClass(code)` — RPC `join_class_by_code` → class UUID | `EnrollmentController@join` | IMPLEMENTED |
-| ENROLL-003 | POST | `/classroom/classes/{id}/leave` | Y | S | `leaveClass()` — RPC `leave_class` | `EnrollmentController@leave` | IMPLEMENTED |
-| ASSIGN-002 | GET | `/classroom/assignments` | Y | S | `assignmentsActions.getAssignedToMe()` | `StudentAssignmentController@index` | IMPLEMENTED |
-| ASSIGN-003 | GET | `/assignments/{id}` | Y | S/T | `assignmentsActions.getById()` | `StudentAssignmentController@show` | IMPLEMENTED |
-| SUBMIT-002 | GET | `/classroom/assignments/{id}/submission` | Y | S | `submissionsActions.getMine()` | `StudentSubmissionController@show` | IMPLEMENTED |
-| SUBMIT-003 | PUT | `/classroom/assignments/{id}/submission` | Y | S | `submitAssignment()` — upsert on `(assignment_id, student_id)` | `StudentSubmissionController@upsert` | IMPLEMENTED |
+| ID         | Method | Endpoint                                 | Auth | Role | Current implementation                                         | Laravel replacement                  | Status      |
+| ---------- | ------ | ---------------------------------------- | ---- | ---- | -------------------------------------------------------------- | ------------------------------------ | ----------- |
+| ENROLL-001 | GET    | `/classroom/classes`                     | Y    | S    | `enrollmentsActions.getMyClasses()`                            | `EnrollmentController@index`         | IMPLEMENTED |
+| ENROLL-002 | POST   | `/classroom/classes/join`                | Y    | S    | `joinClass(code)` — RPC `join_class_by_code` → class UUID      | `EnrollmentController@join`          | IMPLEMENTED |
+| ENROLL-003 | POST   | `/classroom/classes/{id}/leave`          | Y    | S    | `leaveClass()` — RPC `leave_class`                             | `EnrollmentController@leave`         | IMPLEMENTED |
+| ASSIGN-002 | GET    | `/classroom/assignments`                 | Y    | S    | `assignmentsActions.getAssignedToMe()`                         | `StudentAssignmentController@index`  | IMPLEMENTED |
+| ASSIGN-003 | GET    | `/assignments/{id}`                      | Y    | S/T  | `assignmentsActions.getById()`                                 | `StudentAssignmentController@show`   | IMPLEMENTED |
+| SUBMIT-002 | GET    | `/classroom/assignments/{id}/submission` | Y    | S    | `submissionsActions.getMine()`                                 | `StudentSubmissionController@show`   | IMPLEMENTED |
+| SUBMIT-003 | PUT    | `/classroom/assignments/{id}/submission` | Y    | S    | `submitAssignment()` — upsert on `(assignment_id, student_id)` | `StudentSubmissionController@upsert` | IMPLEMENTED |
 
 ### 6.7 Homework, Exams, Flashcards, Grades, Study Sessions
 
-| ID | Method | Endpoint | Auth | Role | Current implementation | Laravel replacement | Status |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| HW-001 | GET | `/homework` | Y² | — | `homeworkActions.getAll()` | `HomeworkController@index` | IMPLEMENTED |
-| HW-002 | POST | `/homework` | Y | — | `createHomework()` — derives `subject_id` from lesson | `HomeworkController@store` | IMPLEMENTED |
-| HW-003 | PATCH | `/homework/{id}` | Y | — | `updateHomework()` | `HomeworkController@update` | IMPLEMENTED |
-| HW-004 | PATCH | `/homework/{id}/completed` | Y | — | `toggleHomeworkCompleted(id, completed)` | `HomeworkController@setCompleted` | IMPLEMENTED |
-| HW-005 | DELETE | `/homework/{id}` | Y | — | `deleteHomework()` | `HomeworkController@destroy` | IMPLEMENTED |
-| EXAM-001 | GET | `/exams` | Y² | — | `examsActions.getAll()` | `ExamController@index` | IMPLEMENTED |
-| EXAM-002 | POST | `/exams` | Y | — | `createExam()` | `ExamController@store` | IMPLEMENTED |
-| EXAM-003 | PATCH | `/exams/{id}` | Y | — | `updateExam()` | `ExamController@update` | IMPLEMENTED |
-| EXAM-004 | PATCH | `/exams/{id}/score` | Y | — | `updateExamScore(id, score)` | `ExamController@setScore` | IMPLEMENTED |
-| EXAM-005 | DELETE | `/exams/{id}` | Y | — | `deleteExam()` | `ExamController@destroy` | IMPLEMENTED |
-| FLASH-001 | GET | `/lessons/{lessonId}/flashcards` | Y² | — | `flashcardsActions.getByLesson()` | `FlashcardController@index` | IMPLEMENTED |
-| FLASH-002 | GET | `/flashcards/decks` | Y² | — | `flashcardsActions.getDecks()` — per-subject rollup | `FlashcardController@decks` | IMPLEMENTED |
-| FLASH-003 | GET | `/flashcards/due` | Y² | — | `flashcardsActions.getDueQueue({subjectId?, lessonId?})` | `FlashcardController@due` | IMPLEMENTED |
-| FLASH-004 | POST | `/flashcards` | Y | — | `createFlashcard()` | `FlashcardController@store` | IMPLEMENTED |
-| FLASH-005 | PATCH | `/flashcards/{id}` | Y | — | `updateFlashcard()` | `FlashcardController@update` | IMPLEMENTED |
-| FLASH-006 | DELETE | `/flashcards/{id}` | Y | — | `deleteFlashcard()` | `FlashcardController@destroy` | IMPLEMENTED |
-| FLASH-007 | POST | `/flashcards/{id}/reviews` | Y | — | `recordFlashcardReview(id, grade)` — SM-2 update + review row | `FlashcardReviewController@store` | IMPLEMENTED |
-| GRADE-001 | GET | `/grades/overview` | Y² | — | `gradesActions.getOverview()` — GPA + trend | `GradeController@overview` | IMPLEMENTED |
-| SESSION-001 | GET | `/study-sessions` | Y² | — | `studySessionsActions.getHistory()` | `StudySessionController@index` | IMPLEMENTED |
-| SESSION-002 | GET | `/study-sessions/running` | Y² | — | `studySessionsActions.getRunning()` | `StudySessionController@running` | IMPLEMENTED |
-| SESSION-003 | GET | `/study-sessions/summary` | Y² | — | `studySessionsActions.getSummary()` | `StudySessionController@summary` | IMPLEMENTED |
-| SESSION-004 | POST | `/study-sessions` | Y | — | `startStudySession()` | `StudySessionController@start` | IMPLEMENTED |
-| SESSION-005 | POST | `/study-sessions/{id}/stop` | Y | — | `stopStudySession()` — sets `ended_at` | `StudySessionController@stop` | IMPLEMENTED |
-| SESSION-006 | POST | `/study-sessions/{id}/cancel` | Y | — | `cancelStudySession()` — deletes the running row | `StudySessionController@cancel` | IMPLEMENTED |
-| SESSION-007 | POST | `/study-sessions/manual` | Y | — | `logManualSession()` | `StudySessionController@logManual` | IMPLEMENTED |
-| SESSION-008 | PATCH | `/study-sessions/{id}` | Y | — | `updateStudySession()` — not in the barrel | `StudySessionController@update` | IMPLEMENTED |
-| SESSION-009 | DELETE | `/study-sessions/{id}` | Y | — | `deleteStudySession()` | `StudySessionController@destroy` | IMPLEMENTED |
+| ID          | Method | Endpoint                         | Auth | Role | Current implementation                                        | Laravel replacement                | Status      |
+| ----------- | ------ | -------------------------------- | ---- | ---- | ------------------------------------------------------------- | ---------------------------------- | ----------- |
+| HW-001      | GET    | `/homework`                      | Y²   | —    | `homeworkActions.getAll()`                                    | `HomeworkController@index`         | IMPLEMENTED |
+| HW-002      | POST   | `/homework`                      | Y    | —    | `createHomework()` — derives `subject_id` from lesson         | `HomeworkController@store`         | IMPLEMENTED |
+| HW-003      | PATCH  | `/homework/{id}`                 | Y    | —    | `updateHomework()`                                            | `HomeworkController@update`        | IMPLEMENTED |
+| HW-004      | PATCH  | `/homework/{id}/completed`       | Y    | —    | `toggleHomeworkCompleted(id, completed)`                      | `HomeworkController@setCompleted`  | IMPLEMENTED |
+| HW-005      | DELETE | `/homework/{id}`                 | Y    | —    | `deleteHomework()`                                            | `HomeworkController@destroy`       | IMPLEMENTED |
+| EXAM-001    | GET    | `/exams`                         | Y²   | —    | `examsActions.getAll()`                                       | `ExamController@index`             | IMPLEMENTED |
+| EXAM-002    | POST   | `/exams`                         | Y    | —    | `createExam()`                                                | `ExamController@store`             | IMPLEMENTED |
+| EXAM-003    | PATCH  | `/exams/{id}`                    | Y    | —    | `updateExam()`                                                | `ExamController@update`            | IMPLEMENTED |
+| EXAM-004    | PATCH  | `/exams/{id}/score`              | Y    | —    | `updateExamScore(id, score)`                                  | `ExamController@setScore`          | IMPLEMENTED |
+| EXAM-005    | DELETE | `/exams/{id}`                    | Y    | —    | `deleteExam()`                                                | `ExamController@destroy`           | IMPLEMENTED |
+| FLASH-001   | GET    | `/lessons/{lessonId}/flashcards` | Y²   | —    | `flashcardsActions.getByLesson()`                             | `FlashcardController@index`        | IMPLEMENTED |
+| FLASH-002   | GET    | `/flashcards/decks`              | Y²   | —    | `flashcardsActions.getDecks()` — per-subject rollup           | `FlashcardController@decks`        | IMPLEMENTED |
+| FLASH-003   | GET    | `/flashcards/due`                | Y²   | —    | `flashcardsActions.getDueQueue({subjectId?, lessonId?})`      | `FlashcardController@due`          | IMPLEMENTED |
+| FLASH-004   | POST   | `/flashcards`                    | Y    | —    | `createFlashcard()`                                           | `FlashcardController@store`        | IMPLEMENTED |
+| FLASH-005   | PATCH  | `/flashcards/{id}`               | Y    | —    | `updateFlashcard()`                                           | `FlashcardController@update`       | IMPLEMENTED |
+| FLASH-006   | DELETE | `/flashcards/{id}`               | Y    | —    | `deleteFlashcard()`                                           | `FlashcardController@destroy`      | IMPLEMENTED |
+| FLASH-007   | POST   | `/flashcards/{id}/reviews`       | Y    | —    | `recordFlashcardReview(id, grade)` — SM-2 update + review row | `FlashcardReviewController@store`  | IMPLEMENTED |
+| GRADE-001   | GET    | `/grades/overview`               | Y²   | —    | `gradesActions.getOverview()` — GPA + trend                   | `GradeController@overview`         | IMPLEMENTED |
+| SESSION-001 | GET    | `/study-sessions`                | Y²   | —    | `studySessionsActions.getHistory()`                           | `StudySessionController@index`     | IMPLEMENTED |
+| SESSION-002 | GET    | `/study-sessions/running`        | Y²   | —    | `studySessionsActions.getRunning()`                           | `StudySessionController@running`   | IMPLEMENTED |
+| SESSION-003 | GET    | `/study-sessions/summary`        | Y²   | —    | `studySessionsActions.getSummary()`                           | `StudySessionController@summary`   | IMPLEMENTED |
+| SESSION-004 | POST   | `/study-sessions`                | Y    | —    | `startStudySession()`                                         | `StudySessionController@start`     | IMPLEMENTED |
+| SESSION-005 | POST   | `/study-sessions/{id}/stop`      | Y    | —    | `stopStudySession()` — sets `ended_at`                        | `StudySessionController@stop`      | IMPLEMENTED |
+| SESSION-006 | POST   | `/study-sessions/{id}/cancel`    | Y    | —    | `cancelStudySession()` — deletes the running row              | `StudySessionController@cancel`    | IMPLEMENTED |
+| SESSION-007 | POST   | `/study-sessions/manual`         | Y    | —    | `logManualSession()`                                          | `StudySessionController@logManual` | IMPLEMENTED |
+| SESSION-008 | PATCH  | `/study-sessions/{id}`           | Y    | —    | `updateStudySession()` — not in the barrel                    | `StudySessionController@update`    | IMPLEMENTED |
+| SESSION-009 | DELETE | `/study-sessions/{id}`           | Y    | —    | `deleteStudySession()`                                        | `StudySessionController@destroy`   | IMPLEMENTED |
 
 ### 6.8 Notifications, Gamification, Aggregates, Search
 
-| ID | Method | Endpoint | Auth | Role | Current implementation | Laravel replacement | Status |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| NOTIF-001 | GET | `/notifications` | Y² | — | `notificationsActions.getAll()` — limit 50 | `NotificationController@index` | IMPLEMENTED |
-| NOTIF-002 | GET | `/notifications/unread-count` | Y² | — | `notificationsActions.getUnreadCount()` | `NotificationController@unreadCount` | IMPLEMENTED |
-| NOTIF-003 | GET | `/notifications/recent` | Y² | — | `getRecentNotifications()` — limit 10 + generation side effect | `NotificationController@recent` | IMPLEMENTED |
-| NOTIF-004 | POST | `/notifications/{id}/read` | Y | — | `markNotificationAsRead()` | `NotificationController@markRead` | IMPLEMENTED |
-| NOTIF-005 | POST | `/notifications/read-all` | Y | — | `markAllNotificationsAsRead()` | `NotificationController@markAllRead` | IMPLEMENTED |
-| NOTIF-006 | POST | `/notifications/{id}/email` | Y | — | `sendNotificationToEmail()` — Resend | `NotificationController@email` | IMPLEMENTED |
-| NOTIF-007 | POST | `/internal/jobs/notifications` | Y³ | SYS | `src/app/api/cron/notifications/route.ts` → `runScheduledNotificationsJob()` | `GenerateNotifications` scheduled job | IMPLEMENTED |
-| NOTIF-008 | — | *(internal)* | Y | — | `ensureNotificationsForUser()` — on-demand, throttled | `NotificationGenerator` service | IMPLEMENTED |
-| GAME-001 | GET | `/gamification/achievements` | Y² | — | `getAchievements()` — RPC `sync_user_achievements` then read | `AchievementController@index` | IMPLEMENTED |
-| GAME-002 | GET | `/gamification/goals` | Y² | — | `getGoals()` | `GoalController@index` | IMPLEMENTED |
-| GAME-003 | POST | `/gamification/goals` | Y | — | `setCurrentGoal()` — upsert on `(user, period, period_start)` | `GoalController@store` | IMPLEMENTED |
-| GAME-004 | PATCH | `/gamification/goals/{id}` | Y | — | `updateGoal()` | `GoalController@update` | IMPLEMENTED |
-| GAME-005 | DELETE | `/gamification/goals/{id}` | Y | — | `deleteGoal()` | `GoalController@destroy` | IMPLEMENTED |
-| DASH-001 | GET | `/dashboard/overview` | Y² | — | `dashboardActions.getOverview()` — **~15 round trips** | `DashboardController@overview` | IMPLEMENTED |
-| STATS-001 | GET | `/statistics/overview` | Y² | — | `statisticsActions.getOverview()` — 6 scans, aggregated in JS | `StatisticsController@overview` | IMPLEMENTED |
-| SEARCH-001 | GET | `/search` | Y² | — | `searchActions.search(query)` — limit 8 | `SearchController@index` | IMPLEMENTED |
-| SEARCH-002 | GET | `/search/live` | Y² | — | `liveSearch(query)` — command palette, same core | `SearchController@index` (shared) | IMPLEMENTED |
+| ID         | Method | Endpoint                       | Auth | Role | Current implementation                                                       | Laravel replacement                   | Status      |
+| ---------- | ------ | ------------------------------ | ---- | ---- | ---------------------------------------------------------------------------- | ------------------------------------- | ----------- |
+| NOTIF-001  | GET    | `/notifications`               | Y²   | —    | `notificationsActions.getAll()` — limit 50                                   | `NotificationController@index`        | IMPLEMENTED |
+| NOTIF-002  | GET    | `/notifications/unread-count`  | Y²   | —    | `notificationsActions.getUnreadCount()`                                      | `NotificationController@unreadCount`  | IMPLEMENTED |
+| NOTIF-003  | GET    | `/notifications/recent`        | Y²   | —    | `getRecentNotifications()` — limit 10 + generation side effect               | `NotificationController@recent`       | IMPLEMENTED |
+| NOTIF-004  | POST   | `/notifications/{id}/read`     | Y    | —    | `markNotificationAsRead()`                                                   | `NotificationController@markRead`     | IMPLEMENTED |
+| NOTIF-005  | POST   | `/notifications/read-all`      | Y    | —    | `markAllNotificationsAsRead()`                                               | `NotificationController@markAllRead`  | IMPLEMENTED |
+| NOTIF-006  | POST   | `/notifications/{id}/email`    | Y    | —    | `sendNotificationToEmail()` — Resend                                         | `NotificationController@email`        | IMPLEMENTED |
+| NOTIF-007  | POST   | `/internal/jobs/notifications` | Y³   | SYS  | `src/app/api/cron/notifications/route.ts` → `runScheduledNotificationsJob()` | `GenerateNotifications` scheduled job | IMPLEMENTED |
+| NOTIF-008  | —      | _(internal)_                   | Y    | —    | `ensureNotificationsForUser()` — on-demand, throttled                        | `NotificationGenerator` service       | IMPLEMENTED |
+| GAME-001   | GET    | `/gamification/achievements`   | Y²   | —    | `getAchievements()` — RPC `sync_user_achievements` then read                 | `AchievementController@index`         | IMPLEMENTED |
+| GAME-002   | GET    | `/gamification/goals`          | Y²   | —    | `getGoals()`                                                                 | `GoalController@index`                | IMPLEMENTED |
+| GAME-003   | POST   | `/gamification/goals`          | Y    | —    | `setCurrentGoal()` — upsert on `(user, period, period_start)`                | `GoalController@store`                | IMPLEMENTED |
+| GAME-004   | PATCH  | `/gamification/goals/{id}`     | Y    | —    | `updateGoal()`                                                               | `GoalController@update`               | IMPLEMENTED |
+| GAME-005   | DELETE | `/gamification/goals/{id}`     | Y    | —    | `deleteGoal()`                                                               | `GoalController@destroy`              | IMPLEMENTED |
+| DASH-001   | GET    | `/dashboard/overview`          | Y²   | —    | `dashboardActions.getOverview()` — **~15 round trips**                       | `DashboardController@overview`        | IMPLEMENTED |
+| STATS-001  | GET    | `/statistics/overview`         | Y²   | —    | `statisticsActions.getOverview()` — 6 scans, aggregated in JS                | `StatisticsController@overview`       | IMPLEMENTED |
+| SEARCH-001 | GET    | `/search`                      | Y²   | —    | `searchActions.search(query)` — limit 8                                      | `SearchController@index`              | IMPLEMENTED |
+| SEARCH-002 | GET    | `/search/live`                 | Y²   | —    | `liveSearch(query)` — command palette, same core                             | `SearchController@index` (shared)     | IMPLEMENTED |
 
 ³ NOTIF-007 authenticates with `Authorization: Bearer <CRON_SECRET>`, compared using
 `timingSafeEqual`. It is not a user session.
 
 ### 6.9 Totals
 
-| Category | Count |
-| --- | --- |
-| Public endpoints | 6 |
-| Authenticated, any role | 78 |
-| Teacher-only | 17 |
-| Student-only | 7 |
-| System/cron | 1 |
-| Internal (no HTTP surface) | 2 |
-| **Total operations** | **111** |
+| Category                   | Count   |
+| -------------------------- | ------- |
+| Public endpoints           | 6       |
+| Authenticated, any role    | 78      |
+| Teacher-only               | 17      |
+| Student-only               | 7       |
+| System/cron                | 1       |
+| Internal (no HTTP surface) | 2       |
+| **Total operations**       | **111** |
 
 ---
 
@@ -531,12 +540,12 @@ file and function so a reader can verify the claim.
 }
 ```
 
-| Field | Rules | Source |
-| --- | --- | --- |
+| Field      | Rules                                | Source                 |
+| ---------- | ------------------------------------ | ---------------------- |
 | `fullName` | required, trimmed, `min:2`, `max:80` | `createRegisterSchema` |
-| `email` | required, valid email, unique | `createRegisterSchema` |
-| `password` | required, `min:8` | `createRegisterSchema` |
-| `role` | required, `in:student,teacher` | `APP_ROLES` |
+| `email`    | required, valid email, unique        | `createRegisterSchema` |
+| `password` | required, `min:8`                    | `createRegisterSchema` |
+| `role`     | required, `in:student,teacher`       | `APP_ROLES`            |
 
 `confirmPassword` is validated **client-side only** and is not sent to the API.
 
@@ -581,7 +590,12 @@ triggers that bypass RLS.
 **Response** `200`:
 
 ```json
-{ "data": { "token": "1|abc…", "user": { "id": "…", "email": "…", "role": "student" } } }
+{
+  "data": {
+    "token": "1|abc…",
+    "user": { "id": "…", "email": "…", "role": "student" }
+  }
+}
 ```
 
 The token replaces Supabase's cookie session. The action layer stores it and attaches it as
@@ -615,10 +629,14 @@ Revokes the current token. `200` `{"data": null}`. Idempotent.
 ```json
 {
   "data": {
-    "id": "uuid", "email": "sara@example.com",
-    "fullName": "Sara Ahmed", "avatarUrl": null,
-    "timezone": "Africa/Cairo", "role": "student",
-    "createdAt": "2026-08-01T09:00:00Z", "updatedAt": "2026-08-20T11:12:13Z"
+    "id": "uuid",
+    "email": "sara@example.com",
+    "fullName": "Sara Ahmed",
+    "avatarUrl": null,
+    "timezone": "Africa/Cairo",
+    "role": "student",
+    "createdAt": "2026-08-01T09:00:00Z",
+    "updatedAt": "2026-08-20T11:12:13Z"
   }
 }
 ```
@@ -699,7 +717,7 @@ email template that must be newly authored — Supabase provided it.
 
 Request `{"password": "…"}`, `min:8`.
 
-**Important shape difference.** The current form submits *only* a new password: it does not parse a
+**Important shape difference.** The current form submits _only_ a new password: it does not parse a
 token, relying on the recovery session Supabase established from the emailed link
 (`modules/auth/reset-password/csr/ResetPasswordForm.tsx`). Laravel's flow needs `token` and `email`
 too, so this endpoint's request body **must change** to:
@@ -721,9 +739,9 @@ the frontend genuinely changes. Tracked as `RISK-06`.
 
 **Request:** `{"fullName": "Sara A.", "timezone": "Africa/Cairo"}`
 
-| Field | Rules |
-| --- | --- |
-| `fullName` | required, trimmed, `min:2`, `max:80` |
+| Field      | Rules                                                                |
+| ---------- | -------------------------------------------------------------------- |
+| `fullName` | required, trimmed, `min:2`, `max:80`                                 |
 | `timezone` | required, non-empty (validate against `timezone_identifiers_list()`) |
 
 **`role` is not accepted here** and must be rejected if present — the database trigger
@@ -753,6 +771,7 @@ caller's role must currently be `NULL`.
 **Current:** `src/actions/onboarding.mutations.ts` → `setMyRole()` → `rpc("set_my_role", {p_role})`.
 
 The RPC (`SECURITY DEFINER`) does:
+
 1. raise if `auth.uid()` is null;
 2. raise `invalid role: %` (SQLSTATE `22023`) unless in `('student','teacher')`;
 3. `update profiles set role = p_role where id = auth.uid() and role is null`;
@@ -785,6 +804,7 @@ to a translated message.
 **Errors:** `409 {"message": "teacher_has_classes"}` — keep the sentinel string.
 
 **Current:** `src/actions/settings.mutations.ts` → `deleteAccount()`:
+
 1. `auth.getUser()`
 2. count `teacher_classes where teacher_id = uid`; if `> 0` → refuse
 3. `createAdminClient().auth.admin.deleteUser(uid)` — **service-role, bypasses RLS**
@@ -815,17 +835,21 @@ verify the cascade map matches Postgres exactly.
       "enabledInBrowser": true,
       "enabledInEmail": false,
       "types": {
-        "upcoming_lesson": true, "homework_due": true, "daily_reminder": true,
-        "upcoming_class": true, "review_reminder": true,
-        "assignment_assigned": true, "assignment_graded": true
+        "upcoming_lesson": true,
+        "homework_due": true,
+        "daily_reminder": true,
+        "upcoming_class": true,
+        "review_reminder": true,
+        "assignment_assigned": true,
+        "assignment_graded": true
       }
     },
     "gradeScale": [
-      {"letter": "A", "minPercent": 90, "gradePoints": 4},
-      {"letter": "B", "minPercent": 80, "gradePoints": 3},
-      {"letter": "C", "minPercent": 70, "gradePoints": 2},
-      {"letter": "D", "minPercent": 60, "gradePoints": 1},
-      {"letter": "F", "minPercent": 0,  "gradePoints": 0}
+      { "letter": "A", "minPercent": 90, "gradePoints": 4 },
+      { "letter": "B", "minPercent": 80, "gradePoints": 3 },
+      { "letter": "C", "minPercent": 70, "gradePoints": 2 },
+      { "letter": "D", "minPercent": 60, "gradePoints": 1 },
+      { "letter": "F", "minPercent": 0, "gradePoints": 0 }
     ]
   }
 }
@@ -854,11 +878,11 @@ Soft-empty: returns defaults, not `401`, when unauthenticated.
 Preserve that, or the UI's "toggle one switch" flow (which sends the full object) will behave
 inconsistently across the two implementations.
 
-| Field | Rules |
-| --- | --- |
-| `enabledInBrowser` | required, boolean |
-| `enabledInEmail` | required, boolean |
-| `types` | required, object; each of the 7 keys required boolean |
+| Field              | Rules                                                 |
+| ------------------ | ----------------------------------------------------- |
+| `enabledInBrowser` | required, boolean                                     |
+| `enabledInEmail`   | required, boolean                                     |
+| `types`            | required, object; each of the 7 keys required boolean |
 
 **Current:** `settings.mutations.ts` → `updateNotificationPreferences()`.
 
@@ -868,12 +892,12 @@ inconsistently across the two implementations.
 
 **Request:** `{"gradeScale": [{"letter": "A", "minPercent": 90, "gradePoints": 4}, …]}`
 
-| Field | Rules |
-| --- | --- |
-| `gradeScale` | required, array, `min:1` |
-| `gradeScale.*.letter` | required, string, `max:2` |
-| `gradeScale.*.minPercent` | required, numeric, `between:0,100` |
-| `gradeScale.*.gradePoints` | required, numeric, `min:0` |
+| Field                      | Rules                              |
+| -------------------------- | ---------------------------------- |
+| `gradeScale`               | required, array, `min:1`           |
+| `gradeScale.*.letter`      | required, string, `max:2`          |
+| `gradeScale.*.minPercent`  | required, numeric, `between:0,100` |
+| `gradeScale.*.gradePoints` | required, numeric, `min:0`         |
 
 Whole-array replace. There is no DB constraint on the shape — validation is entirely new.
 
@@ -892,13 +916,27 @@ camelCase domain types), plus `exportedAt`:
 {
   "data": {
     "exportedAt": "2026-08-28T10:00:00Z",
-    "profile": { /* profiles row */ },
-    "settings": { /* settings row */ },
-    "subjects": [], "classes": [], "classOccurrences": [], "lessons": [],
-    "lessonNotes": [], "attachments": [], "studySessions": [], "homework": [],
-    "exams": [], "tags": [], "lessonTags": [], "notifications": [],
-    "goals": [], "achievements": []
-  }
+    "profile": {
+      /* profiles row */
+    },
+    "settings": {
+      /* settings row */
+    },
+    "subjects": [],
+    "classes": [],
+    "classOccurrences": [],
+    "lessons": [],
+    "lessonNotes": [],
+    "attachments": [],
+    "studySessions": [],
+    "homework": [],
+    "exams": [],
+    "tags": [],
+    "lessonTags": [],
+    "notifications": [],
+    "goals": [],
+    "achievements": [],
+  },
 }
 ```
 
@@ -936,20 +974,27 @@ Returns every subject the user owns, **including archived ones**, each with deri
 
 ```jsonc
 {
-  "data": [{
-    "id": "uuid", "userId": "uuid",
-    "name": "Mathematics", "color": "#6366F1", "icon": "calculator",
-    "isArchived": false, "creditHours": 3,
-    "createdAt": "…", "updatedAt": "…",
-    "stats": {
-      "subjectId": "uuid",
-      "totalLessons": 24,
-      "attendanceRate": 92,        // 0-100
-      "studyRate": 71,             // 0-100
-      "homeworkProgress": 88,      // 0-100
-      "totalStudyMinutes": 1460
-    }
-  }]
+  "data": [
+    {
+      "id": "uuid",
+      "userId": "uuid",
+      "name": "Mathematics",
+      "color": "#6366F1",
+      "icon": "calculator",
+      "isArchived": false,
+      "creditHours": 3,
+      "createdAt": "…",
+      "updatedAt": "…",
+      "stats": {
+        "subjectId": "uuid",
+        "totalLessons": 24,
+        "attendanceRate": 92, // 0-100
+        "studyRate": 71, // 0-100
+        "homeworkProgress": 88, // 0-100
+        "totalStudyMinutes": 1460,
+      },
+    },
+  ],
 }
 ```
 
@@ -964,6 +1009,7 @@ aggregates in SQL (`withCount` / `selectRaw` sub-selects) rather than in PHP —
 over the current implementation and changes no output.
 
 Stat definitions, to reproduce exactly:
+
 - `totalLessons` — count of the subject's lessons.
 - `attendanceRate` — `attended / (occurrences with a non-null attendance_status) × 100`.
 - `studyRate` — `lessons with study_status ∈ (completed, reviewed) / totalLessons × 100`.
@@ -980,15 +1026,20 @@ Same object, single. `{"data": null}` when not found or not owned.
 #### POST /api/v1/subjects — `SUBJ-003`
 
 ```json
-{ "name": "Mathematics", "color": "#6366F1", "icon": "calculator", "creditHours": 3 }
+{
+  "name": "Mathematics",
+  "color": "#6366F1",
+  "icon": "calculator",
+  "creditHours": 3
+}
 ```
 
-| Field | Rules | Enforced today by |
-| --- | --- | --- |
-| `name` | required, `min:1`, `max:80` | DB CHECK |
-| `color` | required, `regex:/^#[0-9A-Fa-f]{6}$/` | DB CHECK |
-| `icon` | required, `in:` the 10 icons below | DB CHECK |
-| `creditHours` | required, numeric, `gt:0` | DB CHECK |
+| Field         | Rules                                 | Enforced today by |
+| ------------- | ------------------------------------- | ----------------- |
+| `name`        | required, `min:1`, `max:80`           | DB CHECK          |
+| `color`       | required, `regex:/^#[0-9A-Fa-f]{6}$/` | DB CHECK          |
+| `icon`        | required, `in:` the 10 icons below    | DB CHECK          |
+| `creditHours` | required, numeric, `gt:0`             | DB CHECK          |
 
 Icons: `book-open`, `calculator`, `flask-conical`, `globe`, `landmark`, `palette`, `code`, `music`,
 `dumbbell`, `languages`.
@@ -1021,32 +1072,41 @@ Same ownership rule as subjects: `user_id = auth.uid()` on all four commands →
 
 **Query parameters** (all optional, AND-combined — mirrors `LessonFilters`):
 
-| Param | Type | Notes |
-| --- | --- | --- |
-| `subjectId` | uuid | |
-| `studyStatus` | enum | `not_started` \| `studying` \| `completed` \| `reviewed` |
-| `reviewStatus` | enum | `not_reviewed` \| `needs_review` \| `reviewed` |
-| `tagIds[]` | uuid[] | repeated param; matches lessons having **any** of these tags |
-| `dateFrom` | date | inclusive |
-| `dateTo` | date | inclusive |
+| Param          | Type   | Notes                                                        |
+| -------------- | ------ | ------------------------------------------------------------ |
+| `subjectId`    | uuid   |                                                              |
+| `studyStatus`  | enum   | `not_started` \| `studying` \| `completed` \| `reviewed`     |
+| `reviewStatus` | enum   | `not_reviewed` \| `needs_review` \| `reviewed`               |
+| `tagIds[]`     | uuid[] | repeated param; matches lessons having **any** of these tags |
+| `dateFrom`     | date   | inclusive                                                    |
+| `dateTo`       | date   | inclusive                                                    |
 
 Order: `date DESC`. No pagination today.
 
 ```jsonc
 {
-  "data": [{
-    "id": "uuid", "userId": "uuid", "subjectId": "uuid",
-    "classOccurrenceId": null,
-    "title": "Quadratic equations",
-    "date": "2026-08-24",
-    "studyStatus": "completed", "reviewStatus": "not_reviewed",
-    "homeworkStatus": "none", "isArchived": false,
-    "tagIds": ["uuid"],
-    "subjectName": "Mathematics", "subjectColor": "#6366F1",
-    "tags": ["algebra"],
-    "noteCount": 2, "attachmentCount": 1,
-    "createdAt": "…", "updatedAt": "…"
-  }]
+  "data": [
+    {
+      "id": "uuid",
+      "userId": "uuid",
+      "subjectId": "uuid",
+      "classOccurrenceId": null,
+      "title": "Quadratic equations",
+      "date": "2026-08-24",
+      "studyStatus": "completed",
+      "reviewStatus": "not_reviewed",
+      "homeworkStatus": "none",
+      "isArchived": false,
+      "tagIds": ["uuid"],
+      "subjectName": "Mathematics",
+      "subjectColor": "#6366F1",
+      "tags": ["algebra"],
+      "noteCount": 2,
+      "attachmentCount": 1,
+      "createdAt": "…",
+      "updatedAt": "…",
+    },
+  ],
 }
 ```
 
@@ -1065,17 +1125,22 @@ Single `LessonWithRelations`; `{"data": null}` if absent or not owned.
 #### POST /api/v1/lessons — `LESSON-003`
 
 ```json
-{ "subjectId": "uuid", "title": "Quadratic equations", "date": "2026-08-24",
-  "classOccurrenceId": null, "tagIds": ["uuid"] }
+{
+  "subjectId": "uuid",
+  "title": "Quadratic equations",
+  "date": "2026-08-24",
+  "classOccurrenceId": null,
+  "tagIds": ["uuid"]
+}
 ```
 
-| Field | Rules |
-| --- | --- |
-| `subjectId` | required, uuid, **must belong to the caller** |
-| `title` | required, `min:1`, `max:160` |
-| `date` | required, date `Y-m-d` |
-| `classOccurrenceId` | optional, uuid, must belong to the caller |
-| `tagIds` | optional, array of uuid, each **must belong to the caller** |
+| Field               | Rules                                                       |
+| ------------------- | ----------------------------------------------------------- |
+| `subjectId`         | required, uuid, **must belong to the caller**               |
+| `title`             | required, `min:1`, `max:160`                                |
+| `date`              | required, date `Y-m-d`                                      |
+| `classOccurrenceId` | optional, uuid, must belong to the caller                   |
+| `tagIds`            | optional, array of uuid, each **must belong to the caller** |
 
 The `subjectId`/`tagIds` ownership checks are enforced today by RLS and by the
 `enforce_lesson_tags_owner` trigger; in Laravel they become explicit `exists:…,user_id` rules.
@@ -1130,12 +1195,19 @@ and a denormalized `user_id`, and RLS keys on `user_id`.
 #### GET /api/v1/lessons/{lessonId}/notes — `NOTE-001`
 
 ```jsonc
-{ "data": [{
-    "id": "uuid", "lessonId": "uuid", "userId": "uuid",
-    "title": "Worked examples",
-    "contentMarkdown": "## Example 1\n…",
-    "createdAt": "…", "updatedAt": "…"
-}] }
+{
+  "data": [
+    {
+      "id": "uuid",
+      "lessonId": "uuid",
+      "userId": "uuid",
+      "title": "Worked examples",
+      "contentMarkdown": "## Example 1\n…",
+      "createdAt": "…",
+      "updatedAt": "…",
+    },
+  ],
+}
 ```
 
 Order: `created_at DESC`. **Current:** `src/actions/lesson-notes.ts` → `notesActions.getAllForLesson()`.
@@ -1146,9 +1218,9 @@ Order: `created_at DESC`. **Current:** `src/actions/lesson-notes.ts` → `notesA
 { "title": "Worked examples", "contentMarkdown": "## Example 1" }
 ```
 
-| Field | Rules |
-| --- | --- |
-| `title` | required, `min:1`, `max:160` (DB CHECK) |
+| Field             | Rules                                      |
+| ----------------- | ------------------------------------------ |
+| `title`           | required, `min:1`, `max:160` (DB CHECK)    |
 | `contentMarkdown` | required, string; may be `""` (DB default) |
 
 **Returns the created note** — `201 {"data": {…LessonNote}}`. This is one of the three bespoke
@@ -1174,16 +1246,23 @@ This domain spans the database **and** object storage; see §14 for the storage 
 #### GET /api/v1/lessons/{lessonId}/attachments — `ATTACH-001`
 
 ```jsonc
-{ "data": [{
-    "id": "uuid", "lessonId": "uuid", "userId": "uuid",
-    "kind": "pdf",
-    "fileName": "chapter-3.pdf",
-    "storagePath": "…/…/1756372800000-chapter-3.pdf",
-    "publicUrl": "https://…/storage/v1/object/public/attachments/…",
-    "sizeBytes": 184320,
-    "mimeType": "application/pdf",
-    "createdAt": "…", "updatedAt": "…"
-}] }
+{
+  "data": [
+    {
+      "id": "uuid",
+      "lessonId": "uuid",
+      "userId": "uuid",
+      "kind": "pdf",
+      "fileName": "chapter-3.pdf",
+      "storagePath": "…/…/1756372800000-chapter-3.pdf",
+      "publicUrl": "https://…/storage/v1/object/public/attachments/…",
+      "sizeBytes": 184320,
+      "mimeType": "application/pdf",
+      "createdAt": "…",
+      "updatedAt": "…",
+    },
+  ],
+}
 ```
 
 `publicUrl` is **derived at read time and never persisted** — the current code calls
@@ -1196,10 +1275,10 @@ This domain spans the database **and** object storage; see §14 for the storage 
 
 **Content type:** `multipart/form-data`, single `file` field.
 
-| Rule | Value | Source |
-| --- | --- | --- |
-| Max size | 50 MB (`52428800` bytes) | bucket `file_size_limit`; `MAX_ATTACHMENT_SIZE_BYTES` |
-| Allowed MIME | the 12 types below | bucket `allowed_mime_types`; `ATTACHMENT_MIME_KIND` |
+| Rule         | Value                    | Source                                                |
+| ------------ | ------------------------ | ----------------------------------------------------- |
+| Max size     | 50 MB (`52428800` bytes) | bucket `file_size_limit`; `MAX_ATTACHMENT_SIZE_BYTES` |
+| Allowed MIME | the 12 types below       | bucket `allowed_mime_types`; `ATTACHMENT_MIME_KIND`   |
 
 `image/png`, `image/jpeg`, `image/webp`, `image/gif`, `application/pdf`, `video/mp4`, `video/webm`,
 `video/quicktime`, `audio/mpeg`, `audio/mp4`, `audio/wav`, `audio/webm`.
@@ -1252,8 +1331,8 @@ duplicate or errors. Only on a miss does it insert.
 `src/lib/constants/tags.ts` — a deterministic name→hex mapping. Port that function; do not let
 clients choose tag colors.
 
-| Field | Rules |
-| --- | --- |
+| Field  | Rules                                           |
+| ------ | ----------------------------------------------- |
 | `name` | required, trimmed, `min:1`, `max:40` (DB CHECK) |
 
 `200 {"data": {…Tag}}` — returns the found-or-created tag, since the UI attaches it immediately.
@@ -1270,7 +1349,7 @@ re-reading.
 
 ### 7.9 Classes (the student's recurring weekly class)
 
-> **Naming warning.** `classes` is the *student's own recurring weekly class*. It is a completely
+> **Naming warning.** `classes` is the _student's own recurring weekly class_. It is a completely
 > different entity from `teacher_classes` (§7.11), which is a teacher's roster-bearing class. The
 > migration filenames are misleading — see §8.1.
 
@@ -1284,19 +1363,29 @@ Ownership: `user_id = auth.uid()` on all four commands → `ClassPolicy` + owner
 Order: `created_at ASC`.
 
 ```jsonc
-{ "data": [{
-    "id": "uuid", "userId": "uuid", "subjectId": "uuid",
-    "teacher": "Dr. Hassan", "location": "Room 12",
-    "meetings": [
-      { "dayOfWeek": 1, "startTime": "16:00", "durationMinutes": 90 },
-      { "dayOfWeek": 4, "startTime": "14:00", "durationMinutes": 120 }
-    ],
-    "isActive": true,
-    "teacherClassId": null,
-    "subjectName": "Mathematics", "subjectColor": "#6366F1", "subjectIcon": "calculator",
-    "linkedTeacherClassName": null,
-    "createdAt": "…", "updatedAt": "…"
-}] }
+{
+  "data": [
+    {
+      "id": "uuid",
+      "userId": "uuid",
+      "subjectId": "uuid",
+      "teacher": "Dr. Hassan",
+      "location": "Room 12",
+      "meetings": [
+        { "dayOfWeek": 1, "startTime": "16:00", "durationMinutes": 90 },
+        { "dayOfWeek": 4, "startTime": "14:00", "durationMinutes": 120 },
+      ],
+      "isActive": true,
+      "teacherClassId": null,
+      "subjectName": "Mathematics",
+      "subjectColor": "#6366F1",
+      "subjectIcon": "calculator",
+      "linkedTeacherClassName": null,
+      "createdAt": "…",
+      "updatedAt": "…",
+    },
+  ],
+}
 ```
 
 `dayOfWeek`: **0 = Sunday** … 6 = Saturday. This convention is centralized in
@@ -1326,17 +1415,17 @@ Single `ClassWithSubject`; `{"data": null}` when absent or not owned.
 }
 ```
 
-| Field | Rules |
-| --- | --- |
-| `subjectId` | required, uuid, must belong to caller |
-| `teacher` | optional, trimmed, `max:120` |
-| `location` | optional, trimmed, `max:120` |
-| `meetings` | required, array, `min:1` |
-| `meetings.*.dayOfWeek` | required, integer, `between:0,6`, **unique within the array** |
-| `meetings.*.startTime` | required, `regex:/^([01]\d|2[0-3]):[0-5]\d$/` |
-| `meetings.*.durationMinutes` | required, integer, `gt:0` |
-| `isActive` | optional, boolean, default `true` |
-| `teacherClassId` | optional, uuid or `null`; caller must be **actively enrolled** in it |
+| Field                        | Rules                                                                |
+| ---------------------------- | -------------------------------------------------------------------- | ------------------ |
+| `subjectId`                  | required, uuid, must belong to caller                                |
+| `teacher`                    | optional, trimmed, `max:120`                                         |
+| `location`                   | optional, trimmed, `max:120`                                         |
+| `meetings`                   | required, array, `min:1`                                             |
+| `meetings.*.dayOfWeek`       | required, integer, `between:0,6`, **unique within the array**        |
+| `meetings.*.startTime`       | required, `regex:/^([01]\d                                           | 2[0-3]):[0-5]\d$/` |
+| `meetings.*.durationMinutes` | required, integer, `gt:0`                                            |
+| `isActive`                   | optional, boolean, default `true`                                    |
+| `teacherClassId`             | optional, uuid or `null`; caller must be **actively enrolled** in it |
 
 The whole `meetings` rule set is enforced today by the `classes_meetings_valid` CHECK, which calls
 `validate_class_meetings(jsonb)`. Port it as a Laravel custom rule; keep the DB check too.
@@ -1357,6 +1446,7 @@ Sparse; same rules, all `sometimes`. An **empty patch short-circuits to success*
 the database — harmless to reproduce, and cheap.
 
 **Two side effects, in order:**
+
 1. `deleteFutureUntouchedOccurrences(classId)` — see below.
 2. `resetClassOccurrencesMaterializedAt(userId)`.
 
@@ -1418,7 +1508,7 @@ rewrite the timing of occurrences that already happened.
 **Timezone:** "today" is the user's local date, from `profiles.timezone`, falling back to UTC.
 
 **Errors are swallowed** — this runs on read paths and must never fail a page render. Note the
-stamp is set *before* generation, so a failure delays the retry by one interval rather than
+stamp is set _before_ generation, so a failure delays the retry by one interval rather than
 hot-looping.
 
 **Purging on edit — `deleteFutureUntouchedOccurrences(classId)`:** deletes occurrences that are
@@ -1437,15 +1527,28 @@ that read occurrences. Use `updateOrInsert` with the unique `(class_id, date)` i
 `examStatus`, `dateFrom`, `dateTo`. Order: `date ASC, start_time ASC`.
 
 ```jsonc
-{ "data": [{
-    "id": "uuid", "userId": "uuid", "classId": "uuid", "subjectId": "uuid",
-    "date": "2026-08-24", "startTime": "16:00", "durationMinutes": 90,
-    "attendanceStatus": null,
-    "examStatus": "none",
-    "subjectName": "Mathematics", "subjectColor": "#6366F1", "subjectIcon": "calculator",
-    "teacher": "Dr. Hassan", "location": "Room 12",
-    "createdAt": "…", "updatedAt": "…"
-}] }
+{
+  "data": [
+    {
+      "id": "uuid",
+      "userId": "uuid",
+      "classId": "uuid",
+      "subjectId": "uuid",
+      "date": "2026-08-24",
+      "startTime": "16:00",
+      "durationMinutes": 90,
+      "attendanceStatus": null,
+      "examStatus": "none",
+      "subjectName": "Mathematics",
+      "subjectColor": "#6366F1",
+      "subjectIcon": "calculator",
+      "teacher": "Dr. Hassan",
+      "location": "Room 12",
+      "createdAt": "…",
+      "updatedAt": "…",
+    },
+  ],
+}
 ```
 
 `teacher` and `location` are **not** columns on the occurrence — they are read through the join to
@@ -1460,7 +1563,16 @@ Single occurrence, same shape.
 **Query:** `upcomingLimit` — optional integer, default **5**.
 
 ```jsonc
-{ "data": { "today": [ /* occurrences */ ], "upcoming": [ /* ≤ limit */ ] } }
+{
+  "data": {
+    "today": [
+      /* occurrences */
+    ],
+    "upcoming": [
+      /* ≤ limit */
+    ],
+  },
+}
 ```
 
 `today` uses the user's local date. Backs the dashboard's class card.
@@ -1471,10 +1583,10 @@ Single occurrence, same shape.
 { "attendanceStatus": "attended", "examStatus": "upcoming" }
 ```
 
-| Field | Rules |
-| --- | --- |
+| Field              | Rules                                                   |
+| ------------------ | ------------------------------------------------------- |
 | `attendanceStatus` | optional, nullable, `in:attended,absent,late,cancelled` |
-| `examStatus` | optional, `in:none,upcoming,completed` |
+| `examStatus`       | optional, `in:none,upcoming,completed`                  |
 
 `attendanceStatus` is explicitly nullable — clearing it back to "unrecorded" is a valid operation.
 
@@ -1491,14 +1603,24 @@ over the **previous full calendar month** by `sync_user_achievements` (§9.1), a
 **Path params:** `year` (integer), `month` (**1–12**, not zero-indexed).
 
 ```jsonc
-{ "data": {
-    "year": 2026, "month": 8,
+{
+  "data": {
+    "year": 2026,
+    "month": 8,
     "days": [
-      { "date": "2026-08-01", "lessons": [ /* LessonWithRelations */ ],
-        "classes": [ /* ClassOccurrenceWithRelations */ ] }
+      {
+        "date": "2026-08-01",
+        "lessons": [
+          /* LessonWithRelations */
+        ],
+        "classes": [
+          /* ClassOccurrenceWithRelations */
+        ],
+      },
       // … one entry per day of the month
-    ]
-} }
+    ],
+  },
+}
 ```
 
 One entry per calendar day, including empty days — the month grid renders from this array directly.
@@ -1525,15 +1647,22 @@ route group, returning `403`.
 #### GET /api/v1/teaching/classes — `TCLASS-001`
 
 ```jsonc
-{ "data": [{
-    "id": "uuid", "teacherId": "uuid",
-    "name": "Grade 10 Physics",
-    "subjectLabel": "Physics", "description": null,
-    "isArchived": false,
-    "joinCode": "K7M2QX",
-    "studentCount": 23,
-    "createdAt": "…", "updatedAt": "…"
-}] }
+{
+  "data": [
+    {
+      "id": "uuid",
+      "teacherId": "uuid",
+      "name": "Grade 10 Physics",
+      "subjectLabel": "Physics",
+      "description": null,
+      "isArchived": false,
+      "joinCode": "K7M2QX",
+      "studentCount": 23,
+      "createdAt": "…",
+      "updatedAt": "…",
+    },
+  ],
+}
 ```
 
 **`joinCode` comes from a separate table on purpose.** `class_join_codes` exists as its own table
@@ -1561,12 +1690,17 @@ Single `TeacherClassWithStats`.
 #### GET /api/v1/teaching/classes/{id}/roster — `TCLASS-003`
 
 ```jsonc
-{ "data": [{
-    "studentId": "uuid",
-    "fullName": "Sara Ahmed", "avatarUrl": null,
-    "status": "active",
-    "joinedAt": "2026-08-10T12:00:00Z"
-}] }
+{
+  "data": [
+    {
+      "studentId": "uuid",
+      "fullName": "Sara Ahmed",
+      "avatarUrl": null,
+      "status": "active",
+      "joinedAt": "2026-08-10T12:00:00Z",
+    },
+  ],
+}
 ```
 
 Includes `removed` students, so the teacher can see who left.
@@ -1590,14 +1724,18 @@ notes, subjects, grades, study sessions, or attachments.
 #### POST /api/v1/teaching/classes — `TCLASS-004`
 
 ```json
-{ "name": "Grade 10 Physics", "subjectLabel": "Physics", "description": "Mechanics unit" }
+{
+  "name": "Grade 10 Physics",
+  "subjectLabel": "Physics",
+  "description": "Mechanics unit"
+}
 ```
 
-| Field | Rules |
-| --- | --- |
-| `name` | required, `min:1`, `max:120` (DB CHECK) |
-| `subjectLabel` | optional, nullable, string |
-| `description` | optional, nullable, string |
+| Field          | Rules                                   |
+| -------------- | --------------------------------------- |
+| `name`         | required, `min:1`, `max:120` (DB CHECK) |
+| `subjectLabel` | optional, nullable, string              |
+| `description`  | optional, nullable, string              |
 
 **Transactional requirement.** This is not a plain insert — it calls the `create_teacher_class` RPC,
 which inserts the class **and** its join code in one transaction, so **a class never exists without
@@ -1617,6 +1755,7 @@ TeacherClassController@store
 ```
 
 **Join-code generation** — port `generate_join_code()` exactly:
+
 - 6 characters from the alphabet `ABCDEFGHJKMNPQRSTUVWXYZ23456789`
 - **`I`, `L`, `O`, `0`, `1` are excluded** to avoid transcription errors (~887M combinations)
 - up to 10 attempts, checking uniqueness; callers additionally retry once on a unique violation
@@ -1654,14 +1793,18 @@ Generates a new code, invalidating the old one. Existing enrollments are unaffec
 Student-only. The classes the caller has joined.
 
 ```jsonc
-{ "data": [{
-    "teacherClassId": "uuid",
-    "name": "Grade 10 Physics",
-    "subjectLabel": "Physics",
-    "teacherName": "Mr. Khaled",
-    "status": "active",
-    "joinedAt": "2026-08-10T12:00:00Z"
-}] }
+{
+  "data": [
+    {
+      "teacherClassId": "uuid",
+      "name": "Grade 10 Physics",
+      "subjectLabel": "Physics",
+      "teacherName": "Mr. Khaled",
+      "status": "active",
+      "joinedAt": "2026-08-10T12:00:00Z",
+    },
+  ],
+}
 ```
 
 **No `joinCode` field** — students must never receive it.
@@ -1672,8 +1815,8 @@ Student-only. The classes the caller has joined.
 { "code": "K7M2QX" }
 ```
 
-| Field | Rules |
-| --- | --- |
+| Field  | Rules                                                  |
+| ------ | ------------------------------------------------------ |
 | `code` | required, trimmed, uppercased, `regex:/^[A-Z0-9]{6}$/` |
 
 **Server-side normalization (must reproduce):** the RPC applies
@@ -1684,6 +1827,7 @@ are the same code. Do not rely on the client having normalized it.
 navigate.
 
 **Errors:**
+
 - `422` malformed code
 - `403` caller is not a student (`current_app_role() <> 'student'`)
 - `404 {"message": "invalid_join_code"}` — unknown code. Keep this **exact sentinel string**; the UI
@@ -1748,17 +1892,24 @@ A draft assignment is **invisible** to students, not forbidden — unpublishing 
 Teacher view — all of the caller's assignments, drafts included.
 
 ```jsonc
-{ "data": [{
-    "id": "uuid", "teacherClassId": "uuid", "teacherId": "uuid",
-    "title": "Problem set 3",
-    "instructions": "Questions 1–12",
-    "dueAt": "2026-09-01T21:00:00Z",
-    "totalPoints": 100,
-    "status": "published",
-    "publishedAt": "2026-08-25T08:00:00Z",
-    "className": "Grade 10 Physics",
-    "createdAt": "…", "updatedAt": "…"
-}] }
+{
+  "data": [
+    {
+      "id": "uuid",
+      "teacherClassId": "uuid",
+      "teacherId": "uuid",
+      "title": "Problem set 3",
+      "instructions": "Questions 1–12",
+      "dueAt": "2026-09-01T21:00:00Z",
+      "totalPoints": 100,
+      "status": "published",
+      "publishedAt": "2026-08-25T08:00:00Z",
+      "className": "Grade 10 Physics",
+      "createdAt": "…",
+      "updatedAt": "…",
+    },
+  ],
+}
 ```
 
 Note `dueAt` is a **timestamptz**, not a date.
@@ -1768,14 +1919,22 @@ Note `dueAt` is a **timestamptz**, not a date.
 Student view — published assignments for actively-enrolled classes only.
 
 ```jsonc
-{ "data": [{
-    "id": "uuid", "teacherClassId": "uuid",
-    "title": "Problem set 3", "instructions": "Questions 1–12",
-    "dueAt": "2026-09-01T21:00:00Z", "totalPoints": 100,
-    "status": "published", "publishedAt": "…",
-    "className": "Grade 10 Physics",
-    "teacherName": "Mr. Khaled"
-}] }
+{
+  "data": [
+    {
+      "id": "uuid",
+      "teacherClassId": "uuid",
+      "title": "Problem set 3",
+      "instructions": "Questions 1–12",
+      "dueAt": "2026-09-01T21:00:00Z",
+      "totalPoints": 100,
+      "status": "published",
+      "publishedAt": "…",
+      "className": "Grade 10 Physics",
+      "teacherName": "Mr. Khaled",
+    },
+  ],
+}
 ```
 
 `teacherId`, `createdAt`, and `updatedAt` are **deliberately absent** from the student shape.
@@ -1788,17 +1947,22 @@ call it. `{"data": null}` when not visible — do **not** return `403` (§4.3).
 #### POST /api/v1/teaching/assignments — `ASSIGN-004`
 
 ```json
-{ "teacherClassId": "uuid", "title": "Problem set 3",
-  "instructions": "Questions 1–12", "dueAt": "2026-09-01T21:00:00Z", "totalPoints": 100 }
+{
+  "teacherClassId": "uuid",
+  "title": "Problem set 3",
+  "instructions": "Questions 1–12",
+  "dueAt": "2026-09-01T21:00:00Z",
+  "totalPoints": 100
+}
 ```
 
-| Field | Rules | Source |
-| --- | --- | --- |
-| `teacherClassId` | required, uuid, caller must teach it | Zod + RLS |
-| `title` | required, trimmed, `min:1`, `max:160` | Zod + DB CHECK |
-| `instructions` | optional, trimmed, `max:5000` | Zod + DB CHECK |
-| `dueAt` | required, ISO datetime | Zod |
-| `totalPoints` | required, numeric, `gt:0`, `max:1000` | Zod (`max:1000`) + DB CHECK (`> 0`) |
+| Field            | Rules                                 | Source                              |
+| ---------------- | ------------------------------------- | ----------------------------------- |
+| `teacherClassId` | required, uuid, caller must teach it  | Zod + RLS                           |
+| `title`          | required, trimmed, `min:1`, `max:160` | Zod + DB CHECK                      |
+| `instructions`   | optional, trimmed, `max:5000`         | Zod + DB CHECK                      |
+| `dueAt`          | required, ISO datetime                | Zod                                 |
+| `totalPoints`    | required, numeric, `gt:0`, `max:1000` | Zod (`max:1000`) + DB CHECK (`> 0`) |
 
 Note the mismatch: the DB only enforces `> 0`; the `max:1000` ceiling exists **only** in the Zod
 form schema and is therefore unenforced today. Decide deliberately whether to enforce it server-side
@@ -1812,7 +1976,7 @@ Sparse `title`, `instructions`, `dueAt`, `totalPoints`.
 
 **`teacherClassId` is immutable** — it is excluded from `UpdateAssignmentInput` at the type level and
 the `enforce_assignment_pin` trigger rejects any change to `teacher_class_id` or `teacher_id` with
-`42501`. Reject it in the FormRequest (`prohibited`) *and* keep a DB-level guard.
+`42501`. Reject it in the FormRequest (`prohibited`) _and_ keep a DB-level guard.
 
 #### POST /api/v1/teaching/assignments/{id}/publish — `ASSIGN-006`
 
@@ -1882,17 +2046,29 @@ Keep the DB trigger as a backstop.
 Teacher-only. The grading queue.
 
 ```jsonc
-{ "data": [{
-    "studentId": "uuid",
-    "fullName": "Sara Ahmed", "avatarUrl": null,
-    "status": "submitted",
-    "submission": {
-      "id": "uuid", "assignmentId": "uuid", "studentId": "uuid",
-      "content": "…", "submittedAt": "…",
-      "score": null, "feedback": null, "gradedAt": null, "gradedBy": null,
-      "createdAt": "…", "updatedAt": "…"
-    }
-}] }
+{
+  "data": [
+    {
+      "studentId": "uuid",
+      "fullName": "Sara Ahmed",
+      "avatarUrl": null,
+      "status": "submitted",
+      "submission": {
+        "id": "uuid",
+        "assignmentId": "uuid",
+        "studentId": "uuid",
+        "content": "…",
+        "submittedAt": "…",
+        "score": null,
+        "feedback": null,
+        "gradedAt": null,
+        "gradedBy": null,
+        "createdAt": "…",
+        "updatedAt": "…",
+      },
+    },
+  ],
+}
 ```
 
 **Every actively enrolled student appears**, even without a submission — a student who has not turned
@@ -1901,25 +2077,33 @@ this is a left join from the roster, not a list of submissions.
 
 **`status` is derived, never stored:**
 
-| Condition | Status |
-| --- | --- |
-| no submission row | `assigned` |
+| Condition                       | Status      |
+| ------------------------------- | ----------- |
+| no submission row               | `assigned`  |
 | row exists, `graded_at IS NULL` | `submitted` |
-| `graded_at IS NOT NULL` | `graded` |
+| `graded_at IS NOT NULL`         | `graded`    |
 
 #### GET /api/v1/classroom/assignments/{id}/submission — `SUBMIT-002`
 
 The student's own submission, or `{"data": null}` if they have not submitted.
 
 ```jsonc
-{ "data": {
-    "id": "uuid", "assignmentId": "uuid", "studentId": "uuid",
-    "content": "…", "submittedAt": "…",
-    "score": 87, "feedback": "Good work on Q7.",
-    "gradedAt": "…", "gradedBy": "uuid",
+{
+  "data": {
+    "id": "uuid",
+    "assignmentId": "uuid",
+    "studentId": "uuid",
+    "content": "…",
+    "submittedAt": "…",
+    "score": 87,
+    "feedback": "Good work on Q7.",
+    "gradedAt": "…",
+    "gradedBy": "uuid",
     "status": "graded",
-    "createdAt": "…", "updatedAt": "…"
-} }
+    "createdAt": "…",
+    "updatedAt": "…",
+  },
+}
 ```
 
 #### PUT /api/v1/classroom/assignments/{id}/submission — `SUBMIT-003`
@@ -1931,13 +2115,14 @@ same row rather than creating a second one.
 { "content": "My answers…" }
 ```
 
-| Field | Rules |
-| --- | --- |
+| Field     | Rules                                     |
+| --------- | ----------------------------------------- |
 | `content` | required, `min:1`, `max:20000` (DB CHECK) |
 
 `submitted_at` is set to `now()` server-side on every submit.
 
 **Errors:**
+
 - `403` caller is not a student
 - `403` the assignment is not published, or the student is not actively enrolled — enforced by the
   `can_submit_assignment(assignment_id)` RLS predicate on INSERT:
@@ -1960,10 +2145,10 @@ predicate** in the query — authorization rests entirely on the RLS insert poli
 { "score": 87, "feedback": "Good work on Q7." }
 ```
 
-| Field | Rules |
-| --- | --- |
-| `score` | required, numeric, `min:0`, **`<= assignment.total_points`** |
-| `feedback` | optional, nullable, `max:5000` (DB CHECK) |
+| Field      | Rules                                                        |
+| ---------- | ------------------------------------------------------------ |
+| `score`    | required, numeric, `min:0`, **`<= assignment.total_points`** |
+| `feedback` | optional, nullable, `max:5000` (DB CHECK)                    |
 
 The `score <= total_points` check is **cross-table** and is enforced today only inside the trigger
 (raising `23514`). In Laravel implement it as a FormRequest rule that loads the assignment.
@@ -2011,15 +2196,24 @@ Ownership: `user_id = auth.uid()` on all four commands.
 Order: `deadline ASC`.
 
 ```jsonc
-{ "data": [{
-    "id": "uuid", "userId": "uuid", "lessonId": "uuid", "subjectId": "uuid",
-    "title": "Exercises 4.1–4.8",
-    "deadline": "2026-08-30",
-    "completed": false,
-    "subjectName": "Mathematics", "subjectColor": "#6366F1",
-    "lessonTitle": "Quadratic equations",
-    "createdAt": "…", "updatedAt": "…"
-}] }
+{
+  "data": [
+    {
+      "id": "uuid",
+      "userId": "uuid",
+      "lessonId": "uuid",
+      "subjectId": "uuid",
+      "title": "Exercises 4.1–4.8",
+      "deadline": "2026-08-30",
+      "completed": false,
+      "subjectName": "Mathematics",
+      "subjectColor": "#6366F1",
+      "lessonTitle": "Quadratic equations",
+      "createdAt": "…",
+      "updatedAt": "…",
+    },
+  ],
+}
 ```
 
 #### POST /api/v1/homework — `HW-002`
@@ -2028,11 +2222,11 @@ Order: `deadline ASC`.
 { "lessonId": "uuid", "title": "Exercises 4.1–4.8", "deadline": "2026-08-30" }
 ```
 
-| Field | Rules |
-| --- | --- |
-| `lessonId` | required, uuid, must belong to caller |
-| `title` | required, `min:1`, `max:160` (DB CHECK) |
-| `deadline` | required, date `Y-m-d` |
+| Field      | Rules                                   |
+| ---------- | --------------------------------------- |
+| `lessonId` | required, uuid, must belong to caller   |
+| `title`    | required, `min:1`, `max:160` (DB CHECK) |
+| `deadline` | required, date `Y-m-d`                  |
 
 **`subjectId` is not accepted** — it is derived server-side from the lesson. The column is
 denormalized onto `homework` for query performance, and the current action looks it up from the
@@ -2068,16 +2262,26 @@ Ownership: `user_id = auth.uid()`.
 Order: `date DESC`.
 
 ```jsonc
-{ "data": [{
-    "id": "uuid", "userId": "uuid", "lessonId": "uuid", "subjectId": "uuid",
-    "title": "Midterm",
-    "date": "2026-08-20",
-    "score": 87, "totalScore": 100,
-    "percentage": 87,
-    "subjectName": "Mathematics", "subjectColor": "#6366F1",
-    "lessonTitle": "Quadratic equations",
-    "createdAt": "…", "updatedAt": "…"
-}] }
+{
+  "data": [
+    {
+      "id": "uuid",
+      "userId": "uuid",
+      "lessonId": "uuid",
+      "subjectId": "uuid",
+      "title": "Midterm",
+      "date": "2026-08-20",
+      "score": 87,
+      "totalScore": 100,
+      "percentage": 87,
+      "subjectName": "Mathematics",
+      "subjectColor": "#6366F1",
+      "lessonTitle": "Quadratic equations",
+      "createdAt": "…",
+      "updatedAt": "…",
+    },
+  ],
+}
 ```
 
 **`percentage` is a generated column**, `numeric(5,2)`, computed as
@@ -2088,21 +2292,27 @@ and average on it directly.
 #### POST /api/v1/exams — `EXAM-002`
 
 ```json
-{ "lessonId": "uuid", "title": "Midterm", "date": "2026-08-20", "totalScore": 100, "score": 87 }
+{
+  "lessonId": "uuid",
+  "title": "Midterm",
+  "date": "2026-08-20",
+  "totalScore": 100,
+  "score": 87
+}
 ```
 
-| Field | Rules |
-| --- | --- |
-| `lessonId` | required, uuid, must belong to caller |
-| `title` | required, `min:1`, `max:160` |
-| `date` | required, date |
-| `totalScore` | required, numeric, `gt:0` |
-| `score` | optional, numeric, `min:0`, **`lte:totalScore`** |
+| Field        | Rules                                            |
+| ------------ | ------------------------------------------------ |
+| `lessonId`   | required, uuid, must belong to caller            |
+| `title`      | required, `min:1`, `max:160`                     |
+| `date`       | required, date                                   |
+| `totalScore` | required, numeric, `gt:0`                        |
+| `score`      | optional, numeric, `min:0`, **`lte:totalScore`** |
 
 `subjectId` is derived from the lesson, as with homework.
 
 The `score <= totalScore` rule exists in both the Zod schema (as a `.refine()`) and the DB CHECK
-`exams_score_within_total`. An exam with no `score` is an *upcoming* exam.
+`exams_score_within_total`. An exam with no `score` is an _upcoming_ exam.
 
 #### PATCH /api/v1/exams/{id} — `EXAM-003`
 
@@ -2134,15 +2344,28 @@ Spaced repetition using **SM-2 (SuperMemo 1987)**. The scheduling state lives on
 #### GET /api/v1/lessons/{lessonId}/flashcards — `FLASH-001`
 
 ```jsonc
-{ "data": [{
-    "id": "uuid", "userId": "uuid", "lessonId": "uuid", "subjectId": "uuid",
-    "front": "What is the discriminant?", "back": "b² − 4ac",
-    "easeFactor": 2.5, "intervalDays": 6, "repetitions": 2,
-    "dueDate": "2026-08-30", "lastReviewedAt": "2026-08-24T18:00:00Z",
-    "subjectName": "Mathematics", "subjectColor": "#6366F1",
-    "lessonTitle": "Quadratic equations",
-    "createdAt": "…", "updatedAt": "…"
-}] }
+{
+  "data": [
+    {
+      "id": "uuid",
+      "userId": "uuid",
+      "lessonId": "uuid",
+      "subjectId": "uuid",
+      "front": "What is the discriminant?",
+      "back": "b² − 4ac",
+      "easeFactor": 2.5,
+      "intervalDays": 6,
+      "repetitions": 2,
+      "dueDate": "2026-08-30",
+      "lastReviewedAt": "2026-08-24T18:00:00Z",
+      "subjectName": "Mathematics",
+      "subjectColor": "#6366F1",
+      "lessonTitle": "Quadratic equations",
+      "createdAt": "…",
+      "updatedAt": "…",
+    },
+  ],
+}
 ```
 
 #### GET /api/v1/flashcards/decks — `FLASH-002`
@@ -2150,10 +2373,17 @@ Spaced repetition using **SM-2 (SuperMemo 1987)**. The scheduling state lives on
 Per-subject rollup for the deck browser.
 
 ```jsonc
-{ "data": [{
-    "subjectId": "uuid", "subjectName": "Mathematics", "subjectColor": "#6366F1",
-    "totalCards": 42, "dueCount": 7
-}] }
+{
+  "data": [
+    {
+      "subjectId": "uuid",
+      "subjectName": "Mathematics",
+      "subjectColor": "#6366F1",
+      "totalCards": 42,
+      "dueCount": 7,
+    },
+  ],
+}
 ```
 
 `dueCount` counts cards with `due_date <= today`.
@@ -2169,11 +2399,11 @@ Per-subject rollup for the deck browser.
 { "lessonId": "uuid", "front": "What is the discriminant?", "back": "b² − 4ac" }
 ```
 
-| Field | Rules |
-| --- | --- |
-| `lessonId` | required, uuid, must belong to caller |
-| `front` | required, trimmed, `min:1`, `max:500` |
-| `back` | required, trimmed, `min:1`, `max:1000` |
+| Field      | Rules                                  |
+| ---------- | -------------------------------------- |
+| `lessonId` | required, uuid, must belong to caller  |
+| `front`    | required, trimmed, `min:1`, `max:500`  |
+| `back`     | required, trimmed, `min:1`, `max:1000` |
 
 `subjectId` is derived from the lesson. SM-2 state initializes to
 `easeFactor 2.5`, `intervalDays 0`, `repetitions 0`, `dueDate = current_date` — i.e. a new card is
@@ -2196,8 +2426,8 @@ Sparse `front` / `back` **only**. SM-2 state is never client-editable.
 { "grade": "good" }
 ```
 
-| Field | Rules |
-| --- | --- |
+| Field   | Rules                               |
+| ------- | ----------------------------------- |
 | `grade` | required, `in:again,hard,good,easy` |
 
 **Two writes in one operation:** insert a `flashcard_reviews` row and update the card's SM-2 state.
@@ -2205,12 +2435,12 @@ Wrap in a transaction.
 
 **Grade → SM-2 quality mapping** (the UI offers 4 buttons, SM-2 uses 0–5):
 
-| Grade | Quality |
-| --- | --- |
-| `again` | 0 |
-| `hard` | 3 |
-| `good` | 4 |
-| `easy` | 5 |
+| Grade   | Quality |
+| ------- | ------- |
+| `again` | 0       |
+| `hard`  | 3       |
+| `good`  | 4       |
+| `easy`  | 5       |
 
 **The algorithm** — port `applySm2()` from `src/lib/flashcards/sm2.ts` exactly:
 
@@ -2243,22 +2473,28 @@ and no `updated_at` column or trigger. Preserve that; the review log is audit da
 
 #### GET /api/v1/grades/overview — `GRADE-001`
 
-Read-only aggregate. No mutations exist in this domain — the grade *scale* is edited through
+Read-only aggregate. No mutations exist in this domain — the grade _scale_ is edited through
 `SET-003`.
 
 ```jsonc
-{ "data": {
-    "subjects": [{
-      "subjectId": "uuid", "subjectName": "Mathematics", "subjectColor": "#6366F1",
-      "creditHours": 3,
-      "examCount": 4,
-      "average": 86.5,
-      "letter": "B",
-      "gradePoints": 3
-    }],
+{
+  "data": {
+    "subjects": [
+      {
+        "subjectId": "uuid",
+        "subjectName": "Mathematics",
+        "subjectColor": "#6366F1",
+        "creditHours": 3,
+        "examCount": 4,
+        "average": 86.5,
+        "letter": "B",
+        "gradePoints": 3,
+      },
+    ],
     "gpa": 3.42,
-    "trend": [{ "label": "Mar", "value": 81.2 }]
-} }
+    "trend": [{ "label": "Mar", "value": 81.2 }],
+  },
+}
 ```
 
 **Computation, to reproduce exactly** (`src/actions/grades.ts` + `src/lib/grades/scale.ts`):
@@ -2306,14 +2542,24 @@ survives deletion of the thing it was about.
 Order: `started_at DESC`. Full history, unbounded.
 
 ```jsonc
-{ "data": [{
-    "id": "uuid", "userId": "uuid",
-    "subjectId": "uuid", "lessonId": null,
-    "startedAt": "2026-08-24T16:00:00Z", "endedAt": "2026-08-24T17:30:00Z",
-    "durationMinutes": 90,
-    "subjectName": "Mathematics", "subjectColor": "#6366F1", "lessonTitle": null,
-    "createdAt": "…", "updatedAt": "…"
-}] }
+{
+  "data": [
+    {
+      "id": "uuid",
+      "userId": "uuid",
+      "subjectId": "uuid",
+      "lessonId": null,
+      "startedAt": "2026-08-24T16:00:00Z",
+      "endedAt": "2026-08-24T17:30:00Z",
+      "durationMinutes": 90,
+      "subjectName": "Mathematics",
+      "subjectColor": "#6366F1",
+      "lessonTitle": null,
+      "createdAt": "…",
+      "updatedAt": "…",
+    },
+  ],
+}
 ```
 
 #### GET /api/v1/study-sessions/running — `SESSION-002`
@@ -2321,18 +2567,20 @@ Order: `started_at DESC`. Full history, unbounded.
 The caller's single in-progress session, or `{"data": null}`.
 Backed by the partial index `idx_study_sessions_running (user_id) WHERE ended_at IS NULL`.
 
-**Note:** nothing enforces *one* running session per user — there is no unique constraint. The UI
+**Note:** nothing enforces _one_ running session per user — there is no unique constraint. The UI
 prevents it, but the API does not. Consider adding a partial unique index (`OQ-07`).
 
 #### GET /api/v1/study-sessions/summary — `SESSION-003`
 
 ```jsonc
-{ "data": {
+{
+  "data": {
     "totalMinutesThisWeek": 420,
     "totalMinutesToday": 90,
     "averageSessionMinutes": 52,
-    "sessionsThisWeek": 8
-} }
+    "sessionsThisWeek": 8,
+  },
+}
 ```
 
 #### POST /api/v1/study-sessions — `SESSION-004`
@@ -2359,16 +2607,20 @@ contributes no study time. `200`.
 Logs time already studied.
 
 ```json
-{ "subjectId": "uuid", "lessonId": null,
-  "startedAt": "2026-08-23T14:00:00Z", "durationMinutes": 45 }
+{
+  "subjectId": "uuid",
+  "lessonId": null,
+  "startedAt": "2026-08-23T14:00:00Z",
+  "durationMinutes": 45
+}
 ```
 
-| Field | Rules |
-| --- | --- |
-| `subjectId` | optional, nullable, uuid, must belong to caller |
-| `lessonId` | optional, nullable, uuid, must belong to caller |
-| `startedAt` | required, ISO datetime |
-| `durationMinutes` | required, integer, `gt:0` |
+| Field             | Rules                                           |
+| ----------------- | ----------------------------------------------- |
+| `subjectId`       | optional, nullable, uuid, must belong to caller |
+| `lessonId`        | optional, nullable, uuid, must belong to caller |
+| `startedAt`       | required, ISO datetime                          |
+| `durationMinutes` | required, integer, `gt:0`                       |
 
 **`ended_at` is computed server-side** as `startedAt + durationMinutes`, because `duration_minutes`
 is generated and cannot be written directly. The DB CHECK `ended_at >= started_at` backstops it.
@@ -2398,15 +2650,21 @@ Seven types: `upcoming_lesson`, `homework_due`, `daily_reminder`, `upcoming_clas
 The notification center. **Limit 50**, `created_at DESC`.
 
 ```jsonc
-{ "data": [{
-    "id": "uuid", "userId": "uuid",
-    "type": "homework_due",
-    "title": "واجب مستحق قريبًا",
-    "body": "Exercises 4.1–4.8 — due tomorrow",
-    "readAt": null,
-    "linkPath": "/homework/list",
-    "createdAt": "…", "updatedAt": "…"
-}] }
+{
+  "data": [
+    {
+      "id": "uuid",
+      "userId": "uuid",
+      "type": "homework_due",
+      "title": "واجب مستحق قريبًا",
+      "body": "Exercises 4.1–4.8 — due tomorrow",
+      "readAt": null,
+      "linkPath": "/homework/list",
+      "createdAt": "…",
+      "updatedAt": "…",
+    },
+  ],
+}
 ```
 
 **`title` and `body` are stored, already-localized strings**, not i18n keys. They are written at
@@ -2429,7 +2687,14 @@ that fallback.
 Drives the bell. **Limit 10.**
 
 ```jsonc
-{ "data": { "items": [ /* ≤10 notifications */ ], "unreadCount": 3 } }
+{
+  "data": {
+    "items": [
+      /* ≤10 notifications */
+    ],
+    "unreadCount": 3,
+  },
+}
 ```
 
 **This endpoint has a write side effect.** It calls the on-demand generator before reading (§15.2),
@@ -2480,11 +2745,11 @@ The cron sweep endpoint. **Not a user session** — see §16.
 
 **Responses:**
 
-| Status | Body |
-| --- | --- |
-| `401` | `{"error": "Unauthorized"}` |
-| `200` | `{"scanned": 42, "created": 17, "emailed": 3, "errors": []}` |
-| `500` | `{"error": "The notifications job failed."}` |
+| Status | Body                                                         |
+| ------ | ------------------------------------------------------------ |
+| `401`  | `{"error": "Unauthorized"}`                                  |
+| `200`  | `{"scanned": 42, "created": 17, "emailed": 3, "errors": []}` |
+| `500`  | `{"error": "The notifications job failed."}`                 |
 
 **A run with per-user errors still returns `200`** with those errors listed in `errors[]` — one
 user's failure must not fail the sweep. Preserve that.
@@ -2500,12 +2765,19 @@ dropped entirely — a strict improvement, since it removes a public route and a
 #### GET /api/v1/gamification/achievements — `GAME-001`
 
 ```jsonc
-{ "data": [{
-    "id": "uuid", "key": "streak-7",
-    "title": "7-Day Streak", "description": "…", "icon": "flame",
-    "unlockedAt": "2026-08-20T00:00:00Z",
-    "progress": 100
-}] }
+{
+  "data": [
+    {
+      "id": "uuid",
+      "key": "streak-7",
+      "title": "7-Day Streak",
+      "description": "…",
+      "icon": "flame",
+      "unlockedAt": "2026-08-20T00:00:00Z",
+      "progress": 100,
+    },
+  ],
+}
 ```
 
 **Side effect:** calls `sync_user_achievements` (§9.1) before reading, so the catalog is always
@@ -2521,12 +2793,20 @@ The six seeded keys: `first-lesson`, `streak-7`, `streak-30`, `hundred-hours`,
 #### GET /api/v1/gamification/goals — `GAME-002`
 
 ```jsonc
-{ "data": [{
-    "id": "uuid", "userId": "uuid",
-    "period": "weekly", "targetMinutes": 600, "achievedMinutes": 420,
-    "periodStart": "2026-08-24",
-    "createdAt": "…", "updatedAt": "…"
-}] }
+{
+  "data": [
+    {
+      "id": "uuid",
+      "userId": "uuid",
+      "period": "weekly",
+      "targetMinutes": 600,
+      "achievedMinutes": 420,
+      "periodStart": "2026-08-24",
+      "createdAt": "…",
+      "updatedAt": "…",
+    },
+  ],
+}
 ```
 
 #### POST /api/v1/gamification/goals — `GAME-003`
@@ -2535,9 +2815,9 @@ The six seeded keys: `first-lesson`, `streak-7`, `streak-30`, `hundred-hours`,
 { "period": "weekly", "targetMinutes": 600 }
 ```
 
-| Field | Rules |
-| --- | --- |
-| `period` | required, `in:weekly,monthly` |
+| Field           | Rules                                       |
+| --------------- | ------------------------------------------- |
+| `period`        | required, `in:weekly,monthly`               |
 | `targetMinutes` | required, integer, `min:1` (DB CHECK `> 0`) |
 
 **Upsert on `(user_id, period, period_start)`** — the unique constraint means setting a goal twice in
@@ -2582,25 +2862,41 @@ formula shape is assumed by the progress ring.
 One aggregate powering the entire dashboard.
 
 ```jsonc
-{ "data": {
+{
+  "data": {
     "greetingName": "Sara",
     "progress": {
-      "xp": 1840, "level": 7, "xpToNextLevel": 610,
-      "currentStreakDays": 5, "longestStreakDays": 23
+      "xp": 1840,
+      "level": 7,
+      "xpToNextLevel": 610,
+      "currentStreakDays": 5,
+      "longestStreakDays": 23,
     },
     "overallProgressPercent": 70,
-    "todayClasses":    [ /* ClassOccurrenceWithRelations */ ],
-    "upcomingClasses": [ /* ≤5 */ ],
-    "recentActivity": [{
-      "id": "uuid", "kind": "lesson_completed",
-      "label": "Quadratic equations", "occurredAt": "…"
-    }],
+    "todayClasses": [
+      /* ClassOccurrenceWithRelations */
+    ],
+    "upcomingClasses": [
+      /* ≤5 */
+    ],
+    "recentActivity": [
+      {
+        "id": "uuid",
+        "kind": "lesson_completed",
+        "label": "Quadratic equations",
+        "occurredAt": "…",
+      },
+    ],
     "weeklySummary": {
-      "totalMinutes": 420, "targetMinutes": 600,
-      "dayBreakdown": [{ "date": "2026-08-24", "minutes": 90 }]
+      "totalMinutes": 420,
+      "targetMinutes": 600,
+      "dayBreakdown": [{ "date": "2026-08-24", "minutes": 90 }],
     },
-    "assignedWork": [ /* AssignmentForStudent[] — students only */ ]
-} }
+    "assignedWork": [
+      /* AssignmentForStudent[] — students only */
+    ],
+  },
+}
 ```
 
 **Performance — the single heaviest endpoint.** The current implementation issues roughly **15
@@ -2632,17 +2928,23 @@ occurrence materialization — so loading the dashboard can create `class_occurr
 #### GET /api/v1/statistics/overview — `STATS-001`
 
 ```jsonc
-{ "data": {
-    "cards": [{ "key": "totalStudyHours", "label": "…", "value": 128, "suffix": "h" }],
-    "weeklyStudyTime":  [{ "label": "Mon", "value": 90 }],
-    "monthlyLessons":   [{ "label": "Aug", "value": 24 }],
+{
+  "data": {
+    "cards": [
+      { "key": "totalStudyHours", "label": "…", "value": 128, "suffix": "h" },
+    ],
+    "weeklyStudyTime": [{ "label": "Mon", "value": 90 }],
+    "monthlyLessons": [{ "label": "Aug", "value": 24 }],
     "attendanceBreakdown": [{ "label": "attended", "value": 41 }],
-    "subjectDistribution": [{ "subjectName": "Mathematics", "subjectColor": "#6366F1", "value": 620 }],
-    "studyProgress":    [{ "label": "…", "value": 0 }],
-    "heatMap":          [{ "date": "2026-08-24", "intensity": 3 }],
-    "dailyActivity":    [{ "label": "…", "value": 0 }],
-    "monthlyGrowth":    [{ "label": "…", "value": 0 }]
-} }
+    "subjectDistribution": [
+      { "subjectName": "Mathematics", "subjectColor": "#6366F1", "value": 620 },
+    ],
+    "studyProgress": [{ "label": "…", "value": 0 }],
+    "heatMap": [{ "date": "2026-08-24", "intensity": 3 }],
+    "dailyActivity": [{ "label": "…", "value": 0 }],
+    "monthlyGrowth": [{ "label": "…", "value": 0 }],
+  },
+}
 ```
 
 Six raw scans (`study_sessions`, `lessons`, `class_occurrences`, `homework`, `exams`, `subjects`),
@@ -2668,13 +2970,17 @@ Both endpoints share one implementation (`runSearchQuery()` in `src/lib/search/q
 route.
 
 ```jsonc
-{ "data": [{
-    "id": "uuid",
-    "kind": "lesson",
-    "title": "Quadratic equations",
-    "subtitle": "Mathematics",
-    "path": "/lessons/list"
-}] }
+{
+  "data": [
+    {
+      "id": "uuid",
+      "kind": "lesson",
+      "title": "Quadratic equations",
+      "subtitle": "Mathematics",
+      "path": "/lessons/list",
+    },
+  ],
+}
 ```
 
 `kind` ∈ `subject` | `lesson` | `teacher` | `note` | `tag`. **Limit 8 per source**, all scoped to
@@ -2682,10 +2988,10 @@ route.
 
 **Two different search strategies, deliberately:**
 
-| Source | Strategy |
-| --- | --- |
-| `lessons`, `lesson_notes` | **Postgres full-text search** on generated `search_vector` columns (GIN-indexed), via `websearch_to_tsquery` with the `english` config |
-| `subjects`, `tags`, `classes.teacher` | plain `ILIKE '%term%'` — small flat tables where FTS is not worth an index |
+| Source                                | Strategy                                                                                                                               |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `lessons`, `lesson_notes`             | **Postgres full-text search** on generated `search_vector` columns (GIN-indexed), via `websearch_to_tsquery` with the `english` config |
+| `subjects`, `tags`, `classes.teacher` | plain `ILIKE '%term%'` — small flat tables where FTS is not worth an index                                                             |
 
 The `teacher` source searches `classes.teacher` (a free-text column) and de-duplicates names, which
 is why it queries with `limit × 3`.
@@ -2735,10 +3041,10 @@ both the column and the `set_updated_at` trigger. All `uuid` PKs default to `gen
 
 #### Identity & configuration
 
-| Table | Purpose | PK | Notable columns | Key constraints |
-| --- | --- | --- | --- | --- |
-| `profiles` | app user record, 1:1 with `auth.users` | `id` (FK → `auth.users` CASCADE) | `full_name`, `avatar_url`, `timezone`, `role` **nullable** | CHECK `role in ('student','teacher')`; idx on `role` |
-| `settings` | one row per user | `user_id` (FK CASCADE) | `theme`, `locale`, `notification_preferences` jsonb, `grade_scale` jsonb, `notifications_generated_at`, `class_occurrences_materialized_at` | CHECK `theme in ('light','dark','system')` |
+| Table      | Purpose                                | PK                               | Notable columns                                                                                                                             | Key constraints                                      |
+| ---------- | -------------------------------------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| `profiles` | app user record, 1:1 with `auth.users` | `id` (FK → `auth.users` CASCADE) | `full_name`, `avatar_url`, `timezone`, `role` **nullable**                                                                                  | CHECK `role in ('student','teacher')`; idx on `role` |
+| `settings` | one row per user                       | `user_id` (FK CASCADE)           | `theme`, `locale`, `notification_preferences` jsonb, `grade_scale` jsonb, `notifications_generated_at`, `class_occurrences_materialized_at` | CHECK `theme in ('light','dark','system')`           |
 
 `profiles.role` is **nullable by design** — an OAuth signup has no role until onboarding. Both
 `profiles` and `settings` rows are created by `AFTER INSERT` triggers on `auth.users`.
@@ -2747,42 +3053,42 @@ The two `*_at` timestamps on `settings` are **throttle stamps**, not audit field
 
 #### Study core
 
-| Table | Purpose | Notable columns | Key constraints |
-| --- | --- | --- | --- |
-| `subjects` | a course | `name`, `color`, `icon`, `is_archived`, `credit_hours` | CHECK name 1–80; `color ~ '^#[0-9A-Fa-f]{6}$'`; icon in 10 values; `credit_hours > 0` |
-| `lessons` | one study item | `title`, `date`, `study_status`, `review_status`, `homework_status`, `is_archived`, `class_occurrence_id`, `search_vector` | 3 status CHECKs; `search_vector` **GENERATED**; GIN index |
-| `tags` | user-defined label | `name`, `color` | UNIQUE `(user_id, name)`; name 1–40 |
-| `lesson_tags` | join | `lesson_id`, `tag_id` | PK `(lesson_id, tag_id)`; **no `updated_at`**; owner trigger |
-| `lesson_notes` | markdown note | `title`, `content_markdown`, `search_vector` | title 1–160; `search_vector` GENERATED (title A + body B) |
-| `attachments` | file metadata | `kind`, `file_name`, `storage_path`, `size_bytes`, `mime_type` | `storage_path` **UNIQUE**; kind in 4 values; `size_bytes >= 0` |
-| `study_sessions` | timed or logged study | `started_at`, `ended_at`, `duration_minutes` | `duration_minutes` **GENERATED** (`ceil`); CHECK `ended_at >= started_at`; partial idx `WHERE ended_at IS NULL` |
-| `homework` | private to-do | `title`, `deadline`, `completed` | title 1–160; partial idx `WHERE NOT completed` |
-| `exams` | a graded assessment | `title`, `date`, `score`, `total_score`, `percentage` | `percentage` **GENERATED**; `total_score > 0`; `score <= total_score` |
-| `flashcards` | SM-2 card | `front`, `back`, `ease_factor`, `interval_days`, `repetitions`, `due_date`, `last_reviewed_at` | `ease_factor >= 1.3`; `interval_days >= 0`; `repetitions >= 0` |
-| `flashcard_reviews` | append-only review log | `quality`, `reviewed_at` | `quality between 0 and 5`; **no `updated_at`** |
+| Table               | Purpose                | Notable columns                                                                                                            | Key constraints                                                                                                 |
+| ------------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `subjects`          | a course               | `name`, `color`, `icon`, `is_archived`, `credit_hours`                                                                     | CHECK name 1–80; `color ~ '^#[0-9A-Fa-f]{6}$'`; icon in 10 values; `credit_hours > 0`                           |
+| `lessons`           | one study item         | `title`, `date`, `study_status`, `review_status`, `homework_status`, `is_archived`, `class_occurrence_id`, `search_vector` | 3 status CHECKs; `search_vector` **GENERATED**; GIN index                                                       |
+| `tags`              | user-defined label     | `name`, `color`                                                                                                            | UNIQUE `(user_id, name)`; name 1–40                                                                             |
+| `lesson_tags`       | join                   | `lesson_id`, `tag_id`                                                                                                      | PK `(lesson_id, tag_id)`; **no `updated_at`**; owner trigger                                                    |
+| `lesson_notes`      | markdown note          | `title`, `content_markdown`, `search_vector`                                                                               | title 1–160; `search_vector` GENERATED (title A + body B)                                                       |
+| `attachments`       | file metadata          | `kind`, `file_name`, `storage_path`, `size_bytes`, `mime_type`                                                             | `storage_path` **UNIQUE**; kind in 4 values; `size_bytes >= 0`                                                  |
+| `study_sessions`    | timed or logged study  | `started_at`, `ended_at`, `duration_minutes`                                                                               | `duration_minutes` **GENERATED** (`ceil`); CHECK `ended_at >= started_at`; partial idx `WHERE ended_at IS NULL` |
+| `homework`          | private to-do          | `title`, `deadline`, `completed`                                                                                           | title 1–160; partial idx `WHERE NOT completed`                                                                  |
+| `exams`             | a graded assessment    | `title`, `date`, `score`, `total_score`, `percentage`                                                                      | `percentage` **GENERATED**; `total_score > 0`; `score <= total_score`                                           |
+| `flashcards`        | SM-2 card              | `front`, `back`, `ease_factor`, `interval_days`, `repetitions`, `due_date`, `last_reviewed_at`                             | `ease_factor >= 1.3`; `interval_days >= 0`; `repetitions >= 0`                                                  |
+| `flashcard_reviews` | append-only review log | `quality`, `reviewed_at`                                                                                                   | `quality between 0 and 5`; **no `updated_at`**                                                                  |
 
 `lessons`, `homework`, `exams`, `flashcards` all carry both `user_id` and a denormalized
 `subject_id`. RLS keys on `user_id`.
 
 #### Scheduling
 
-| Table | Purpose | Notable columns | Key constraints |
-| --- | --- | --- | --- |
-| `classes` | recurring weekly class | `teacher`, `location`, `meetings` jsonb, `is_active`, `teacher_class_id` | CHECK `validate_class_meetings(meetings)`; `teacher_class_id` FK → `teacher_classes` **SET NULL** |
-| `class_occurrences` | one dated instance | `class_id` **NOT NULL**, `date`, `start_time`, `duration_minutes`, `attendance_status` **nullable**, `exam_status` | UNIQUE `(class_id, date)`; `duration_minutes > 0`; attendance in 4 values or NULL |
+| Table               | Purpose                | Notable columns                                                                                                    | Key constraints                                                                                   |
+| ------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
+| `classes`           | recurring weekly class | `teacher`, `location`, `meetings` jsonb, `is_active`, `teacher_class_id`                                           | CHECK `validate_class_meetings(meetings)`; `teacher_class_id` FK → `teacher_classes` **SET NULL** |
+| `class_occurrences` | one dated instance     | `class_id` **NOT NULL**, `date`, `start_time`, `duration_minutes`, `attendance_status` **nullable**, `exam_status` | UNIQUE `(class_id, date)`; `duration_minutes > 0`; attendance in 4 values or NULL                 |
 
 `classes` has **no start or end date** — it recurs indefinitely; `is_active` pauses it. The
 `starts_on`/`ends_on` columns were dropped in the consolidation.
 
 #### Teaching
 
-| Table | Purpose | Notable columns | Key constraints |
-| --- | --- | --- | --- |
-| `teacher_classes` | a teacher's class | `teacher_id`, `name`, `subject_label` (**free text**), `description`, `is_archived` | name 1–120 |
-| `class_join_codes` | the 6-char code | `teacher_class_id` **PK**, `code`, `rotated_at` | `code` **UNIQUE**; `code ~ '^[A-Z0-9]{6}$'` |
-| `class_enrollments` | student ↔ class | `teacher_class_id`, `student_id`, `status`, `joined_at` | UNIQUE `(teacher_class_id, student_id)`; status in `active`,`removed` |
-| `assignments` | teacher-set work | `teacher_class_id`, `teacher_id`, `title`, `instructions`, `due_at` **timestamptz**, `total_points`, `status`, `published_at` | title 1–160; instructions ≤ 5000; `total_points > 0`; status in `draft`,`published` |
-| `assignment_submissions` | a student's answer | `content`, `submitted_at`, `score`, `feedback`, `graded_at`, `graded_by` | UNIQUE `(assignment_id, student_id)`; content 1–20000; feedback ≤ 5000; `graded_by` FK **SET NULL** |
+| Table                    | Purpose            | Notable columns                                                                                                               | Key constraints                                                                                     |
+| ------------------------ | ------------------ | ----------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `teacher_classes`        | a teacher's class  | `teacher_id`, `name`, `subject_label` (**free text**), `description`, `is_archived`                                           | name 1–120                                                                                          |
+| `class_join_codes`       | the 6-char code    | `teacher_class_id` **PK**, `code`, `rotated_at`                                                                               | `code` **UNIQUE**; `code ~ '^[A-Z0-9]{6}$'`                                                         |
+| `class_enrollments`      | student ↔ class   | `teacher_class_id`, `student_id`, `status`, `joined_at`                                                                       | UNIQUE `(teacher_class_id, student_id)`; status in `active`,`removed`                               |
+| `assignments`            | teacher-set work   | `teacher_class_id`, `teacher_id`, `title`, `instructions`, `due_at` **timestamptz**, `total_points`, `status`, `published_at` | title 1–160; instructions ≤ 5000; `total_points > 0`; status in `draft`,`published`                 |
+| `assignment_submissions` | a student's answer | `content`, `submitted_at`, `score`, `feedback`, `graded_at`, `graded_by`                                                      | UNIQUE `(assignment_id, student_id)`; content 1–20000; feedback ≤ 5000; `graded_by` FK **SET NULL** |
 
 `class_join_codes` is a separate table **specifically because Postgres has no column-level RLS** —
 enrolled students can read `teacher_classes` but must not read the code.
@@ -2792,12 +3098,12 @@ cross-table and lives in the `enforce_submission_write_scope` trigger.
 
 #### Notifications & gamification
 
-| Table | Purpose | Notable columns | Key constraints |
-| --- | --- | --- | --- |
-| `notifications` | one delivered message | `type`, `title`, `body`, `read_at`, `link_path`, `dedupe_key`, `emailed_at` | type CHECK (7 values); **UNIQUE `(user_id, dedupe_key)` — FULL, not partial**; partial idx `WHERE read_at IS NULL` |
-| `achievements` | global seeded catalog | `key` **UNIQUE**, `title`, `description`, `icon` | **no `user_id`, no `updated_at`** |
-| `user_achievements` | per-user progress | `unlocked_at`, `progress` | PK `(user_id, achievement_id)`; `progress between 0 and 100` |
-| `goals` | study-time target | `period`, `target_minutes`, `achieved_minutes`, `period_start` | UNIQUE `(user_id, period, period_start)`; period in `weekly`,`monthly`; `target_minutes > 0` |
+| Table               | Purpose               | Notable columns                                                             | Key constraints                                                                                                    |
+| ------------------- | --------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `notifications`     | one delivered message | `type`, `title`, `body`, `read_at`, `link_path`, `dedupe_key`, `emailed_at` | type CHECK (7 values); **UNIQUE `(user_id, dedupe_key)` — FULL, not partial**; partial idx `WHERE read_at IS NULL` |
+| `achievements`      | global seeded catalog | `key` **UNIQUE**, `title`, `description`, `icon`                            | **no `user_id`, no `updated_at`**                                                                                  |
+| `user_achievements` | per-user progress     | `unlocked_at`, `progress`                                                   | PK `(user_id, achievement_id)`; `progress between 0 and 100`                                                       |
+| `goals`             | study-time target     | `period`, `target_minutes`, `achieved_minutes`, `period_start`              | UNIQUE `(user_id, period, period_start)`; period in `weekly`,`monthly`; `target_minutes > 0`                       |
 
 **`idx_notifications_dedupe` must be a full unique index on `(user_id, dedupe_key)`.** It was
 originally partial (`WHERE dedupe_key IS NOT NULL`), which silently broke **every** insert, because
@@ -2842,12 +3148,12 @@ class occurrence they were attached to.
 Recreate as real generated columns, not application-computed values — queries filter and aggregate
 on them.
 
-| Column | Definition |
-| --- | --- |
-| `lessons.search_vector` | `setweight(to_tsvector('english', coalesce(title,'')), 'A')` — title only |
-| `lesson_notes.search_vector` | title weight `A` ‖ `content_markdown` weight `B` |
+| Column                            | Definition                                                                 |
+| --------------------------------- | -------------------------------------------------------------------------- |
+| `lessons.search_vector`           | `setweight(to_tsvector('english', coalesce(title,'')), 'A')` — title only  |
+| `lesson_notes.search_vector`      | title weight `A` ‖ `content_markdown` weight `B`                           |
 | `study_sessions.duration_minutes` | `ceil(extract(epoch from (ended_at - started_at)) / 60)::int`, else `NULL` |
-| `exams.percentage` | `round((score / total_score) * 100, 2)`, else `NULL` |
+| `exams.percentage`                | `round((score / total_score) * 100, 2)`, else `NULL`                       |
 
 Note `lessons.search_vector` was **rebuilt to title-only** by the class split (it previously included
 the dropped `teacher`/`location` fields).
@@ -2856,12 +3162,12 @@ the dropped `teacher`/`location` fields).
 
 There is **no `deleted_at` column anywhere.** Four tables soft-delete, each differently:
 
-| Table | Mechanism | Notes |
-| --- | --- | --- |
-| `subjects` | `is_archived` boolean | list endpoints return archived rows too |
-| `lessons` | `is_archived` boolean | partial idx `WHERE NOT is_archived` |
-| `teacher_classes` | `is_archived` boolean | |
-| `class_enrollments` | `status = 'removed'` | **never deleted** — preserves submissions |
+| Table               | Mechanism             | Notes                                     |
+| ------------------- | --------------------- | ----------------------------------------- |
+| `subjects`          | `is_archived` boolean | list endpoints return archived rows too   |
+| `lessons`           | `is_archived` boolean | partial idx `WHERE NOT is_archived`       |
+| `teacher_classes`   | `is_archived` boolean |                                           |
+| `class_enrollments` | `status = 'removed'`  | **never deleted** — preserves submissions |
 
 `classes.is_active` looks similar but is **not** a soft delete — it is a pause switch that stops
 occurrence generation. An inactive class is still listed and editable.
@@ -2870,15 +3176,15 @@ occurrence generation. An inactive class is still listed and editable.
 
 Per the audit brief:
 
-| Category | Tables |
-| --- | --- |
-| **Never queried by the app** | none — all 24 are read or written somewhere |
+| Category                                      | Tables                                                                                                                                                                                   |
+| --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Never queried by the app**                  | none — all 24 are read or written somewhere                                                                                                                                              |
 | **Backend/system only** (no direct user CRUD) | `class_join_codes` (written only by RPCs), `user_achievements` (written only by `sync_user_achievements`), `flashcard_reviews` (insert-only), `lesson_tags` (managed via lesson updates) |
-| **Auth-related** | `profiles`, `settings` (both auto-created by `auth.users` triggers) |
-| **Storage-related** | `attachments` (+ the `storage.objects` system table) |
-| **Notification-related** | `notifications`, `settings` (preferences + throttle stamp) |
-| **Touched by cron** | `settings`, `profiles`, `subjects`, `lessons`, `homework`, `class_occurrences`, `classes`, `notifications` |
-| **Global/reference data** | `achievements` (seeded, 6 rows, no `user_id`) |
+| **Auth-related**                              | `profiles`, `settings` (both auto-created by `auth.users` triggers)                                                                                                                      |
+| **Storage-related**                           | `attachments` (+ the `storage.objects` system table)                                                                                                                                     |
+| **Notification-related**                      | `notifications`, `settings` (preferences + throttle stamp)                                                                                                                               |
+| **Touched by cron**                           | `settings`, `profiles`, `subjects`, `lessons`, `homework`, `class_occurrences`, `classes`, `notifications`                                                                               |
+| **Global/reference data**                     | `achievements` (seeded, 6 rows, no `user_id`)                                                                                                                                            |
 
 `achievements` is the only table without a `user_id` and the only one readable by every
 authenticated user (`USING true`).
@@ -2969,13 +3275,13 @@ every achievements read and on every dashboard load.
 
 Recomputes all six achievements for `auth.uid()`:
 
-| Key | Rule |
-| --- | --- |
-| `first-lesson` | ≥ 1 lesson with `study_status IN ('completed','reviewed')` |
-| `hundred-hours` | `SUM(study_sessions.duration_minutes)` vs **6000** minutes |
-| `exam-ace` | any exam with `percentage >= 90` |
-| `streak-7` | longest run of consecutive calendar days with a `study_sessions` row, vs 7 |
-| `streak-30` | same, vs 30 |
+| Key                  | Rule                                                                                                                                                                                  |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `first-lesson`       | ≥ 1 lesson with `study_status IN ('completed','reviewed')`                                                                                                                            |
+| `hundred-hours`      | `SUM(study_sessions.duration_minutes)` vs **6000** minutes                                                                                                                            |
+| `exam-ace`           | any exam with `percentage >= 90`                                                                                                                                                      |
+| `streak-7`           | longest run of consecutive calendar days with a `study_sessions` row, vs 7                                                                                                            |
+| `streak-30`          | same, vs 30                                                                                                                                                                           |
 | `perfect-attendance` | over `class_occurrences` in the **previous full calendar month**: `count(*) FILTER (WHERE attendance_status = 'attended')` vs `count(*) FILTER (WHERE attendance_status IS NOT NULL)` |
 
 Upserts on `(user_id, achievement_id)` with **`progress = greatest(existing, new)`** and
@@ -3009,7 +3315,7 @@ Called best-effort by `submissions.mutations.ts:88`. See §7.15.
 
 **Why both of these are `SECURITY DEFINER`:** the `notifications` INSERT policy is
 `WITH CHECK user_id = auth.uid()` — a user may only insert notifications **for themselves**. These
-two functions must write rows for *other* users, so they escalate. Critically, they **re-derive
+two functions must write rows for _other_ users, so they escalate. Critically, they **re-derive
 authorization from the database** rather than trusting the caller. Laravel has no RLS, so the
 escalation disappears — but the re-derivation must stay, as an explicit policy check inside the job.
 
@@ -3018,27 +3324,27 @@ escalation disappears — but the re-derivation must stay, as an explicit policy
 All `STABLE`, `SECURITY DEFINER`, `LANGUAGE sql`, granted only to `authenticated`. They are
 `DEFINER` purely to break RLS recursion cycles — not to grant extra rights.
 
-| Function | Logic | Laravel |
-| --- | --- | --- |
-| `current_app_role()` | `SELECT role FROM profiles WHERE id = auth.uid()` | `auth()->user()->role` |
-| `is_teacher_of_class(uuid)` | caller owns that `teacher_classes` row | `$u->id === $class->teacher_id` |
-| `is_enrolled_in_class(uuid)` | caller has an **active** enrollment | `$u->activeEnrollments()->where(...)->exists()` |
-| `is_teacher_of_assignment(uuid)` | caller owns the assignment | `$u->id === $assignment->teacher_id` |
-| `can_submit_assignment(uuid)` | assignment is `published` **and** caller is actively enrolled | `SubmissionPolicy::create` |
-| `shares_teacher_class_with(uuid)` | caller teaches a class the target is actively enrolled in, **or** vice versa. **Not transitive** — co-students cannot see each other. | `$u->sharesTeacherClassWith($id)` |
+| Function                          | Logic                                                                                                                                 | Laravel                                         |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| `current_app_role()`              | `SELECT role FROM profiles WHERE id = auth.uid()`                                                                                     | `auth()->user()->role`                          |
+| `is_teacher_of_class(uuid)`       | caller owns that `teacher_classes` row                                                                                                | `$u->id === $class->teacher_id`                 |
+| `is_enrolled_in_class(uuid)`      | caller has an **active** enrollment                                                                                                   | `$u->activeEnrollments()->where(...)->exists()` |
+| `is_teacher_of_assignment(uuid)`  | caller owns the assignment                                                                                                            | `$u->id === $assignment->teacher_id`            |
+| `can_submit_assignment(uuid)`     | assignment is `published` **and** caller is actively enrolled                                                                         | `SubmissionPolicy::create`                      |
+| `shares_teacher_class_with(uuid)` | caller teaches a class the target is actively enrolled in, **or** vice versa. **Not transitive** — co-students cannot see each other. | `$u->sharesTeacherClassWith($id)`               |
 
 Implement these as query scopes and policy helpers on the `User` model. They are used in many
 policies, so a single well-tested helper each is worth it.
 
 ### 9.3 Other functions
 
-| Function | Role | Laravel |
-| --- | --- | --- |
-| `validate_class_meetings(jsonb) → boolean` | `IMMUTABLE`; backs the `classes_meetings_valid` CHECK. Requires: JSON array, length > 0, each element has `dayOfWeek` (number 0–6, unique within the array), `startTime` matching `^([01]\d\|2[0-3]):[0-5]\d$`, `durationMinutes` > 0 | custom validation rule **+ keep the CHECK** |
-| `generate_join_code() → text` | 10 attempts over alphabet `ABCDEFGHJKMNPQRSTUVWXYZ23456789` (no `I L O 0 1`), returning the first unused. **Revoked from all app roles** — internal only. Check-then-return is not atomic, so callers retry on unique violation. | `JoinCodeGenerator` support class |
-| `custom_access_token_hook(jsonb) → jsonb` | `STABLE`, `SECURITY INVOKER`; injects the `user_role` JWT claim (§12.3) | Sanctum token claim |
-| `set_updated_at()` | trigger fn, touches `updated_at` | Eloquent timestamps |
-| `handle_new_user()` / `handle_new_user_settings()` | `AFTER INSERT` on `auth.users`; create the `profiles` / `settings` rows | `RegistrationService` (§7.1) |
+| Function                                           | Role                                                                                                                                                                                                                                  | Laravel                                     |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| `validate_class_meetings(jsonb) → boolean`         | `IMMUTABLE`; backs the `classes_meetings_valid` CHECK. Requires: JSON array, length > 0, each element has `dayOfWeek` (number 0–6, unique within the array), `startTime` matching `^([01]\d\|2[0-3]):[0-5]\d$`, `durationMinutes` > 0 | custom validation rule **+ keep the CHECK** |
+| `generate_join_code() → text`                      | 10 attempts over alphabet `ABCDEFGHJKMNPQRSTUVWXYZ23456789` (no `I L O 0 1`), returning the first unused. **Revoked from all app roles** — internal only. Check-then-return is not atomic, so callers retry on unique violation.      | `JoinCodeGenerator` support class           |
+| `custom_access_token_hook(jsonb) → jsonb`          | `STABLE`, `SECURITY INVOKER`; injects the `user_role` JWT claim (§12.3)                                                                                                                                                               | Sanctum token claim                         |
+| `set_updated_at()`                                 | trigger fn, touches `updated_at`                                                                                                                                                                                                      | Eloquent timestamps                         |
+| `handle_new_user()` / `handle_new_user_settings()` | `AFTER INSERT` on `auth.users`; create the `profiles` / `settings` rows                                                                                                                                                               | `RegistrationService` (§7.1)                |
 
 **Seed caveat:** `supabase/seed.sql` grants `EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO authenticated`
 — a **local-dev convenience that contradicts** the per-function revokes, notably for
@@ -3095,31 +3401,31 @@ The scope is not optional. Without it, an unfiltered `index()` returns every use
 
 ### 10.2 Non-standard policies — the ones that need real thought
 
-| Table | Command | Predicate | Laravel |
-| --- | --- | --- | --- |
-| `profiles` | SELECT | `id = auth.uid()` | own profile |
-| `profiles` | SELECT | `shares_teacher_class_with(id)` | **the only cross-user read in the app** |
-| `profiles` | SELECT | `TO supabase_auth_admin USING (true)` | auth-hook only; no Laravel equivalent |
-| `profiles` | UPDATE | `id = auth.uid()` | + role immutability (§11.2) |
-| `profiles` | — | **no INSERT, no DELETE policy** | rows created by trigger, removed by cascade |
-| `lesson_tags` | SELECT/INSERT/DELETE | `EXISTS (SELECT 1 FROM lessons WHERE lessons.id = lesson_tags.lesson_id AND lessons.user_id = auth.uid())` | authorize via the **parent lesson**; **no UPDATE policy** |
-| `notifications` | INSERT | `user_id = auth.uid()` | users insert only for themselves |
-| `notifications` | — | **no DELETE policy** | notifications can never be deleted — do not add an endpoint |
-| `settings` | SELECT/UPDATE only | `user_id = auth.uid()` | no INSERT (trigger-created), no DELETE |
-| `achievements` | SELECT | `true` | public catalog to any authenticated user |
-| `user_achievements` | SELECT only | `user_id = auth.uid()` | writes only via `sync_user_achievements` |
-| `flashcard_reviews` | SELECT/INSERT only | `user_id = auth.uid()` | **append-only** — no UPDATE, no DELETE |
-| `teacher_classes` | SELECT | `teacher_id = auth.uid() OR is_enrolled_in_class(id)` | teacher **or** enrolled student |
-| `teacher_classes` | INSERT | `teacher_id = auth.uid() AND current_app_role() = 'teacher'` | role check **in the policy**, not just middleware |
-| `class_join_codes` | SELECT/UPDATE/DELETE | `is_teacher_of_class(teacher_class_id)` | **no INSERT policy** — RPC only |
-| `class_enrollments` | SELECT | `student_id = auth.uid() OR is_teacher_of_class(teacher_class_id)` | |
-| `class_enrollments` | UPDATE | `is_teacher_of_class(teacher_class_id)` | **no INSERT, no DELETE policy** |
-| `assignments` | SELECT | `is_teacher_of_class(...) OR (status = 'published' AND is_enrolled_in_class(...))` | drafts invisible to students |
-| `assignments` | INSERT | `teacher_id = auth.uid() AND is_teacher_of_class(...) AND current_app_role() = 'teacher'` | three conjuncts — keep all three |
-| `assignment_submissions` | SELECT | `student_id = auth.uid() OR is_teacher_of_assignment(assignment_id)` | |
-| `assignment_submissions` | INSERT | `student_id = auth.uid() AND can_submit_assignment(assignment_id)` | published + enrolled |
-| `assignment_submissions` | UPDATE | `student_id = auth.uid() OR is_teacher_of_assignment(...)` | **deliberately broad** — the trigger does column scoping (§7.15) |
-| `assignment_submissions` | DELETE | `student_id = auth.uid() AND graded_at IS NULL` | ungraded only |
+| Table                    | Command              | Predicate                                                                                                  | Laravel                                                          |
+| ------------------------ | -------------------- | ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `profiles`               | SELECT               | `id = auth.uid()`                                                                                          | own profile                                                      |
+| `profiles`               | SELECT               | `shares_teacher_class_with(id)`                                                                            | **the only cross-user read in the app**                          |
+| `profiles`               | SELECT               | `TO supabase_auth_admin USING (true)`                                                                      | auth-hook only; no Laravel equivalent                            |
+| `profiles`               | UPDATE               | `id = auth.uid()`                                                                                          | + role immutability (§11.2)                                      |
+| `profiles`               | —                    | **no INSERT, no DELETE policy**                                                                            | rows created by trigger, removed by cascade                      |
+| `lesson_tags`            | SELECT/INSERT/DELETE | `EXISTS (SELECT 1 FROM lessons WHERE lessons.id = lesson_tags.lesson_id AND lessons.user_id = auth.uid())` | authorize via the **parent lesson**; **no UPDATE policy**        |
+| `notifications`          | INSERT               | `user_id = auth.uid()`                                                                                     | users insert only for themselves                                 |
+| `notifications`          | —                    | **no DELETE policy**                                                                                       | notifications can never be deleted — do not add an endpoint      |
+| `settings`               | SELECT/UPDATE only   | `user_id = auth.uid()`                                                                                     | no INSERT (trigger-created), no DELETE                           |
+| `achievements`           | SELECT               | `true`                                                                                                     | public catalog to any authenticated user                         |
+| `user_achievements`      | SELECT only          | `user_id = auth.uid()`                                                                                     | writes only via `sync_user_achievements`                         |
+| `flashcard_reviews`      | SELECT/INSERT only   | `user_id = auth.uid()`                                                                                     | **append-only** — no UPDATE, no DELETE                           |
+| `teacher_classes`        | SELECT               | `teacher_id = auth.uid() OR is_enrolled_in_class(id)`                                                      | teacher **or** enrolled student                                  |
+| `teacher_classes`        | INSERT               | `teacher_id = auth.uid() AND current_app_role() = 'teacher'`                                               | role check **in the policy**, not just middleware                |
+| `class_join_codes`       | SELECT/UPDATE/DELETE | `is_teacher_of_class(teacher_class_id)`                                                                    | **no INSERT policy** — RPC only                                  |
+| `class_enrollments`      | SELECT               | `student_id = auth.uid() OR is_teacher_of_class(teacher_class_id)`                                         |                                                                  |
+| `class_enrollments`      | UPDATE               | `is_teacher_of_class(teacher_class_id)`                                                                    | **no INSERT, no DELETE policy**                                  |
+| `assignments`            | SELECT               | `is_teacher_of_class(...) OR (status = 'published' AND is_enrolled_in_class(...))`                         | drafts invisible to students                                     |
+| `assignments`            | INSERT               | `teacher_id = auth.uid() AND is_teacher_of_class(...) AND current_app_role() = 'teacher'`                  | three conjuncts — keep all three                                 |
+| `assignment_submissions` | SELECT               | `student_id = auth.uid() OR is_teacher_of_assignment(assignment_id)`                                       |                                                                  |
+| `assignment_submissions` | INSERT               | `student_id = auth.uid() AND can_submit_assignment(assignment_id)`                                         | published + enrolled                                             |
+| `assignment_submissions` | UPDATE               | `student_id = auth.uid() OR is_teacher_of_assignment(...)`                                                 | **deliberately broad** — the trigger does column scoping (§7.15) |
+| `assignment_submissions` | DELETE               | `student_id = auth.uid() AND graded_at IS NULL`                                                            | ungraded only                                                    |
 
 ### 10.3 What teachers can and cannot see
 
@@ -3137,16 +3443,16 @@ that boundary.
 
 ### 10.4 Mapping to Laravel constructs
 
-| Supabase mechanism | Laravel construct |
-| --- | --- |
-| `user_id = auth.uid()` on SELECT | **global query scope** (so misses are 404) |
-| `user_id = auth.uid()` on UPDATE/DELETE | **Policy** method |
-| `WITH CHECK` on INSERT | set the column server-side; never accept it from the client |
-| `current_app_role() = 'x'` | **middleware** (`EnsureRole`) **and** a policy check — the app does both today |
-| `EXISTS(... parent ...)` (e.g. `lesson_tags`) | Policy on the **parent**, plus `exists:table,id,user_id` validation |
-| `SECURITY DEFINER` cross-user writes | **Service/Job** with an explicit re-derived authorization check |
-| Column-scoped writes (submissions) | **separate endpoints + FormRequests**, plus an observer |
-| Trigger-enforced invariants | **Model observers**, plus keeping the DB triggers as a backstop |
+| Supabase mechanism                            | Laravel construct                                                              |
+| --------------------------------------------- | ------------------------------------------------------------------------------ |
+| `user_id = auth.uid()` on SELECT              | **global query scope** (so misses are 404)                                     |
+| `user_id = auth.uid()` on UPDATE/DELETE       | **Policy** method                                                              |
+| `WITH CHECK` on INSERT                        | set the column server-side; never accept it from the client                    |
+| `current_app_role() = 'x'`                    | **middleware** (`EnsureRole`) **and** a policy check — the app does both today |
+| `EXISTS(... parent ...)` (e.g. `lesson_tags`) | Policy on the **parent**, plus `exists:table,id,user_id` validation            |
+| `SECURITY DEFINER` cross-user writes          | **Service/Job** with an explicit re-derived authorization check                |
+| Column-scoped writes (submissions)            | **separate endpoints + FormRequests**, plus an observer                        |
+| Trigger-enforced invariants                   | **Model observers**, plus keeping the DB triggers as a backstop                |
 
 ---
 
@@ -3181,8 +3487,8 @@ decision.
 ---
 
 **`enforce_lesson_tags_owner`** · `BEFORE INSERT OR UPDATE` on `lesson_tags`
-*(trigger `enforce_lesson_tags_owner` → function `enforce_lesson_tag_owner()` — note the differing
-plural; both names are real)*
+_(trigger `enforce_lesson_tags_owner` → function `enforce_lesson_tag_owner()` — note the differing
+plural; both names are real)_
 
 Raises `lesson and tag must belong to the same user` if the lesson and tag have different owners, or
 either is missing. This is a **cross-table integrity rule a foreign key cannot express**.
@@ -3274,7 +3580,7 @@ it.
 session; the auth pages redirect signed-in users; the onboarding page redirects if a role is already
 set; `/home` forwards by role.
 
-**Laravel/Next split.** In the target architecture Laravel owns *API* authorization (Sanctum +
+**Laravel/Next split.** In the target architecture Laravel owns _API_ authorization (Sanctum +
 policies) and Next.js keeps this routing middleware, swapping `getClaims()` for a call to
 `GET /auth/me`. Do not try to move route protection into Laravel — it is a UI navigation concern.
 
@@ -3289,11 +3595,11 @@ claims := jsonb_set(claims, '{user_role}', to_jsonb(v_role));
 
 **The present-but-null distinction is load-bearing:**
 
-| Claim state | Meaning |
-| --- | --- |
-| `user_role` present, value `"student"` / `"teacher"` | role known |
-| `user_role` present, value **`null`** | hook ran; user has not completed onboarding |
-| `user_role` **absent** | hook not enabled → middleware falls back to a `profiles` query |
+| Claim state                                          | Meaning                                                        |
+| ---------------------------------------------------- | -------------------------------------------------------------- |
+| `user_role` present, value `"student"` / `"teacher"` | role known                                                     |
+| `user_role` present, value **`null`**                | hook ran; user has not completed onboarding                    |
+| `user_role` **absent**                               | hook not enabled → middleware falls back to a `profiles` query |
 
 Because the function is `SECURITY INVOKER` and Supabase runs it as `supabase_auth_admin` (which has
 no RLS bypass), the migration must grant that role `USAGE` on `public`, `EXECUTE` on the function,
@@ -3314,13 +3620,13 @@ Laravel-issued token always carries the claim.
 Supabase CLI defaults, which means **these are currently undocumented and must be decided explicitly
 for Laravel**:
 
-| Setting | Supabase CLI default | Decide for Laravel |
-| --- | --- | --- |
-| Signup enabled | yes | yes |
-| Email confirmation | **disabled locally** | is verification required? (`OQ-01`) |
-| JWT expiry | 3600 s | Sanctum token expiry |
-| Refresh token rotation | on | Sanctum has no refresh tokens — see `OQ-02` |
-| Minimum password length | 6 | **use 8** — matches the Zod schema the UI enforces |
+| Setting                 | Supabase CLI default | Decide for Laravel                                 |
+| ----------------------- | -------------------- | -------------------------------------------------- |
+| Signup enabled          | yes                  | yes                                                |
+| Email confirmation      | **disabled locally** | is verification required? (`OQ-01`)                |
+| JWT expiry              | 3600 s               | Sanctum token expiry                               |
+| Refresh token rotation  | on                   | Sanctum has no refresh tokens — see `OQ-02`        |
+| Minimum password length | 6                    | **use 8** — matches the Zod schema the UI enforces |
 
 Note the mismatch: Supabase's server-side minimum is 6 while the form requires 8. Standardize on 8.
 
@@ -3335,18 +3641,18 @@ model, but you need to recognize them to be sure nothing is missed.
 ```ts
 export async function requireUser(
   supabase: SupabaseServerClient,
-): Promise<{ userId: string } | { error: string }>
+): Promise<{ userId: string } | { error: string }>;
 
 export async function requireRole(
   supabase: SupabaseServerClient,
   role: AppRole,
-): Promise<{ userId: string; role: AppRole } | { error: string }>
+): Promise<{ userId: string; role: AppRole } | { error: string }>;
 ```
 
 A discriminated union — call sites do `if ("error" in auth) return {success: false, error: auth.error}`.
 Error strings are exactly `"You must be signed in."` and `"You do not have access to this action."`
 `requireRole` reads `profiles.role` through a React `cache()` deduped per request by `userId`, so
-repeated calls in one render hit the table once. `requireUser` is only consumed *inside*
+repeated calls in one render hit the table once. `requireUser` is only consumed _inside_
 `requireRole` — no action calls it directly.
 
 Used by 4 files (19 call sites): `assignments.mutations.ts`, `submissions.mutations.ts`,
@@ -3418,31 +3724,31 @@ requirement.
 
 One bucket, defined in `20260807120016_storage_attachments.sql`:
 
-| Property | Value |
-| --- | --- |
-| Name | `attachments` |
-| **Public** | **`true`** |
-| Size limit | `52428800` (50 MB) |
-| Allowed MIME | 12 types (§7.7) |
+| Property        | Value                                          |
+| --------------- | ---------------------------------------------- |
+| Name            | `attachments`                                  |
+| **Public**      | **`true`**                                     |
+| Size limit      | `52428800` (50 MB)                             |
+| Allowed MIME    | 12 types (§7.7)                                |
 | Path convention | `{user_id}/{lesson_id}/{timestamp}-{filename}` |
 
 `storage.objects` policies:
 
-| Command | Predicate |
-| --- | --- |
-| SELECT | `bucket_id = 'attachments'` — **any authenticated user, any file** |
-| INSERT | `bucket_id = 'attachments' AND auth.uid()::text = (storage.foldername(name))[1]` |
-| UPDATE | same as INSERT (no `WITH CHECK` declared) |
-| DELETE | same as INSERT |
+| Command | Predicate                                                                        |
+| ------- | -------------------------------------------------------------------------------- |
+| SELECT  | `bucket_id = 'attachments'` — **any authenticated user, any file**               |
+| INSERT  | `bucket_id = 'attachments' AND auth.uid()::text = (storage.foldername(name))[1]` |
+| UPDATE  | same as INSERT (no `WITH CHECK` declared)                                        |
+| DELETE  | same as INSERT                                                                   |
 
 ### 14.2 The security finding
 
-**Reads are effectively unprotected.** The bucket is public *and* the SELECT policy grants every
+**Reads are effectively unprotected.** The bucket is public _and_ the SELECT policy grants every
 authenticated user access to every object. URLs are generated with `getPublicUrl()` and are
 **unsigned** — there is no `createSignedUrl` call anywhere in the codebase.
 
 Path secrecy is the only protection on read. By contrast the `public.attachments` **row** is
-strictly owner-scoped, so a user cannot *enumerate* others' files — but any leaked or guessed URL
+strictly owner-scoped, so a user cannot _enumerate_ others' files — but any leaked or guessed URL
 works for anyone, forever.
 
 **This is a genuine confidentiality gap, not a quirk.** Moving to private storage with signed URLs
@@ -3455,14 +3761,14 @@ silent migration side effect. In particular, any URL already shared or embedded 
 config/filesystems.php → 's3' disk (S3, R2, or MinIO)
 ```
 
-| Concern | Implementation |
-| --- | --- |
-| Upload | `POST /api/v1/lessons/{lessonId}/attachments`, `multipart/form-data` |
-| Validation | `file\|max:51200` (KB) `\|mimetypes:<the 12 types>` |
-| Path | keep `{user_id}/{lesson_id}/{timestamp}-{name}` — makes data migration a straight copy |
-| Read | `Storage::temporaryUrl($path, now()->addMinutes(15))` **(recommended)**, or `Storage::url()` to preserve current behavior exactly |
-| Delete | delete object, then row |
-| Authorization | `AttachmentPolicy` on the row; the disk stays private |
+| Concern       | Implementation                                                                                                                    |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Upload        | `POST /api/v1/lessons/{lessonId}/attachments`, `multipart/form-data`                                                              |
+| Validation    | `file\|max:51200` (KB) `\|mimetypes:<the 12 types>`                                                                               |
+| Path          | keep `{user_id}/{lesson_id}/{timestamp}-{name}` — makes data migration a straight copy                                            |
+| Read          | `Storage::temporaryUrl($path, now()->addMinutes(15))` **(recommended)**, or `Storage::url()` to preserve current behavior exactly |
+| Delete        | delete object, then row                                                                                                           |
+| Authorization | `AttachmentPolicy` on the row; the disk stays private                                                                             |
 
 **Two behaviors that must be preserved:**
 
@@ -3561,15 +3867,15 @@ without also widening that threshold.
 
 Identical constants in both paths:
 
-| Constant | Value |
-| --- | --- |
-| `UPCOMING_LESSON_DAYS` | 1 |
-| `UPCOMING_CLASS_LEAD_MINUTES` | 10 |
-| `HOMEWORK_DUE_DAYS` | 2 |
-| `REVIEW_AGE_DAYS` | 7 |
-| `REVIEW_MAX_AGE_DAYS` | 60 |
-| `REVIEW_REMINDERS_PER_RUN` | 3 |
-| `REFRESH_INTERVAL_MS` | 5 min |
+| Constant                      | Value |
+| ----------------------------- | ----- |
+| `UPCOMING_LESSON_DAYS`        | 1     |
+| `UPCOMING_CLASS_LEAD_MINUTES` | 10    |
+| `HOMEWORK_DUE_DAYS`           | 2     |
+| `REVIEW_AGE_DAYS`             | 7     |
+| `REVIEW_MAX_AGE_DAYS`         | 60    |
+| `REVIEW_REMINDERS_PER_RUN`    | 3     |
+| `REFRESH_INTERVAL_MS`         | 5 min |
 
 **Dedupe key formats** — these define "the same notification" and must be reproduced exactly:
 
@@ -3637,7 +3943,7 @@ Preference checks use `coalesce(pref, true)`: a missing key means **enabled**.
 service, no service worker. Uses the Web Notifications API directly.
 
 - SSR-safe: `permission` starts `"denied"` and resolves in `useEffect`.
-- Shown ids are persisted to `localStorage` under **`"study-line:notified-ids"`**, capped at 200.
+- Shown ids are persisted to `localStorage` under **`"lessonio:notified-ids"`**, capped at 200.
 - The bell's first poll of a session is **baseline-only** (`markAsShown` without popups), so
   returning after days away does not burst notifications.
 - OS popups additionally require `enabledInBrowser` **and** `permission === "granted"`.
@@ -3650,15 +3956,15 @@ Nothing here changes in the migration.
 
 Exactly one scheduled job.
 
-| Field | Value |
-| --- | --- |
-| Job name | `notifications-sweep` |
-| Schedule | `*/5 * * * *` (every 5 minutes) |
-| Mechanism | `pg_cron` + `pg_net` |
-| Action | `net.http_post` to `{app_url}/api/cron/notifications` with `Authorization: Bearer <secret>` |
-| Secrets | Supabase Vault: `cron_notifications_url`, `cron_notifications_secret` |
+| Field           | Value                                                                                                      |
+| --------------- | ---------------------------------------------------------------------------------------------------------- |
+| Job name        | `notifications-sweep`                                                                                      |
+| Schedule        | `*/5 * * * *` (every 5 minutes)                                                                            |
+| Mechanism       | `pg_cron` + `pg_net`                                                                                       |
+| Action          | `net.http_post` to `{app_url}/api/cron/notifications` with `Authorization: Bearer <secret>`                |
+| Secrets         | Supabase Vault: `cron_notifications_url`, `cron_notifications_secret`                                      |
 | Tables affected | `settings`, `profiles`, `subjects`, `lessons`, `homework`, `class_occurrences`, `classes`, `notifications` |
-| API equivalent | `NOTIF-007` |
+| API equivalent  | `NOTIF-007`                                                                                                |
 
 The database calls the application over HTTP, which is why a shared secret exists at all. Secrets
 live in Vault and are never committed.
@@ -3687,15 +3993,15 @@ between sweeps.
 
 **One external service.**
 
-| Field | Value |
-| --- | --- |
-| Service | **Resend** (transactional email) |
-| Access | official `resend` npm SDK (^6.18.1) — **not** raw `fetch` |
-| Endpoint | `emails.send({from, to, subject, html})` |
-| Auth | API key |
-| Env vars | `RESEND_API_KEY`, `EMAIL_FROM` |
-| Callers | `emailNotifications()` in `notifications.generate.ts` and `notifications.jobs.ts`; `sendNotificationToEmail()` in `notifications.mutations.ts` |
-| Error handling | missing config → `{success: false, error: "Email delivery is not configured."}`. Never throws. |
+| Field          | Value                                                                                                                                          |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Service        | **Resend** (transactional email)                                                                                                               |
+| Access         | official `resend` npm SDK (^6.18.1) — **not** raw `fetch`                                                                                      |
+| Endpoint       | `emails.send({from, to, subject, html})`                                                                                                       |
+| Auth           | API key                                                                                                                                        |
+| Env vars       | `RESEND_API_KEY`, `EMAIL_FROM`                                                                                                                 |
+| Callers        | `emailNotifications()` in `notifications.generate.ts` and `notifications.jobs.ts`; `sendNotificationToEmail()` in `notifications.mutations.ts` |
+| Error handling | missing config → `{success: false, error: "Email delivery is not configured."}`. Never throws.                                                 |
 
 → **Laravel:** the Resend mail driver, or SMTP. Configuration lives in `config/mail.php`; keep the
 graceful-degradation behavior so a missing key never 500s a notification read.
@@ -3744,11 +4050,11 @@ OAuth client credentials.
 The application is in an unusually good position. There is **no API client, no Axios, no fetch
 wrapper** — because there is nothing to wrap. Instead:
 
-| Layer | Pattern |
-| --- | --- |
-| SSR components (40+ files, `modules/**/ssr/*.tsx`) | `import { Actions } from "@/actions"` → `Actions.Domain.method()` |
+| Layer                                                                        | Pattern                                                                           |
+| ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| SSR components (40+ files, `modules/**/ssr/*.tsx`)                           | `import { Actions } from "@/actions"` → `Actions.Domain.method()`                 |
 | Client components (~45 files, `modules/**/csr/*.tsx`, `**/components/*.tsx`) | `import { createX } from "@/actions/<domain>.mutations"` wrapped in `useMutation` |
-| Cache invalidation | `revalidatePath("/", "layout")` inside every mutation |
+| Cache invalidation                                                           | `revalidatePath("/", "layout")` inside every mutation                             |
 
 **Zero components touch Supabase directly.** The browser client has no importers at all.
 
@@ -3773,14 +4079,22 @@ bodies of the action functions, keeping every signature and return type identica
 // src/lib/api/client.ts  (new)
 const BASE = `${process.env.NEXT_PUBLIC_API_URL}/api/v1`;
 
-async function request<T>(path: string, init?: RequestInit): Promise<ActionResult<T>> {
+async function request<T>(
+  path: string,
+  init?: RequestInit,
+): Promise<ActionResult<T>> {
   try {
     const res = await fetch(`${BASE}${path}`, {
       ...init,
-      headers: { "Content-Type": "application/json", ...authHeader(), ...init?.headers },
+      headers: {
+        "Content-Type": "application/json",
+        ...authHeader(),
+        ...init?.headers,
+      },
     });
     const body = await res.json();
-    if (!res.ok) return { data: null, error: body.message ?? "Request failed." };
+    if (!res.ok)
+      return { data: null, error: body.message ?? "Request failed." };
     return { data: body.data as T, error: null };
   } catch {
     return { data: null, error: "Network error." };
@@ -3935,30 +4249,30 @@ core feature · **MEDIUM** = degraded behavior · **LOW** = cosmetic or easily c
 `src/actions/` imports Zod zero times; all 13 schemas are client-side form schemas. Any payload can
 be sent directly to a Server Action today, bounded only by DB CHECK constraints. Every FormRequest
 in this document is **new enforcement**.
-*Mitigation:* implement the rule tables in §7 exhaustively. Treat a missing FormRequest as a bug.
-*Upside:* this is the migration's single biggest correctness win.
+_Mitigation:_ implement the rule tables in §7 exhaustively. Treat a missing FormRequest as a bug.
+_Upside:_ this is the migration's single biggest correctness win.
 
 **`RISK-02` — RLS has no Laravel equivalent**
 ~60 policies enforce authorization in the database. Application code above them is permissive by
 design — `.eq("user_id", uid)` filters are belt-and-braces, and in two cases absent entirely.
 Dropping RLS without reimplementing every predicate is a mass data leak.
-*Mitigation:* §10, both halves — Policy **and** global scope. Audit every model for the scope.
+_Mitigation:_ §10, both halves — Policy **and** global scope. Audit every model for the scope.
 
 **`RISK-03` — `gradeSubmission` has no ownership check in application code**
 It filters only `.eq("id", submissionId)`. Safe today purely because of RLS plus the write-scope
 trigger. A naive port lets **any teacher grade any submission in the system.**
-*Mitigation:* mandatory `SubmissionPolicy::grade` (§7.15). Add an explicit regression test.
+_Mitigation:_ mandatory `SubmissionPolicy::grade` (§7.15). Add an explicit regression test.
 
 **`RISK-04` — Trigger-enforced column scoping on submissions**
 `enforce_submission_write_scope()` prevents students setting `score`/`feedback`/`graded_at`, prevents
 teachers editing `content`, blocks edits to graded work, validates `score <= total_points`
 cross-table, and server-stamps `graded_by`/`graded_at`. None of this is visible in the TypeScript.
-*Mitigation:* split endpoints + FormRequests + observer; keep the DB trigger as a backstop (§11.2).
+_Mitigation:_ split endpoints + FormRequests + observer; keep the DB trigger as a backstop (§11.2).
 
 **`RISK-05` — Attachment storage is effectively public**
 Bucket `public: true` and a SELECT policy of `bucket_id = 'attachments'`: any authenticated user can
 read any file, and URLs are unsigned and permanent.
-*Mitigation:* move to a private disk with temporary URLs (§14.2) — but note this **changes behavior**
+_Mitigation:_ move to a private disk with temporary URLs (§14.2) — but note this **changes behavior**
 and invalidates already-shared links. Make it a deliberate decision.
 
 ### HIGH
@@ -4051,20 +4365,20 @@ key. Do not "fix" by translating the DB rows; the UI ignores them (§7.22).
 
 Answers are needed from the product owner, not derivable from the code.
 
-| ID | Question | Why it matters |
-| --- | --- | --- |
-| `OQ-01` | Is email verification required on signup? | Not implemented in app code; whatever exists is Supabase Dashboard config that the audit cannot see. Laravel needs an explicit decision. |
-| `OQ-02` | Token lifetime and refresh strategy? | Supabase uses 1 h JWTs with refresh-token rotation. Sanctum has no refresh tokens. Choose long-lived tokens or add a refresh endpoint. |
+| ID      | Question                                             | Why it matters                                                                                                                                                                                                                             |
+| ------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `OQ-01` | Is email verification required on signup?            | Not implemented in app code; whatever exists is Supabase Dashboard config that the audit cannot see. Laravel needs an explicit decision.                                                                                                   |
+| `OQ-02` | Token lifetime and refresh strategy?                 | Supabase uses 1 h JWTs with refresh-token rotation. Sanctum has no refresh tokens. Choose long-lived tokens or add a refresh endpoint.                                                                                                     |
 | `OQ-03` | Should `GET /settings/export` include teaching data? | It currently exports 16 collections and **omits** `teacher_classes`, `class_enrollments`, `assignments`, `assignment_submissions`, `flashcards`, `flashcard_reviews`. Unclear whether deliberate or an oversight. Possible GDPR relevance. |
-| `OQ-04` | Enforce `totalPoints <= 1000` on assignments? | The ceiling exists only in the Zod form schema; the DB allows any positive value. Enforcing it server-side could reject existing rows. |
-| `OQ-05` | Localize the duplicated-lesson `" (Copy)"` suffix? | Hardcoded English in an otherwise bilingual app. |
-| `OQ-06` | Should late submissions be rejected? | `assignments.due_at` is displayed but never enforced — submissions are accepted at any time. |
-| `OQ-07` | Enforce one running study session per user? | No unique constraint exists; only the UI prevents it. A partial unique index would fix it but may conflict with existing data. |
-| `OQ-08` | Improve Arabic full-text search? | FTS uses the `english` config for lessons and notes. Arabic content effectively relies on the `ILIKE` sources. A product decision, not a migration task. |
-| `OQ-09` | Is the `azure` OAuth provider wanted? | Typed as a valid `OAuthProvider` but has no UI button and no local config. Port it or drop it. |
-| `OQ-10` | Keep notification generation on a `GET`? | The bell's polling `GET` mutates state. Preserving it is exact; splitting it is cleaner HTTP (§7.21). |
-| `OQ-11` | Should notifications ever be deletable? | There is deliberately **no DELETE policy** on `notifications`. Confirm before adding an endpoint. |
-| `OQ-12` | Move attachments to signed URLs? | Fixes `RISK-05` but invalidates any already-shared link (§14.2). |
+| `OQ-04` | Enforce `totalPoints <= 1000` on assignments?        | The ceiling exists only in the Zod form schema; the DB allows any positive value. Enforcing it server-side could reject existing rows.                                                                                                     |
+| `OQ-05` | Localize the duplicated-lesson `" (Copy)"` suffix?   | Hardcoded English in an otherwise bilingual app.                                                                                                                                                                                           |
+| `OQ-06` | Should late submissions be rejected?                 | `assignments.due_at` is displayed but never enforced — submissions are accepted at any time.                                                                                                                                               |
+| `OQ-07` | Enforce one running study session per user?          | No unique constraint exists; only the UI prevents it. A partial unique index would fix it but may conflict with existing data.                                                                                                             |
+| `OQ-08` | Improve Arabic full-text search?                     | FTS uses the `english` config for lessons and notes. Arabic content effectively relies on the `ILIKE` sources. A product decision, not a migration task.                                                                                   |
+| `OQ-09` | Is the `azure` OAuth provider wanted?                | Typed as a valid `OAuthProvider` but has no UI button and no local config. Port it or drop it.                                                                                                                                             |
+| `OQ-10` | Keep notification generation on a `GET`?             | The bell's polling `GET` mutates state. Preserving it is exact; splitting it is cleaner HTTP (§7.21).                                                                                                                                      |
+| `OQ-11` | Should notifications ever be deletable?              | There is deliberately **no DELETE policy** on `notifications`. Confirm before adding an endpoint.                                                                                                                                          |
+| `OQ-12` | Move attachments to signed URLs?                     | Fixes `RISK-05` but invalidates any already-shared link (§14.2).                                                                                                                                                                           |
 
 ### Inferred vs implemented
 
@@ -4135,7 +4449,7 @@ because every call already goes through `src/actions/`.
 
 ---
 
-*Generated from repository inspection on 2026-08-28. Sources: 47 files in `src/actions/`, 38
+_Generated from repository inspection on 2026-08-28. Sources: 47 files in `src/actions/`, 38
 migrations in `supabase/migrations/`, 2 route handlers, the middleware and auth layer, 13 validation
 schemas, and 30 domain type definitions. No application code was modified. No secret values appear
-in this document — environment variables are referenced by name only.*
+in this document — environment variables are referenced by name only._

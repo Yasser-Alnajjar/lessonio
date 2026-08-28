@@ -1,8 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
-import { useMutation } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format, parseISO } from "date-fns";
 import { useTranslations } from "next-intl";
@@ -49,21 +48,18 @@ export function SubmissionPanel({
     defaultValues: { content: submission?.content ?? "" },
   });
 
-  const mutation = useMutation({
-    mutationFn: (values: SubmitAssignmentInput) =>
-      submitAssignment(assignmentId, values),
-    onSuccess: (result) => {
+  const [isPending, startTransition] = useTransition();
+
+  const onSubmit = form.handleSubmit((values) => {
+    setFormError(null);
+    startTransition(async () => {
+      const result = await submitAssignment(assignmentId, values);
       if (!result.success) {
         setFormError(result.error);
         return;
       }
       router.refresh();
-    },
-  });
-
-  const onSubmit = form.handleSubmit((values) => {
-    setFormError(null);
-    mutation.mutate(values);
+    });
   });
 
   if (submission?.status === "graded") {
@@ -136,9 +132,9 @@ export function SubmissionPanel({
             )}
 
             <div>
-              <Button type="submit" disabled={mutation.isPending}>
-                {mutation.isPending && <LessonioSpinner />}
-                {mutation.isPending
+              <Button type="submit" disabled={isPending}>
+                {isPending && <LessonioSpinner />}
+                {isPending
                   ? t("submitting")
                   : submission
                     ? t("resubmit")

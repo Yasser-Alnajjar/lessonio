@@ -1,7 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMemo, useState, useTransition } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useLocale, useTranslations } from "next-intl";
@@ -82,24 +81,22 @@ export function GoalFormDialog({
     }
   }
 
-  const mutation = useMutation({
-    mutationFn: (values: CreateGoalInput) =>
-      isEdit && goal
-        ? updateGoal(goal.id, { targetMinutes: values.targetMinutes })
-        : setCurrentGoal(values),
-    onSuccess: (result) => {
+  const [isPending, startTransition] = useTransition();
+
+  const onSubmit = form.handleSubmit((values) => {
+    setFormError(null);
+    startTransition(async () => {
+      const result =
+        isEdit && goal
+          ? await updateGoal(goal.id, { targetMinutes: values.targetMinutes })
+          : await setCurrentGoal(values);
       if (!result.success) {
         setFormError(result.error);
         return;
       }
       onOpenChange(false);
       onSaved?.();
-    },
-  });
-
-  const onSubmit = form.handleSubmit((values) => {
-    setFormError(null);
-    mutation.mutate(values);
+    });
   });
 
   return (
@@ -182,9 +179,9 @@ export function GoalFormDialog({
               >
                 {t("cancel")}
               </Button>
-              <Button type="submit" disabled={mutation.isPending}>
-                {mutation.isPending && <LessonioSpinner />}
-                {mutation.isPending
+              <Button type="submit" disabled={isPending}>
+                {isPending && <LessonioSpinner />}
+                {isPending
                   ? t("submitting")
                   : isEdit
                     ? t("submitEdit")

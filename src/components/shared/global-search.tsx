@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { useQuery } from "@tanstack/react-query";
 import { SearchIcon } from "lucide-react";
 import { useLocale } from "next-intl";
 
@@ -75,13 +74,27 @@ export function GlobalSearch() {
     if (!open) setQuery("");
   }
 
-  const { data, isFetching } = useQuery({
-    queryKey: ["search", "live", trimmedQuery],
-    queryFn: () => liveSearch(trimmedQuery),
-    enabled: trimmedQuery.length > 0,
-  });
+  const [results, setResults] = React.useState<SearchResultItem[]>([]);
+  const [isFetching, setIsFetching] = React.useState(false);
 
-  const results = data?.data ?? [];
+  React.useEffect(() => {
+    if (trimmedQuery.length === 0) {
+      setResults([]);
+      setIsFetching(false);
+      return;
+    }
+    let cancelled = false;
+    setIsFetching(true);
+    liveSearch(trimmedQuery).then((result) => {
+      if (cancelled) return;
+      setResults(result.data ?? []);
+      setIsFetching(false);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [trimmedQuery]);
+
   const groups = groupByKind(results);
 
   const goTo = (path: string) => {

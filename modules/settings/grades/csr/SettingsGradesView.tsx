@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useState, useTransition } from "react";
 
 import { updateGradeScale } from "@/actions/settings.mutations";
 import { Button } from "@/components/ui/button";
@@ -35,18 +34,23 @@ export const SettingsGradesView = ({ scale: initialScale }: SettingsGradesViewPr
   const [scale, setScale] = useState<GradeScaleEntry[]>(initialScale ?? DEFAULT_GRADE_SCALE);
   const [status, setStatus] = useState<{ kind: "saved" | "error"; message: string } | null>(null);
 
-  const save = useMutation({
-    mutationFn: () => updateGradeScale(scale),
-    onSuccess: (result) => {
-      if (result.success) {
-        setStatus({ kind: "saved", message: t("saved") });
-        router.refresh();
-      } else {
-        setStatus({ kind: "error", message: result.error ?? t("genericError") });
+  const [isPending, startTransition] = useTransition();
+
+  const save = () => {
+    startTransition(async () => {
+      try {
+        const result = await updateGradeScale(scale);
+        if (result.success) {
+          setStatus({ kind: "saved", message: t("saved") });
+          router.refresh();
+        } else {
+          setStatus({ kind: "error", message: result.error ?? t("genericError") });
+        }
+      } catch {
+        setStatus({ kind: "error", message: t("genericError") });
       }
-    },
-    onError: () => setStatus({ kind: "error", message: t("genericError") }),
-  });
+    });
+  };
 
   const updateEntry = (index: number, patch: Partial<GradeScaleEntry>) => {
     setStatus(null);
@@ -124,8 +128,8 @@ export const SettingsGradesView = ({ scale: initialScale }: SettingsGradesViewPr
         )}
 
         <div className="flex items-center gap-3">
-          <Button type="button" onClick={() => save.mutate()} disabled={!valid || save.isPending}>
-            {save.isPending ? t("saving") : t("save")}
+          <Button type="button" onClick={save} disabled={!valid || isPending}>
+            {isPending ? t("saving") : t("save")}
           </Button>
           {status && (
             <p role="status" className={status.kind === "error" ? "text-sm text-destructive" : "text-sm"}>

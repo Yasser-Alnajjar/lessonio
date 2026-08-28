@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { CheckCircle2 } from "lucide-react";
 
@@ -32,11 +31,10 @@ export function ReviewRunner({ cards, backHref }: ReviewRunnerProps) {
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [reviewedCount, setReviewedCount] = useState(0);
-
-  const mutation = useMutation({
-    mutationFn: ({ id, grade }: { id: string; grade: FlashcardGrade }) =>
-      recordFlashcardReview(id, grade),
-  });
+  const [pendingGrade, setPendingGrade] = useState<FlashcardGrade | null>(
+    null,
+  );
+  const [isPending, startTransition] = useTransition();
 
   if (cards.length === 0) {
     return (
@@ -72,16 +70,13 @@ export function ReviewRunner({ cards, backHref }: ReviewRunnerProps) {
   }
 
   const handleGrade = (grade: FlashcardGrade) => {
-    mutation.mutate(
-      { id: current.id, grade },
-      {
-        onSuccess: () => {
-          setReviewedCount((prev) => prev + 1);
-          setIndex((prev) => prev + 1);
-          setFlipped(false);
-        },
-      },
-    );
+    setPendingGrade(grade);
+    startTransition(async () => {
+      await recordFlashcardReview(current.id, grade);
+      setReviewedCount((prev) => prev + 1);
+      setIndex((prev) => prev + 1);
+      setFlipped(false);
+    });
   };
 
   return (
@@ -129,11 +124,11 @@ export function ReviewRunner({ cards, backHref }: ReviewRunnerProps) {
               key={grade}
               type="button"
               variant="outline"
-              disabled={mutation.isPending}
+              disabled={isPending}
               onClick={() => handleGrade(grade)}
               className={cn("flex-col gap-1 py-3", GRADE_STYLES[grade])}
             >
-              {mutation.isPending && mutation.variables?.grade === grade ? (
+              {isPending && pendingGrade === grade ? (
                 <LessonioSpinner className="size-4" />
               ) : (
                 t(`grades.${grade}`)

@@ -1,7 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMemo, useState, useTransition } from "react";
 import { Check, Mail, Settings2 } from "lucide-react";
 import { useFormatter, useLocale } from "next-intl";
 
@@ -10,7 +9,6 @@ import {
   markNotificationAsRead,
   sendNotificationToEmail,
 } from "@/actions/notifications.mutations";
-import { NOTIFICATIONS_QUERY_KEY } from "@/components/shared/notification-bell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -63,11 +61,13 @@ export const NotificationsCenterView = ({
   const isArabic = locale === "ar";
   const format = useFormatter();
   const router = useRouter();
-  const queryClient = useQueryClient();
 
   const [tab, setTab] = useState<Tab>("all");
   const [emailedId, setEmailedId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isMarkingRead, startMarkReadTransition] = useTransition();
+  const [isMarkingAllRead, startMarkAllReadTransition] = useTransition();
+  const [isEmailing, startEmailTransition] = useTransition();
 
   const unreadCount = data.filter((item) => item.readAt === null).length;
 
@@ -77,39 +77,43 @@ export const NotificationsCenterView = ({
     return groupByDay(visible);
   }, [data, tab]);
 
-  /** Both the server-rendered list and the bell's polled cache go stale on a write. */
-  const refresh = () => {
-    queryClient.invalidateQueries({ queryKey: NOTIFICATIONS_QUERY_KEY });
-    router.refresh();
+  /** The server-rendered list goes stale on a write; the bell picks up the change on its next poll. */
+  const refresh = () => router.refresh();
+
+  const markRead = (id: string) => {
+    startMarkReadTransition(async () => {
+      await markNotificationAsRead(id);
+      refresh();
+    });
   };
 
-  const markRead = useMutation({
-    mutationFn: (id: string) => markNotificationAsRead(id),
-    onSuccess: refresh,
-  });
+  const markAllRead = () => {
+    startMarkAllReadTransition(async () => {
+      await markAllNotificationsAsRead();
+      refresh();
+    });
+  };
 
-  const markAllRead = useMutation({
-    mutationFn: () => markAllNotificationsAsRead(),
-    onSuccess: refresh,
-  });
-
-  const email = useMutation({
-    mutationFn: (id: string) => sendNotificationToEmail(id),
-    onSuccess: (result, id) => {
-      if (result.success) {
-        setError(null);
-        setEmailedId(id);
-        refresh();
-      } else {
-        setEmailedId(null);
-        setError(result.error ?? t("center.genericError"));
+  const email = (id: string) => {
+    startEmailTransition(async () => {
+      try {
+        const result = await sendNotificationToEmail(id);
+        if (result.success) {
+          setError(null);
+          setEmailedId(id);
+          refresh();
+        } else {
+          setEmailedId(null);
+          setError(result.error ?? t("center.genericError"));
+        }
+      } catch {
+        setError(t("center.genericError"));
       }
-    },
-    onError: () => setError(t("center.genericError")),
-  });
+    });
+  };
 
   const handleOpen = (notification: Notification) => {
-    if (notification.readAt === null) markRead.mutate(notification.id);
+    if (notification.readAt === null) markRead(notification.id);
     if (notification.linkPath) router.push(notification.linkPath);
   };
 
@@ -135,8 +139,8 @@ export const NotificationsCenterView = ({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => markAllRead.mutate()}
-              disabled={markAllRead.isPending}
+              onClick={markAllRead}
+              disabled={isMarkingAllRead}
             >
               <Check />
               {t("center.markAllRead")}
@@ -242,8 +246,8 @@ export const NotificationsCenterView = ({
                             size="icon"
                             aria-label={t("center.markRead")}
                             title={t("center.markRead")}
-                            onClick={() => markRead.mutate(notification.id)}
-                            disabled={markRead.isPending}
+                            onClick={() => markRead(notification.id)}
+                            disabled={isMarkingRead}
                           >
                             <Check />
                           </Button>
@@ -258,8 +262,8 @@ export const NotificationsCenterView = ({
                               ? t("center.emailSent")
                               : t("center.emailMe")
                           }
-                          onClick={() => email.mutate(notification.id)}
-                          disabled={email.isPending}
+                          onClick={() => email(notification.id)}
+                          disabled={isEmailing}
                           className={cn(
                             emailedId === notification.id && "text-primary",
                           )}

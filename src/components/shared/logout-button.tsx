@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
+import { useTransition } from "react";
 import { LogOut } from "lucide-react";
 import { useTranslations } from "next-intl";
 
@@ -20,26 +20,28 @@ export function LogoutButton({
   const t = useTranslations("auth");
   const router = useRouter();
 
-  const mutation = useMutation({
-    mutationFn: () => logout(),
-    onSuccess: (result) => {
+  const [isPending, startTransition] = useTransition();
+
+  const handleLogout = () => {
+    startTransition(async () => {
+      const result = await logout();
       if (result.success) {
         router.push("/auth/login");
         router.refresh();
       }
-    },
-  });
+    });
+  };
 
   return (
     <Button
       type="button"
       variant={variant}
-      disabled={mutation.isPending}
-      onClick={() => mutation.mutate()}
+      disabled={isPending}
+      onClick={handleLogout}
       {...props}
     >
       <LogOut />
-      {showLabel && (mutation.isPending ? t("loggingOut") : t("logout"))}
+      {showLabel && (isPending ? t("loggingOut") : t("logout"))}
     </Button>
   );
 }

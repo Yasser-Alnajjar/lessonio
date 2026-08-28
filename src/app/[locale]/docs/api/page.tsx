@@ -6,7 +6,11 @@ const page = async () => {
   const filePath = path.join(process.cwd(), "docs/API_CONTRACT.md");
   const content = await fs.readFile(filePath, "utf8");
 
-  return <Markdown content={content} />;
+  return (
+    <div className="max-w-7xl mx-auto p-4" dir="ltr">
+      <Markdown content={content} />
+    </div>
+  );
 };
 
 export default page;

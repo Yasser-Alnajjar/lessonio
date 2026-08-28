@@ -1,8 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
-import { useMutation } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format, parseISO } from "date-fns";
 import { useLocale, useTranslations } from "next-intl";
@@ -104,29 +103,27 @@ export function AssignmentFormDialog({
     }
   }
 
-  const mutation = useMutation({
-    mutationFn: (values: CreateAssignmentInput) =>
-      isEdit && item
-        ? updateAssignment(item.id, {
-            title: values.title,
-            instructions: values.instructions,
-            dueAt: values.dueAt,
-            totalPoints: values.totalPoints,
-          })
-        : createAssignment(values),
-    onSuccess: (result) => {
+  const [isPending, startTransition] = useTransition();
+
+  const onSubmit = form.handleSubmit((values) => {
+    setFormError(null);
+    startTransition(async () => {
+      const result =
+        isEdit && item
+          ? await updateAssignment(item.id, {
+              title: values.title,
+              instructions: values.instructions,
+              dueAt: values.dueAt,
+              totalPoints: values.totalPoints,
+            })
+          : await createAssignment(values);
       if (!result.success) {
         setFormError(result.error);
         return;
       }
       onOpenChange(false);
       onSaved?.();
-    },
-  });
-
-  const onSubmit = form.handleSubmit((values) => {
-    setFormError(null);
-    mutation.mutate(values);
+    });
   });
 
   return (
@@ -262,10 +259,10 @@ export function AssignmentFormDialog({
               </Button>
               <Button
                 type="submit"
-                disabled={mutation.isPending || classes.length === 0}
+                disabled={isPending || classes.length === 0}
               >
-                {mutation.isPending && <LessonioSpinner />}
-                {mutation.isPending
+                {isPending && <LessonioSpinner />}
+                {isPending
                   ? t("submitting")
                   : isEdit
                     ? t("submitEdit")

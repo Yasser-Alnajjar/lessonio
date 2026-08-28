@@ -18,9 +18,6 @@ import { getTranslations } from "next-intl/server";
 import { Actions } from "@/actions";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
-import { LanguageSwitch } from "@/components/shared/language-switch";
-import { LessonioMark } from "@/components/shared/lessonio-mark";
-import { ThemeToggle } from "@/components/shared/theme-toggle";
 
 const FEATURE_ICONS = {
   subjects: BookOpen,
@@ -50,44 +47,10 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function DocsPage() {
   const t = await getTranslations("docs");
-  const tApp = await getTranslations("app");
   const { data: user } = await Actions.Auth.getSession();
 
   return (
-    <div className="bg-background flex min-h-svh flex-col">
-      {/* Header */}
-      <header className="border-border/60 border-b">
-        <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-4 px-6">
-          <Link href="/" className="flex items-center gap-2">
-            <LessonioMark className="h-6 w-auto" />
-            <span className="text-md">Lessonio</span>
-          </Link>
-
-          <div className="ms-auto flex items-center gap-2">
-            <div className="hidden items-center gap-2 sm:flex">
-              <ThemeToggle />
-              <LanguageSwitch />
-            </div>
-            {user ? (
-              <Button asChild size="sm">
-                <Link href="/dashboard/overview">
-                  {t("cta.go_to_dashboard")}
-                </Link>
-              </Button>
-            ) : (
-              <>
-                <Button asChild variant="ghost" size="sm">
-                  <Link href="/auth/login">{t("cta.secondary")}</Link>
-                </Button>
-                <Button asChild size="sm">
-                  <Link href="/auth/register">{t("cta.primary")}</Link>
-                </Button>
-              </>
-            )}
-          </div>
-        </div>
-      </header>
-
+    <>
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="from-primary/10 via-background to-highlighter/10 absolute inset-0 -z-10 bg-linear-to-br" />
@@ -223,21 +186,6 @@ export default async function DocsPage() {
           </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="border-border/60 mt-auto border-t">
-        <div className="text-muted-foreground/70 mx-auto flex w-full max-w-6xl flex-col items-center justify-between gap-2 px-6 py-8 text-xs sm:flex-row">
-          <div className="flex items-center gap-2">
-            <LessonioMark className="h-4 w-auto" />
-            <Link href="/" className="hover:text-foreground transition-colors">
-              {t("backHome")}
-            </Link>
-          </div>
-          <span>
-            © {new Date().getFullYear()} {tApp("name")}
-          </span>
-        </div>
-      </footer>
-    </div>
+    </>
   );
 }

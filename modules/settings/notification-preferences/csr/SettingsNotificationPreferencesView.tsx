@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useState, useTransition } from "react";
 import { BellRing } from "lucide-react";
 
 import { updateNotificationPreferences } from "@/actions/settings.mutations";
@@ -44,21 +43,26 @@ export const SettingsNotificationPreferencesView = ({
     message: string;
   } | null>(null);
 
-  const save = useMutation({
-    mutationFn: () => updateNotificationPreferences(preferences),
-    onSuccess: (result) => {
-      if (result.success) {
-        setStatus({ kind: "saved", message: t("saved") });
-        router.refresh();
-      } else {
-        setStatus({
-          kind: "error",
-          message: result.error ?? t("genericError"),
-        });
+  const [isPending, startTransition] = useTransition();
+
+  const save = () => {
+    startTransition(async () => {
+      try {
+        const result = await updateNotificationPreferences(preferences);
+        if (result.success) {
+          setStatus({ kind: "saved", message: t("saved") });
+          router.refresh();
+        } else {
+          setStatus({
+            kind: "error",
+            message: result.error ?? t("genericError"),
+          });
+        }
+      } catch {
+        setStatus({ kind: "error", message: t("genericError") });
       }
-    },
-    onError: () => setStatus({ kind: "error", message: t("genericError") }),
-  });
+    });
+  };
 
   const setType = (type: NotificationType, enabled: boolean) => {
     setStatus(null);
@@ -176,10 +180,10 @@ export const SettingsNotificationPreferencesView = ({
         <div className="flex items-center gap-3">
           <Button
             type="button"
-            onClick={() => save.mutate()}
-            disabled={!data || save.isPending}
+            onClick={save}
+            disabled={!data || isPending}
           >
-            {save.isPending ? t("saving") : t("save")}
+            {isPending ? t("saving") : t("save")}
           </Button>
           {status && (
             <p

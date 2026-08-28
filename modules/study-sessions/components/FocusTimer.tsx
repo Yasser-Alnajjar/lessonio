@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { Play, Square, X } from "lucide-react";
 
 import {
@@ -71,42 +70,46 @@ export function FocusTimer({ running, subjects, lessons }: FocusTimerProps) {
     [lessons, subjectId],
   );
 
-  const startMutation = useMutation({
-    mutationFn: () =>
-      startStudySession({
+  const [error, setError] = useState<string | null>(null);
+  const [isStarting, startStartTransition] = useTransition();
+  const [isStopping, startStopTransition] = useTransition();
+  const [isCancelling, startCancelTransition] = useTransition();
+
+  const handleStart = () => {
+    startStartTransition(async () => {
+      const result = await startStudySession({
         subjectId: subjectId === NO_SUBJECT ? undefined : subjectId,
         lessonId: lessonId === NO_SUBJECT ? undefined : lessonId,
-      }),
-    onSuccess: (result) => {
-      if (result.success) router.refresh();
-    },
-  });
+      });
+      if (result.success) {
+        setError(null);
+        router.refresh();
+      } else {
+        setError(result.error);
+      }
+    });
+  };
 
-  const stopMutation = useMutation({
-    mutationFn: (id: string) => stopStudySession(id),
-    onSuccess: (result) => {
-      if (result.success) router.refresh();
-    },
-  });
+  const handleStop = (id: string) => {
+    startStopTransition(async () => {
+      const result = await stopStudySession(id);
+      if (result.success) {
+        setError(null);
+        router.refresh();
+      } else {
+        setError(result.error);
+      }
+    });
+  };
 
-  const cancelMutation = useMutation({
-    mutationFn: (id: string) => cancelStudySession(id),
-    onSuccess: (result) => {
+  const handleCancel = (id: string) => {
+    startCancelTransition(async () => {
+      const result = await cancelStudySession(id);
       if (result.success) router.refresh();
-    },
-  });
+    });
+  };
 
-  const pending =
-    startMutation.isPending ||
-    stopMutation.isPending ||
-    cancelMutation.isPending;
-  const error =
-    (startMutation.data && !startMutation.data.success
-      ? startMutation.data.error
-      : null) ??
-    (stopMutation.data && !stopMutation.data.success
-      ? stopMutation.data.error
-      : null);
+  const pending = isStarting || isStopping || isCancelling;
 
   return (
     <Card data-slot="focus-timer" className="gap-4">
@@ -137,11 +140,11 @@ export function FocusTimer({ running, subjects, lessons }: FocusTimerProps) {
             )}
             <div className="flex items-center gap-2">
               <Button
-                onClick={() => stopMutation.mutate(running.id)}
+                onClick={() => handleStop(running.id)}
                 disabled={pending}
                 className="gap-2"
               >
-                {stopMutation.isPending ? (
+                {isStopping ? (
                   <LessonioSpinner className="size-4" />
                 ) : (
                   <Square className="size-4" />
@@ -152,7 +155,7 @@ export function FocusTimer({ running, subjects, lessons }: FocusTimerProps) {
                 variant="ghost"
                 size="icon"
                 disabled={pending}
-                onClick={() => cancelMutation.mutate(running.id)}
+                onClick={() => handleCancel(running.id)}
                 aria-label={t("cancel")}
               >
                 <X className="size-4" />
@@ -200,11 +203,11 @@ export function FocusTimer({ running, subjects, lessons }: FocusTimerProps) {
             </Select>
 
             <Button
-              onClick={() => startMutation.mutate()}
+              onClick={handleStart}
               disabled={pending}
               className="gap-2"
             >
-              {startMutation.isPending ? (
+              {isStarting ? (
                 <LessonioSpinner className="size-4" />
               ) : (
                 <Play className="size-4" />

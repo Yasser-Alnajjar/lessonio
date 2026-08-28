@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import React, { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { Bell } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
@@ -9,6 +8,7 @@ import {
   getRecentNotifications,
   markAllNotificationsAsRead,
   markNotificationAsRead,
+  type RecentNotifications,
 } from "@/actions/notifications.mutations";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,14 +23,13 @@ import { NotificationIcon } from "@/components/ui-system/notification-icon";
 import { useBrowserNotifications } from "@/hooks/use-browser-notifications";
 import { Link, useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
+import type { ActionResult } from "@/lib/types/common";
 import type { Notification } from "@/lib/types/notification";
 
 /** How often the bell re-checks for new notifications. */
 const POLL_INTERVAL_MS = 60_000;
 /** How many rows the dropdown itself renders (the query returns up to 10). */
 const VISIBLE_LIMIT = 10;
-
-export const NOTIFICATIONS_QUERY_KEY = ["notifications", "recent"] as const;
 
 interface NotificationBellProps {
   /** From the user's saved preferences — gates the OS popup, not the dropdown. */
@@ -44,31 +43,41 @@ export function NotificationBell({
   const locale = useLocale();
   const isArabic = locale === "ar";
   const router = useRouter();
-  const queryClient = useQueryClient();
   const { permission, showNotification, markAsShown } =
     useBrowserNotifications();
 
-  const { data } = useQuery({
-    queryKey: NOTIFICATIONS_QUERY_KEY,
-    queryFn: () => getRecentNotifications(),
-    refetchInterval: POLL_INTERVAL_MS,
-    refetchOnWindowFocus: true,
-  });
+  const [data, setData] = useState<ActionResult<RecentNotifications> | null>(
+    null,
+  );
+  const [isMarkingAllRead, startMarkAllReadTransition] = useTransition();
+
+  const refresh = useCallback(() => {
+    getRecentNotifications().then(setData);
+  }, []);
+
+  useEffect(() => {
+    refresh();
+    const interval = setInterval(refresh, POLL_INTERVAL_MS);
+    window.addEventListener("focus", refresh);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("focus", refresh);
+    };
+  }, [refresh]);
 
   const items = data?.data?.items ?? [];
   const unreadCount = data?.data?.unreadCount ?? 0;
 
-  const markRead = useMutation({
-    mutationFn: (id: string) => markNotificationAsRead(id),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: NOTIFICATIONS_QUERY_KEY }),
-  });
+  const markRead = (id: string) => {
+    markNotificationAsRead(id).then(refresh);
+  };
 
-  const markAllRead = useMutation({
-    mutationFn: () => markAllNotificationsAsRead(),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: NOTIFICATIONS_QUERY_KEY }),
-  });
+  const markAllRead = () => {
+    startMarkAllReadTransition(async () => {
+      await markAllNotificationsAsRead();
+      refresh();
+    });
+  };
 
   // The first poll of a session establishes the baseline instead of firing
   // popups — otherwise signing in after a few days away would produce a burst
@@ -107,7 +116,7 @@ export function NotificationBell({
 
   const handleSelect = (notification: Notification) => {
     if (notification.readAt === null) {
-      markRead.mutate(notification.id);
+      markRead(notification.id);
     }
     router.push(notification.linkPath ?? "/notifications/center");
   };
@@ -161,8 +170,8 @@ export function NotificationBell({
           {unreadCount > 0 && (
             <Button
               type="button"
-              onClick={() => markAllRead.mutate()}
-              disabled={markAllRead.isPending}
+              onClick={markAllRead}
+              disabled={isMarkingAllRead}
               size="sm"
               variant="ghost"
               className="disabled:opacity-50"

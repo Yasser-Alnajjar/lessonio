@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Check, Copy, RefreshCw } from "lucide-react";
 
@@ -22,13 +21,20 @@ export function JoinCodePanel({
 }: JoinCodePanelProps) {
   const t = useTranslations("teaching.roster.joinCode");
   const [copied, setCopied] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
 
-  const mutation = useMutation({
-    mutationFn: () => rotateJoinCode(classId),
-    onSuccess: (result) => {
-      if (result.data) onRotated?.(result.data);
-    },
-  });
+  const handleRotate = () => {
+    startTransition(async () => {
+      const result = await rotateJoinCode(classId);
+      if (result.data) {
+        setError(null);
+        onRotated?.(result.data);
+      } else {
+        setError(result.error);
+      }
+    });
+  };
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(code);
@@ -58,19 +64,19 @@ export function JoinCodePanel({
           type="button"
           variant="outline"
           size="icon-sm"
-          onClick={() => mutation.mutate()}
-          disabled={mutation.isPending}
+          onClick={handleRotate}
+          disabled={isPending}
           aria-label={t("rotate")}
         >
           <RefreshCw
-            className={cn("size-4", mutation.isPending && "animate-spin")}
+            className={cn("size-4", isPending && "animate-spin")}
           />
         </Button>
       </div>
       <p className="text-xs text-muted-foreground">{t("hint")}</p>
-      {mutation.data?.error && (
+      {error && (
         <p role="alert" className="text-xs font-medium text-destructive">
-          {mutation.data.error}
+          {error}
         </p>
       )}
     </div>

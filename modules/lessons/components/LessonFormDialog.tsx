@@ -1,7 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMemo, useState, useTransition } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { format, parseISO } from "date-fns";
@@ -112,22 +111,22 @@ export function LessonFormDialog({
     }
   }
 
-  const mutation = useMutation({
-    mutationFn: (values: CreateLessonInput) =>
-      isEdit && lesson ? updateLesson(lesson.id, values) : createLesson(values),
-    onSuccess: (result) => {
+  const [isPending, startTransition] = useTransition();
+
+  const onSubmit = form.handleSubmit((values) => {
+    setFormError(null);
+    startTransition(async () => {
+      const result =
+        isEdit && lesson
+          ? await updateLesson(lesson.id, values)
+          : await createLesson(values);
       if (!result.success) {
         setFormError(result.error);
         return;
       }
       onOpenChange(false);
       onSaved?.();
-    },
-  });
-
-  const onSubmit = form.handleSubmit((values) => {
-    setFormError(null);
-    mutation.mutate(values);
+    });
   });
 
   return (
@@ -288,10 +287,10 @@ export function LessonFormDialog({
               </Button>
               <Button
                 type="submit"
-                disabled={mutation.isPending || subjects.length === 0}
+                disabled={isPending || subjects.length === 0}
               >
-                {mutation.isPending && <LessonioSpinner />}
-                {mutation.isPending
+                {isPending && <LessonioSpinner />}
+                {isPending
                   ? t("submitting")
                   : isEdit
                     ? t("submitEdit")

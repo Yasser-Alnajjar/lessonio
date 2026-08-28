@@ -1,7 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMemo, useState, useTransition } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useTranslations } from "next-intl";
@@ -50,21 +49,19 @@ export const RegisterForm = () => {
     },
   });
 
-  const mutation = useMutation({
-    mutationFn: (input: RegisterInput) => register(input),
-    onSuccess: (result) => {
+  const [isPending, startTransition] = useTransition();
+
+  const onSubmit = form.handleSubmit((values) => {
+    setFormError(null);
+    startTransition(async () => {
+      const result = await register(values);
       if (!result.success) {
         setFormError(result.error);
         return;
       }
       setSucceeded(true);
       form.reset();
-    },
-  });
-
-  const onSubmit = form.handleSubmit((values) => {
-    setFormError(null);
-    mutation.mutate(values);
+    });
   });
 
   return (
@@ -209,11 +206,11 @@ export const RegisterForm = () => {
 
                 <Button
                   type="submit"
-                  disabled={mutation.isPending}
+                  disabled={isPending}
                   className="mt-2"
                 >
-                  {mutation.isPending ? <LessonioSpinner /> : <UserPlus />}
-                  {mutation.isPending ? t("submitting") : t("submit")}
+                  {isPending ? <LessonioSpinner /> : <UserPlus />}
+                  {isPending ? t("submitting") : t("submit")}
                 </Button>
               </form>
             </Form>

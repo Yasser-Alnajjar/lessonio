@@ -1,7 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMemo, useState, useTransition } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useSearchParams } from "next/navigation";
@@ -46,9 +45,12 @@ export const LoginForm = () => {
     defaultValues: { email: "", password: "" },
   });
 
-  const mutation = useMutation({
-    mutationFn: (input: LoginInput) => login(input),
-    onSuccess: (result) => {
+  const [isPending, startTransition] = useTransition();
+
+  const onSubmit = form.handleSubmit((values) => {
+    setFormError(null);
+    startTransition(async () => {
+      const result = await login(values);
       if (!result.success) {
         setFormError(result.error);
         return;
@@ -59,12 +61,7 @@ export const LoginForm = () => {
       );
       router.push(destination);
       router.refresh();
-    },
-  });
-
-  const onSubmit = form.handleSubmit((values) => {
-    setFormError(null);
-    mutation.mutate(values);
+    });
   });
 
   return (
@@ -136,11 +133,11 @@ export const LoginForm = () => {
 
             <Button
               type="submit"
-              disabled={mutation.isPending}
+              disabled={isPending}
               className="mt-2"
             >
-              {mutation.isPending ? <LessonioSpinner /> : <LogIn />}
-              {mutation.isPending ? t("submitting") : t("submit")}
+              {isPending ? <LessonioSpinner /> : <LogIn />}
+              {isPending ? t("submitting") : t("submit")}
             </Button>
           </form>
         </Form>

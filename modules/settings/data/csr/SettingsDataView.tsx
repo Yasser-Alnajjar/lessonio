@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useState, useTransition } from "react";
 import { Download } from "lucide-react";
 import { useTranslations } from "next-intl";
 
@@ -37,20 +36,26 @@ export const SettingsDataView = ({ data, email }: SettingsDataViewProps) => {
   const [exportError, setExportError] = useState<string | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
-  const exportMutation = useMutation({
-    mutationFn: () => exportData(),
-    onSuccess: (result) => {
-      if (!result.data) {
-        setExportError(result.error ?? t("exportError"));
-        return;
+  const [isPending, startTransition] = useTransition();
+
+  const handleExport = () => {
+    setExportError(null);
+    startTransition(async () => {
+      try {
+        const result = await exportData();
+        if (!result.data) {
+          setExportError(result.error ?? t("exportError"));
+          return;
+        }
+        downloadJson(
+          result.data,
+          `study-line-backup-${result.data.exportedAt.slice(0, 10)}.json`,
+        );
+      } catch {
+        setExportError(t("exportError"));
       }
-      downloadJson(
-        result.data,
-        `study-line-backup-${result.data.exportedAt.slice(0, 10)}.json`,
-      );
-    },
-    onError: () => setExportError(t("exportError")),
-  });
+    });
+  };
 
   return (
     <div className="flex justify-center">
@@ -82,16 +87,11 @@ export const SettingsDataView = ({ data, email }: SettingsDataViewProps) => {
               type="button"
               variant="outline"
               className="w-fit"
-              disabled={!data || exportMutation.isPending}
-              onClick={() => {
-                setExportError(null);
-                exportMutation.mutate();
-              }}
+              disabled={!data || isPending}
+              onClick={handleExport}
             >
-              {exportMutation.isPending ? <LessonioSpinner /> : <Download />}
-              {exportMutation.isPending
-                ? t("exportPreparing")
-                : t("exportButton")}
+              {isPending ? <LessonioSpinner /> : <Download />}
+              {isPending ? t("exportPreparing") : t("exportButton")}
             </Button>
             {exportError && (
               <p role="alert" className="text-destructive text-sm">

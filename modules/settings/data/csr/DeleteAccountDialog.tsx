@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 
 import { deleteAccount } from "@/actions/settings.mutations";
@@ -35,20 +34,25 @@ export function DeleteAccountDialog({
   const [confirmText, setConfirmText] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  const mutation = useMutation({
-    mutationFn: () => deleteAccount(),
-    onSuccess: (result) => {
-      if (result.success) {
-        router.push("/auth/login");
-        router.refresh();
-      } else if (result.error === "teacher_has_classes") {
-        setError(t("teacherHasClasses"));
-      } else {
-        setError(result.error ?? t("genericError"));
+  const [isPending, startTransition] = useTransition();
+
+  const handleDelete = () => {
+    startTransition(async () => {
+      try {
+        const result = await deleteAccount();
+        if (result.success) {
+          router.push("/auth/login");
+          router.refresh();
+        } else if (result.error === "teacher_has_classes") {
+          setError(t("teacherHasClasses"));
+        } else {
+          setError(result.error ?? t("genericError"));
+        }
+      } catch {
+        setError(t("genericError"));
       }
-    },
-    onError: () => setError(t("genericError")),
-  });
+    });
+  };
 
   const handleOpenChange = (next: boolean) => {
     onOpenChange(next);
@@ -97,11 +101,11 @@ export function DeleteAccountDialog({
           <Button
             type="button"
             variant="destructive"
-            disabled={confirmText !== email || mutation.isPending}
-            onClick={() => mutation.mutate()}
+            disabled={confirmText !== email || isPending}
+            onClick={handleDelete}
           >
-            {mutation.isPending && <LessonioSpinner />}
-            {mutation.isPending ? t("deleting") : t("confirm")}
+            {isPending && <LessonioSpinner />}
+            {isPending ? t("deleting") : t("confirm")}
           </Button>
         </DialogFooter>
       </DialogContent>

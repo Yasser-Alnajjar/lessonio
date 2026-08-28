@@ -1,7 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMemo, useState, useTransition } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useTranslations } from "next-intl";
@@ -42,20 +41,18 @@ export const ForgotPasswordForm = () => {
     defaultValues: { email: "" },
   });
 
-  const mutation = useMutation({
-    mutationFn: (input: ForgotPasswordInput) => requestPasswordReset(input),
-    onSuccess: (result) => {
+  const [isPending, startTransition] = useTransition();
+
+  const onSubmit = form.handleSubmit((values) => {
+    setFormError(null);
+    startTransition(async () => {
+      const result = await requestPasswordReset(values);
       if (!result.success) {
         setFormError(result.error);
         return;
       }
       setSucceeded(true);
-    },
-  });
-
-  const onSubmit = form.handleSubmit((values) => {
-    setFormError(null);
-    mutation.mutate(values);
+    });
   });
 
   return (
@@ -109,11 +106,11 @@ export const ForgotPasswordForm = () => {
 
               <Button
                 type="submit"
-                disabled={mutation.isPending}
+                disabled={isPending}
                 className="mt-2"
               >
-                {mutation.isPending ? <LessonioSpinner /> : <Send />}
-                {mutation.isPending ? t("submitting") : t("submit")}
+                {isPending ? <LessonioSpinner /> : <Send />}
+                {isPending ? t("submitting") : t("submit")}
               </Button>
             </form>
           </Form>

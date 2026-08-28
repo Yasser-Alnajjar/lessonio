@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { ArrowRight } from "lucide-react";
 
@@ -31,16 +30,18 @@ export const OnboardingRoleForm = () => {
   const [role, setRole] = useState<AppRole>("student");
   const [error, setError] = useState<string | null>(null);
 
-  const mutation = useMutation({
-    mutationFn: () => setMyRole(role),
-    onSuccess: (result) => {
+  const [isPending, startTransition] = useTransition();
+
+  const handleSubmit = () => {
+    startTransition(async () => {
+      const result = await setMyRole(role);
       if (!result.success) {
         setError(result.error);
         return;
       }
       router.push("/home");
-    },
-  });
+    });
+  };
 
   return (
     <Card>
@@ -65,12 +66,12 @@ export const OnboardingRoleForm = () => {
         )}
 
         <Button
-          onClick={() => mutation.mutate()}
-          disabled={mutation.isPending}
+          onClick={handleSubmit}
+          disabled={isPending}
           className="mt-2"
         >
-          {mutation.isPending ? <LessonioSpinner /> : <ArrowRight />}
-          {mutation.isPending ? t("submitting") : t("submit")}
+          {isPending ? <LessonioSpinner /> : <ArrowRight />}
+          {isPending ? t("submitting") : t("submit")}
         </Button>
       </CardContent>
     </Card>

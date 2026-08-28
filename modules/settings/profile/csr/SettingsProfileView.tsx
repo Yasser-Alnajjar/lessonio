@@ -1,8 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { useLocale, useTranslations } from "next-intl";
 
@@ -90,25 +89,26 @@ export const SettingsProfileView = ({ data }: SettingsProfileViewProps) => {
     },
   });
 
-  const mutation = useMutation({
-    mutationFn: (values: UpdateProfileInput) => updateProfile(values),
-    onSuccess: (result) => {
-      if (result.success) {
-        setStatus({ kind: "saved", message: t("saved") });
-        router.refresh();
-      } else {
-        setStatus({
-          kind: "error",
-          message: result.error ?? t("genericError"),
-        });
-      }
-    },
-    onError: () => setStatus({ kind: "error", message: t("genericError") }),
-  });
+  const [isPending, startTransition] = useTransition();
 
   const onSubmit = form.handleSubmit((values) => {
     setStatus(null);
-    mutation.mutate(values);
+    startTransition(async () => {
+      try {
+        const result = await updateProfile(values);
+        if (result.success) {
+          setStatus({ kind: "saved", message: t("saved") });
+          router.refresh();
+        } else {
+          setStatus({
+            kind: "error",
+            message: result.error ?? t("genericError"),
+          });
+        }
+      } catch {
+        setStatus({ kind: "error", message: t("genericError") });
+      }
+    });
   });
 
   return (
@@ -194,11 +194,11 @@ export const SettingsProfileView = ({ data }: SettingsProfileViewProps) => {
             <div className="flex items-center gap-3">
               <Button
                 type="submit"
-                disabled={!data || mutation.isPending}
+                disabled={!data || isPending}
                 className="w-fit"
               >
-                {mutation.isPending && <LessonioSpinner />}
-                {mutation.isPending ? t("saving") : t("save")}
+                {isPending && <LessonioSpinner />}
+                {isPending ? t("saving") : t("save")}
               </Button>
               {status && (
                 <p

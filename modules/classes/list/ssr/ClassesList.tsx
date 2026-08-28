@@ -19,6 +19,8 @@ export const ClassesList = async () => {
     Actions.Subjects.getAll(),
     Actions.Enrollments.getMyClasses(),
   ]);
+  console.log("agenda", agenda);
+  console.log("classes", classes);
 
   return (
     <ClassesListView

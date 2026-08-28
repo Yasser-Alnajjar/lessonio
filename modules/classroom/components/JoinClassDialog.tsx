@@ -1,8 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
-import { useMutation } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { UserPlus } from "lucide-react";
@@ -60,9 +59,12 @@ export function JoinClassDialog({
     }
   }
 
-  const mutation = useMutation({
-    mutationFn: (values: JoinClassInput) => joinClass(values.code),
-    onSuccess: (result) => {
+  const [isPending, startTransition] = useTransition();
+
+  const onSubmit = form.handleSubmit((values) => {
+    setFormError(null);
+    startTransition(async () => {
+      const result = await joinClass(values.code);
       if (!result.data) {
         setFormError(
           result.error === "invalid_join_code"
@@ -73,12 +75,7 @@ export function JoinClassDialog({
       }
       onOpenChange(false);
       onJoined?.();
-    },
-  });
-
-  const onSubmit = form.handleSubmit((values) => {
-    setFormError(null);
-    mutation.mutate(values);
+    });
   });
 
   return (
@@ -128,9 +125,9 @@ export function JoinClassDialog({
               >
                 {t("cancel")}
               </Button>
-              <Button type="submit" disabled={mutation.isPending}>
-                {mutation.isPending ? <LessonioSpinner /> : <UserPlus />}
-                {mutation.isPending ? t("submitting") : t("submit")}
+              <Button type="submit" disabled={isPending}>
+                {isPending ? <LessonioSpinner /> : <UserPlus />}
+                {isPending ? t("submitting") : t("submit")}
               </Button>
             </DialogFooter>
           </form>

@@ -1,7 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMemo, useState, useTransition } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useLocale, useTranslations } from "next-intl";
@@ -79,27 +78,25 @@ export function FlashcardFormDialog({
     }
   }
 
-  const mutation = useMutation({
-    mutationFn: (values: CreateFlashcardInput) =>
-      isEdit && flashcard
-        ? updateFlashcard(flashcard.id, {
-            front: values.front,
-            back: values.back,
-          })
-        : createFlashcard(values),
-    onSuccess: (result) => {
+  const [isPending, startTransition] = useTransition();
+
+  const onSubmit = form.handleSubmit((values) => {
+    setFormError(null);
+    startTransition(async () => {
+      const result =
+        isEdit && flashcard
+          ? await updateFlashcard(flashcard.id, {
+              front: values.front,
+              back: values.back,
+            })
+          : await createFlashcard(values);
       if (!result.success) {
         setFormError(result.error);
         return;
       }
       onOpenChange(false);
       onSaved?.();
-    },
-  });
-
-  const onSubmit = form.handleSubmit((values) => {
-    setFormError(null);
-    mutation.mutate(values);
+    });
   });
 
   return (
@@ -164,17 +161,17 @@ export function FlashcardFormDialog({
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
-                disabled={mutation.isPending}
+                disabled={isPending}
               >
                 {t("cancel")}
               </Button>
               <Button
                 type="submit"
-                disabled={mutation.isPending}
+                disabled={isPending}
                 className="gap-2"
               >
-                {mutation.isPending && <LessonioSpinner className="size-4" />}
-                {mutation.isPending
+                {isPending && <LessonioSpinner className="size-4" />}
+                {isPending
                   ? t("submitting")
                   : isEdit
                     ? t("submitEdit")

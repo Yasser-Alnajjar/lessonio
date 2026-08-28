@@ -1,8 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
-import { useMutation } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 
@@ -81,24 +80,22 @@ export function TeacherClassFormDialog({
     }
   }
 
-  const mutation = useMutation({
-    mutationFn: (values: CreateTeacherClassInput) =>
-      isEdit && item
-        ? updateTeacherClass(item.id, values)
-        : createTeacherClass(values),
-    onSuccess: (result) => {
+  const [isPending, startTransition] = useTransition();
+
+  const onSubmit = form.handleSubmit((values) => {
+    setFormError(null);
+    startTransition(async () => {
+      const result =
+        isEdit && item
+          ? await updateTeacherClass(item.id, values)
+          : await createTeacherClass(values);
       if (!result.success) {
         setFormError(result.error);
         return;
       }
       onOpenChange(false);
       onSaved?.();
-    },
-  });
-
-  const onSubmit = form.handleSubmit((values) => {
-    setFormError(null);
-    mutation.mutate(values);
+    });
   });
 
   return (
@@ -178,9 +175,9 @@ export function TeacherClassFormDialog({
               >
                 {t("cancel")}
               </Button>
-              <Button type="submit" disabled={mutation.isPending}>
-                {mutation.isPending && <LessonioSpinner />}
-                {mutation.isPending
+              <Button type="submit" disabled={isPending}>
+                {isPending && <LessonioSpinner />}
+                {isPending
                   ? t("submitting")
                   : isEdit
                     ? t("submitEdit")

@@ -8,6 +8,7 @@ import { Open_Sans, Cairo } from "next/font/google";
 import "@fontsource-variable/fraunces/full.css";
 
 import { routing, localeDirections, type AppLocale } from "@/i18n/routing";
+import { localeOpenGraph, siteUrl } from "@/lib/seo";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { SessionProvider } from "@/components/providers/session-provider";
 import { OfflineBanner } from "@/components/shared/offline-banner";
@@ -32,14 +33,45 @@ export async function generateMetadata({
   params,
 }: Pick<LocaleLayoutProps, "params">): Promise<Metadata> {
   const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) {
+    notFound();
+  }
+
   const t = await getTranslations({ locale, namespace: "app" });
 
   return {
+    metadataBase: siteUrl,
     title: {
       default: "Lessonio",
       template: `%s · Lessonio`,
     },
     description: t("tagline"),
+    applicationName: "Lessonio",
+    creator: "Yasser Alnajjar",
+    publisher: "Yasser Alnajjar",
+    icons: {
+      icon: "/favicon.ico",
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+      },
+    },
+    openGraph: {
+      type: "website",
+      siteName: "Lessonio",
+      title: "Lessonio",
+      description: t("tagline"),
+      ...localeOpenGraph(locale),
+    },
+    twitter: {
+      card: "summary",
+      title: "Lessonio",
+      description: t("tagline"),
+    },
   };
 }
 

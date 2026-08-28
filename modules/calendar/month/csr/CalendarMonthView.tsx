@@ -7,7 +7,12 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { rescheduleLesson } from "@/actions/calendar.mutations";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { ClassOccurrenceCard } from "@/components/ui-system/class-occurrence-card";
 import { LessonCard } from "@/components/ui-system/lesson-card";
 import { useRouter } from "@/i18n/navigation";
@@ -23,7 +28,12 @@ interface CalendarMonthViewProps {
   month: number;
 }
 
-export const CalendarMonthView = ({ data, subjects, year, month }: CalendarMonthViewProps) => {
+export const CalendarMonthView = ({
+  data,
+  subjects,
+  year,
+  month,
+}: CalendarMonthViewProps) => {
   const t = useTranslate("calendar");
   const locale = useLocale();
   const router = useRouter();
@@ -34,15 +44,18 @@ export const CalendarMonthView = ({ data, subjects, year, month }: CalendarMonth
   const [error, setError] = useState<string | null>(null);
 
   const monthDate = new Date(year, month - 1, 1);
-  const monthLabel = new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" }).format(
-    monthDate,
-  );
+  const monthLabel = new Intl.DateTimeFormat(locale, {
+    month: "long",
+    year: "numeric",
+  }).format(monthDate);
   const leadingBlanks = monthDate.getDay();
   const todayIso = format(new Date(), "yyyy-MM-dd");
   const days = data?.days ?? [];
 
   const weekdayLabels = Array.from({ length: 7 }, (_, index) =>
-    new Intl.DateTimeFormat(locale, { weekday: "short" }).format(new Date(2023, 0, index + 1)),
+    new Intl.DateTimeFormat(locale, { weekday: "short" }).format(
+      new Date(2023, 0, index + 1),
+    ),
   );
 
   const goToMonth = (delta: number) => {
@@ -74,7 +87,9 @@ export const CalendarMonthView = ({ data, subjects, year, month }: CalendarMonth
     <div className="flex flex-col gap-6 p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold text-foreground">{t("month.title")}</h1>
+          <h1 className="text-xl font-semibold text-foreground">
+            {t("month.title")}
+          </h1>
           <p className="text-sm text-muted-foreground">{t("month.subtitle")}</p>
         </div>
         <div className="flex items-center gap-2">
@@ -109,7 +124,10 @@ export const CalendarMonthView = ({ data, subjects, year, month }: CalendarMonth
               key={subject.id}
               className="inline-flex items-center gap-1.5 text-xs text-muted-foreground"
             >
-              <span className="size-2 rounded-full" style={{ backgroundColor: subject.color }} />
+              <span
+                className="size-2 rounded-full"
+                style={{ backgroundColor: subject.color }}
+              />
               {subject.name}
             </span>
           ))}
@@ -145,8 +163,14 @@ export const CalendarMonthView = ({ data, subjects, year, month }: CalendarMonth
           const isToday = day.date === todayIso;
           const isDragOver = dragOverDate === day.date;
           const dayItems = [
-            ...day.classes.map((klass) => ({ kind: "class" as const, klass })),
-            ...day.lessons.map((lesson) => ({ kind: "lesson" as const, lesson })),
+            ...day.classes.map((_class) => ({
+              kind: "class" as const,
+              _class,
+            })),
+            ...day.lessons.map((lesson) => ({
+              kind: "lesson" as const,
+              lesson,
+            })),
           ];
           const visibleItems = dayItems.slice(0, 3);
           const overflowCount = dayItems.length - visibleItems.length;
@@ -166,12 +190,15 @@ export const CalendarMonthView = ({ data, subjects, year, month }: CalendarMonth
                 setDragOverDate(day.date);
               }}
               onDragLeave={() =>
-                setDragOverDate((current) => (current === day.date ? null : current))
+                setDragOverDate((current) =>
+                  current === day.date ? null : current,
+                )
               }
               onDrop={(event) => handleDrop(day.date, event)}
               onClick={() => setSelectedDay(day)}
               onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") setSelectedDay(day);
+                if (event.key === "Enter" || event.key === " ")
+                  setSelectedDay(day);
               }}
             >
               <span
@@ -191,12 +218,17 @@ export const CalendarMonthView = ({ data, subjects, year, month }: CalendarMonth
                       key={`lesson-${item.lesson.id}`}
                       draggable
                       onDragStart={(event) => {
-                        event.dataTransfer.setData("text/plain", item.lesson.id);
+                        event.dataTransfer.setData(
+                          "text/plain",
+                          item.lesson.id,
+                        );
                         event.dataTransfer.effectAllowed = "move";
                       }}
                       onClick={(event) => event.stopPropagation()}
                       className="flex cursor-grab items-center gap-1 truncate rounded px-1 py-0.5 text-[0.65rem] text-foreground active:cursor-grabbing"
-                      style={{ backgroundColor: `${item.lesson.subjectColor}22` }}
+                      style={{
+                        backgroundColor: `${item.lesson.subjectColor}22`,
+                      }}
                     >
                       <span
                         className="size-1.5 shrink-0 rounded-full"
@@ -206,16 +238,20 @@ export const CalendarMonthView = ({ data, subjects, year, month }: CalendarMonth
                     </div>
                   ) : (
                     <div
-                      key={`class-${item.klass.id}`}
+                      key={`class-${item._class.id}`}
                       onClick={(event) => event.stopPropagation()}
                       className="flex items-center gap-1 truncate rounded px-1 py-0.5 text-[0.65rem] text-foreground"
-                      style={{ backgroundColor: `${item.klass.subjectColor}22` }}
+                      style={{
+                        backgroundColor: `${item._class.subjectColor}22`,
+                      }}
                     >
                       <span
                         className="size-1.5 shrink-0 rounded-full"
-                        style={{ backgroundColor: item.klass.subjectColor }}
+                        style={{ backgroundColor: item._class.subjectColor }}
                       />
-                      <span className="truncate">{item.klass.subjectName}</span>
+                      <span className="truncate">
+                        {item._class.subjectName}
+                      </span>
                     </div>
                   ),
                 )}
@@ -230,7 +266,10 @@ export const CalendarMonthView = ({ data, subjects, year, month }: CalendarMonth
         })}
       </div>
 
-      <Dialog open={Boolean(selectedDay)} onOpenChange={(open) => !open && setSelectedDay(null)}>
+      <Dialog
+        open={Boolean(selectedDay)}
+        onOpenChange={(open) => !open && setSelectedDay(null)}
+      >
         <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>
@@ -244,7 +283,9 @@ export const CalendarMonthView = ({ data, subjects, year, month }: CalendarMonth
             {selectedDay &&
               selectedDay.lessons.length === 0 &&
               selectedDay.classes.length === 0 && (
-                <p className="text-sm text-muted-foreground">{t("month.dayEmpty")}</p>
+                <p className="text-sm text-muted-foreground">
+                  {t("month.dayEmpty")}
+                </p>
               )}
             {selectedDay?.classes.map((occurrence) => (
               <ClassOccurrenceCard

@@ -420,21 +420,21 @@ async function materializeTodayOccurrences(
 
   const rows: ClassOccurrenceInsert[] = [];
 
-  for (const klass of classRows ?? []) {
-    const today = localIsoDate(now, timezones.get(klass.user_id) ?? null);
+  for (const _class of classRows ?? []) {
+    const today = localIsoDate(now, timezones.get(_class.user_id) ?? null);
     const weekday = new Date(`${today}T00:00:00Z`).getUTCDay();
     // The `classes_meetings_valid` DB constraint guarantees this JSONB
     // column already holds well-formed ClassMeeting objects.
-    const meetings = klass.meetings as unknown as ClassMeeting[];
+    const meetings = _class.meetings as unknown as ClassMeeting[];
     const meeting = meetings.find(
       (candidate) => candidate.dayOfWeek === weekday,
     );
     if (!meeting) continue;
 
     rows.push({
-      user_id: klass.user_id,
-      subject_id: klass.subject_id,
-      class_id: klass.id,
+      user_id: _class.user_id,
+      subject_id: _class.subject_id,
+      class_id: _class.id,
       date: today,
       start_time: meeting.startTime,
       duration_minutes: meeting.durationMinutes,

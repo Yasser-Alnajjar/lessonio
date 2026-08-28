@@ -47,11 +47,11 @@ export const enrollmentsActions = {
       .in("id", classIds);
 
     const classesById = new Map(
-      (classes ?? []).map((klass) => [klass.id, klass]),
+      (classes ?? []).map((_class) => [_class.id, _class]),
     );
 
     const teacherIds = [
-      ...new Set((classes ?? []).map((klass) => klass.teacher_id)),
+      ...new Set((classes ?? []).map((_class) => _class.teacher_id)),
     ];
     const { data: teacherProfiles } = teacherIds.length
       ? await supabase
@@ -66,13 +66,13 @@ export const enrollmentsActions = {
 
     return {
       data: enrollments.map((row) => {
-        const klass = classesById.get(row.teacher_class_id);
+        const _class = classesById.get(row.teacher_class_id);
         return {
           teacherClassId: row.teacher_class_id,
-          name: klass?.name ?? "Unknown class",
-          subjectLabel: klass?.subject_label ?? null,
-          teacherName: klass
-            ? (teacherNamesById.get(klass.teacher_id) ?? null)
+          name: _class?.name ?? "Unknown class",
+          subjectLabel: _class?.subject_label ?? null,
+          teacherName: _class
+            ? (teacherNamesById.get(_class.teacher_id) ?? null)
             : null,
           status: row.status as "active" | "removed",
           joinedAt: row.joined_at,

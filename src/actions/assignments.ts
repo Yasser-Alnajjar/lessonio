@@ -1,5 +1,7 @@
 import "server-only";
 
+import { cache } from "react";
+
 import { createClient } from "@/lib/supabase/server";
 import type { ActionResult } from "@/lib/types/common";
 import type {
@@ -67,7 +69,7 @@ async function fetchClassesWithTeacherNames(
     .in("id", classIds);
 
   const teacherIds = [
-    ...new Set((classes ?? []).map((klass) => klass.teacher_id)),
+    ...new Set((classes ?? []).map((_class) => _class.teacher_id)),
   ];
   const { data: teacherProfiles } = teacherIds.length
     ? await supabase
@@ -81,11 +83,11 @@ async function fetchClassesWithTeacherNames(
   );
 
   return new Map(
-    (classes ?? []).map((klass) => [
-      klass.id,
+    (classes ?? []).map((_class) => [
+      _class.id,
       {
-        name: klass.name,
-        teacherName: teacherNamesById.get(klass.teacher_id) ?? null,
+        name: _class.name,
+        teacherName: teacherNamesById.get(_class.teacher_id) ?? null,
       },
     ]),
   );
@@ -95,7 +97,7 @@ function toAssignmentForStudent(
   assignment: Assignment,
   classesById: Map<string, { name: string; teacherName: string | null }>,
 ): AssignmentForStudent {
-  const klass = classesById.get(assignment.teacherClassId);
+  const _class = classesById.get(assignment.teacherClassId);
   return {
     id: assignment.id,
     teacherClassId: assignment.teacherClassId,
@@ -105,8 +107,8 @@ function toAssignmentForStudent(
     totalPoints: assignment.totalPoints,
     status: assignment.status,
     publishedAt: assignment.publishedAt,
-    className: klass?.name ?? "Unknown class",
-    teacherName: klass?.teacherName ?? null,
+    className: _class?.name ?? "Unknown class",
+    teacherName: _class?.teacherName ?? null,
   };
 }
 
@@ -223,37 +225,40 @@ export const assignmentsActions = {
    * sees their own regardless of status, a student only a published one
    * they're actively enrolled in — everyone else gets `{ data: null }`.
    */
-  async getById(id: string): Promise<ActionResult<AssignmentForStudent>> {
-    const supabase = await createClient();
-    const { data: authData, error: authError } = await supabase.auth.getUser();
+  getById: cache(
+    async (id: string): Promise<ActionResult<AssignmentForStudent>> => {
+      const supabase = await createClient();
+      const { data: authData, error: authError } =
+        await supabase.auth.getUser();
 
-    if (authError || !authData.user) {
-      return { data: null, error: null };
-    }
+      if (authError || !authData.user) {
+        return { data: null, error: null };
+      }
 
-    const { data: row, error } = await supabase
-      .from("assignments")
-      .select("*")
-      .eq("id", id)
-      .maybeSingle();
+      const { data: row, error } = await supabase
+        .from("assignments")
+        .select("*")
+        .eq("id", id)
+        .maybeSingle();
 
-    if (error) {
-      return { data: null, error: error.message };
-    }
-    if (!row) {
-      return { data: null, error: null };
-    }
+      if (error) {
+        return { data: null, error: error.message };
+      }
+      if (!row) {
+        return { data: null, error: null };
+      }
 
-    const assignment = mapAssignmentRow(row);
-    const classesById = await fetchClassesWithTeacherNames(supabase, [
-      assignment.teacherClassId,
-    ]);
+      const assignment = mapAssignmentRow(row);
+      const classesById = await fetchClassesWithTeacherNames(supabase, [
+        assignment.teacherClassId,
+      ]);
 
-    return {
-      data: toAssignmentForStudent(assignment, classesById),
-      error: null,
-    };
-  },
+      return {
+        data: toAssignmentForStudent(assignment, classesById),
+        error: null,
+      };
+    },
+  ),
 
   create: createAssignment,
   update: updateAssignment,

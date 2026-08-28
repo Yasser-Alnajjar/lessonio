@@ -20,7 +20,7 @@ const DocsLayout = async ({ children }: { children: React.ReactNode }) => {
             <span className="text-md">Lessonio</span>
           </Link>
 
-          <div className="ms-auto flex items-center gap-2">
+          <nav className="ms-auto flex items-center gap-2" aria-label="Primary">
             <div className="hidden items-center gap-2 sm:flex">
               <Button asChild size="sm" variant="ghost">
                 <Link href="/docs/api">
@@ -48,10 +48,10 @@ const DocsLayout = async ({ children }: { children: React.ReactNode }) => {
                 </Button>
               </>
             )}
-          </div>
+          </nav>
         </div>
       </header>
-      {children}
+      <main>{children}</main>
       {/* Footer */}
       <footer className="border-border/60 mt-auto border-t">
         <div className="text-muted-foreground/70 mx-auto flex w-full max-w-6xl flex-col items-center justify-between gap-2 px-6 py-8 text-xs sm:flex-row">

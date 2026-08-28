@@ -122,23 +122,25 @@ async function materializeOccurrences(
 
   const rows: ClassOccurrenceInsert[] = [];
 
-  for (const klass of classes) {
+  for (const _class of classes) {
     // The `classes_meetings_valid` DB constraint guarantees this JSONB
     // column already holds well-formed ClassMeeting objects — same cast as
     // mapClassRow() in classes.ts.
-    const meetings = klass.meetings as unknown as ClassMeeting[];
+    const meetings = _class.meetings as unknown as ClassMeeting[];
 
     // ISO `yyyy-mm-dd` strings sort and compare lexicographically like the
     // dates they represent, so this loop can walk the range as strings.
     for (let date = windowStart; date <= windowEnd; date = addDays(date, 1)) {
       const weekday = new Date(`${date}T00:00:00Z`).getUTCDay();
-      const meeting = meetings.find((candidate) => candidate.dayOfWeek === weekday);
+      const meeting = meetings.find(
+        (candidate) => candidate.dayOfWeek === weekday,
+      );
       if (!meeting) continue;
 
       rows.push({
         user_id: userId,
-        subject_id: klass.subject_id,
-        class_id: klass.id,
+        subject_id: _class.subject_id,
+        class_id: _class.id,
         date,
         start_time: meeting.startTime,
         duration_minutes: meeting.durationMinutes,
@@ -215,7 +217,9 @@ export async function deleteFutureUntouchedOccurrences(
     .select("class_occurrence_id")
     .in("class_occurrence_id", candidateIds);
 
-  const linkedIds = new Set((linkedRows ?? []).map((row) => row.class_occurrence_id));
+  const linkedIds = new Set(
+    (linkedRows ?? []).map((row) => row.class_occurrence_id),
+  );
   const deletableIds = candidateIds.filter((id) => !linkedIds.has(id));
   if (deletableIds.length === 0) return;
 

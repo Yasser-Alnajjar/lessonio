@@ -18,6 +18,8 @@ import { getTranslations } from "next-intl/server";
 import { Actions } from "@/actions";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
+import { type AppLocale } from "@/i18n/routing";
+import { localeOpenGraph, localizedAlternates, localizedPath } from "@/lib/seo";
 
 const FEATURE_ICONS = {
   subjects: BookOpen,
@@ -36,12 +38,31 @@ const FEATURE_ICONS = {
 
 const FAQ_KEYS = ["privacy", "free", "offline", "languages"] as const;
 
-export async function generateMetadata(): Promise<Metadata> {
+interface DocsPageProps {
+  params: Promise<{ locale: string }>;
+}
+
+export async function generateMetadata({
+  params,
+}: DocsPageProps): Promise<Metadata> {
+  const { locale } = await params;
   const t = await getTranslations("docs.meta");
 
   return {
     title: t("title"),
     description: t("description"),
+    alternates: localizedAlternates(locale as AppLocale, "/docs"),
+    openGraph: {
+      title: t("title"),
+      description: t("description"),
+      url: localizedPath(locale as AppLocale, "/docs"),
+      ...localeOpenGraph(locale as AppLocale),
+    },
+    twitter: {
+      card: "summary",
+      title: t("title"),
+      description: t("description"),
+    },
   };
 }
 

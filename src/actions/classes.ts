@@ -1,5 +1,7 @@
 import "server-only";
 
+import { cache } from "react";
+
 import { createClient } from "@/lib/supabase/server";
 import type { ActionResult } from "@/lib/types/common";
 import type { Class, ClassMeeting, ClassWithSubject } from "@/lib/types/class";
@@ -39,18 +41,18 @@ function mapClassRow(row: ClassRow): Class {
 }
 
 function withSubject(
-  klass: Class,
+  _class: Class,
   subjectsById: Map<string, SubjectSummary>,
   teacherClassNamesById: Map<string, string>,
 ): ClassWithSubject {
-  const subject = subjectsById.get(klass.subjectId);
+  const subject = subjectsById.get(_class.subjectId);
   return {
-    ...klass,
+    ..._class,
     subjectName: subject?.name ?? "Unknown subject",
     subjectColor: subject?.color ?? "#94a3b8",
     subjectIcon: subject?.icon ?? "book-open",
-    linkedTeacherClassName: klass.teacherClassId
-      ? (teacherClassNamesById.get(klass.teacherClassId) ?? null)
+    linkedTeacherClassName: _class.teacherClassId
+      ? (teacherClassNamesById.get(_class.teacherClassId) ?? null)
       : null,
   };
 }
@@ -130,61 +132,64 @@ export const classesActions = {
 
     const [subjectsById, teacherClassNamesById] = await Promise.all([
       fetchSubjectsByIds(supabase, [
-        ...new Set(classes.map((klass) => klass.subjectId)),
+        ...new Set(classes.map((_class) => _class.subjectId)),
       ]),
       fetchTeacherClassNamesByIds(supabase, [
         ...new Set(
           classes
-            .map((klass) => klass.teacherClassId)
+            .map((_class) => _class.teacherClassId)
             .filter((id): id is string => id !== null),
         ),
       ]),
     ]);
 
     return {
-      data: classes.map((klass) =>
-        withSubject(klass, subjectsById, teacherClassNamesById),
+      data: classes.map((_class) =>
+        withSubject(_class, subjectsById, teacherClassNamesById),
       ),
       error: null,
     };
   },
 
-  async getById(id: string): Promise<ActionResult<ClassWithSubject>> {
-    const supabase = await createClient();
-    const { data: authData, error: authError } = await supabase.auth.getUser();
+  getById: cache(
+    async (id: string): Promise<ActionResult<ClassWithSubject>> => {
+      const supabase = await createClient();
+      const { data: authData, error: authError } =
+        await supabase.auth.getUser();
 
-    if (authError || !authData.user) {
-      return { data: null, error: null };
-    }
+      if (authError || !authData.user) {
+        return { data: null, error: null };
+      }
 
-    const { data: row, error } = await supabase
-      .from("classes")
-      .select("*")
-      .eq("id", id)
-      .eq("user_id", authData.user.id)
-      .maybeSingle();
+      const { data: row, error } = await supabase
+        .from("classes")
+        .select("*")
+        .eq("id", id)
+        .eq("user_id", authData.user.id)
+        .maybeSingle();
 
-    if (error) {
-      return { data: null, error: error.message };
-    }
-    if (!row) {
-      return { data: null, error: null };
-    }
+      if (error) {
+        return { data: null, error: error.message };
+      }
+      if (!row) {
+        return { data: null, error: null };
+      }
 
-    const klass = mapClassRow(row);
-    const [subjectsById, teacherClassNamesById] = await Promise.all([
-      fetchSubjectsByIds(supabase, [klass.subjectId]),
-      fetchTeacherClassNamesByIds(
-        supabase,
-        klass.teacherClassId ? [klass.teacherClassId] : [],
-      ),
-    ]);
+      const _class = mapClassRow(row);
+      const [subjectsById, teacherClassNamesById] = await Promise.all([
+        fetchSubjectsByIds(supabase, [_class.subjectId]),
+        fetchTeacherClassNamesByIds(
+          supabase,
+          _class.teacherClassId ? [_class.teacherClassId] : [],
+        ),
+      ]);
 
-    return {
-      data: withSubject(klass, subjectsById, teacherClassNamesById),
-      error: null,
-    };
-  },
+      return {
+        data: withSubject(_class, subjectsById, teacherClassNamesById),
+        error: null,
+      };
+    },
+  ),
 
   create: createClass,
   update: updateClass,

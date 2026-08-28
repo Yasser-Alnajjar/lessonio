@@ -161,9 +161,9 @@ export function AssignmentFormDialog({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {classes.map((klass) => (
-                        <SelectItem key={klass.id} value={klass.id}>
-                          {klass.name}
+                      {classes.map((_class) => (
+                        <SelectItem key={_class.id} value={_class.id}>
+                          {_class.name}
                         </SelectItem>
                       ))}
                     </SelectContent>

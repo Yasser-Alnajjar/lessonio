@@ -1,4 +1,5 @@
 import { getLocale, getTranslations } from "next-intl/server";
+import type { Metadata } from "next";
 
 import { Actions } from "@/actions";
 import { redirect } from "@/i18n/navigation";
@@ -14,6 +15,14 @@ import {
 interface AppLayoutProps {
   children: React.ReactNode;
 }
+
+/** All application data is authenticated and must never be indexed. */
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 /**
  * Defense in depth: `proxy.ts` already redirects a signed-out request away

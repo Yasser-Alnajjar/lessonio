@@ -1,5 +1,7 @@
 import "server-only";
 
+import { cache } from "react";
+
 import { createClient } from "@/lib/supabase/server";
 import type { ActionResult } from "@/lib/types/common";
 import type {
@@ -71,14 +73,14 @@ async function fetchStudentCountsByClassIds(
 }
 
 function withStats(
-  klass: TeacherClass,
+  _class: TeacherClass,
   joinCodesById: Map<string, string>,
   studentCountsById: Map<string, number>,
 ): TeacherClassWithStats {
   return {
-    ...klass,
-    joinCode: joinCodesById.get(klass.id) ?? "",
-    studentCount: studentCountsById.get(klass.id) ?? 0,
+    ..._class,
+    joinCode: joinCodesById.get(_class.id) ?? "",
+    studentCount: studentCountsById.get(_class.id) ?? 0,
   };
 }
 
@@ -113,53 +115,56 @@ export const teacherClassesActions = {
       return { data: [], error: null };
     }
 
-    const classIds = classes.map((klass) => klass.id);
+    const classIds = classes.map((_class) => _class.id);
     const [joinCodesById, studentCountsById] = await Promise.all([
       fetchJoinCodesByClassIds(supabase, classIds),
       fetchStudentCountsByClassIds(supabase, classIds),
     ]);
 
     return {
-      data: classes.map((klass) =>
-        withStats(klass, joinCodesById, studentCountsById),
+      data: classes.map((_class) =>
+        withStats(_class, joinCodesById, studentCountsById),
       ),
       error: null,
     };
   },
 
-  async getById(id: string): Promise<ActionResult<TeacherClassWithStats>> {
-    const supabase = await createClient();
-    const { data: authData, error: authError } = await supabase.auth.getUser();
+  getById: cache(
+    async (id: string): Promise<ActionResult<TeacherClassWithStats>> => {
+      const supabase = await createClient();
+      const { data: authData, error: authError } =
+        await supabase.auth.getUser();
 
-    if (authError || !authData.user) {
-      return { data: null, error: null };
-    }
+      if (authError || !authData.user) {
+        return { data: null, error: null };
+      }
 
-    const { data: row, error } = await supabase
-      .from("teacher_classes")
-      .select("*")
-      .eq("id", id)
-      .eq("teacher_id", authData.user.id)
-      .maybeSingle();
+      const { data: row, error } = await supabase
+        .from("teacher_classes")
+        .select("*")
+        .eq("id", id)
+        .eq("teacher_id", authData.user.id)
+        .maybeSingle();
 
-    if (error) {
-      return { data: null, error: error.message };
-    }
-    if (!row) {
-      return { data: null, error: null };
-    }
+      if (error) {
+        return { data: null, error: error.message };
+      }
+      if (!row) {
+        return { data: null, error: null };
+      }
 
-    const klass = mapTeacherClassRow(row);
-    const [joinCodesById, studentCountsById] = await Promise.all([
-      fetchJoinCodesByClassIds(supabase, [klass.id]),
-      fetchStudentCountsByClassIds(supabase, [klass.id]),
-    ]);
+      const _class = mapTeacherClassRow(row);
+      const [joinCodesById, studentCountsById] = await Promise.all([
+        fetchJoinCodesByClassIds(supabase, [_class.id]),
+        fetchStudentCountsByClassIds(supabase, [_class.id]),
+      ]);
 
-    return {
-      data: withStats(klass, joinCodesById, studentCountsById),
-      error: null,
-    };
-  },
+      return {
+        data: withStats(_class, joinCodesById, studentCountsById),
+        error: null,
+      };
+    },
+  ),
 
   /**
    * Only `status = 'active'` enrollments — a roster is "who's in the class

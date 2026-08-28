@@ -236,9 +236,9 @@ export function LessonFormDialog({
                         <SelectItem value={CLASS_UNSET_VALUE}>
                           {t("classNone")}
                         </SelectItem>
-                        {classes.map((klass) => (
-                          <SelectItem key={klass.id} value={klass.id}>
-                            {classLabel(klass)}
+                        {classes.map((_class) => (
+                          <SelectItem key={_class.id} value={_class.id}>
+                            {classLabel(_class)}
                           </SelectItem>
                         ))}
                       </SelectContent>

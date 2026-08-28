@@ -15,17 +15,22 @@ export const calendarActions = {
    * `lessonsActions.getAll` and `classOccurrencesActions.getAll` (which both
    * support `dateFrom`/`dateTo`) instead of duplicating their join logic here.
    */
-  async getMonth(year: number, month: number): Promise<ActionResult<CalendarMonthData>> {
+  async getMonth(
+    year: number,
+    month: number,
+  ): Promise<ActionResult<CalendarMonthData>> {
     const monthStart = startOfMonth(new Date(year, month - 1, 1));
     const monthEnd = endOfMonth(monthStart);
     const dateFrom = format(monthStart, "yyyy-MM-dd");
     const dateTo = format(monthEnd, "yyyy-MM-dd");
 
-    const [{ data: lessons, error: lessonsError }, { data: classes, error: classesError }] =
-      await Promise.all([
-        lessonsActions.getAll({ dateFrom, dateTo }),
-        classOccurrencesActions.getAll({ dateFrom, dateTo }),
-      ]);
+    const [
+      { data: lessons, error: lessonsError },
+      { data: classes, error: classesError },
+    ] = await Promise.all([
+      lessonsActions.getAll({ dateFrom, dateTo }),
+      classOccurrencesActions.getAll({ dateFrom, dateTo }),
+    ]);
     if (lessonsError) {
       return { data: null, error: lessonsError };
     }
@@ -33,14 +38,16 @@ export const calendarActions = {
       return { data: null, error: classesError };
     }
 
-    const days = eachDayOfInterval({ start: monthStart, end: monthEnd }).map((date) => {
-      const iso = format(date, "yyyy-MM-dd");
-      return {
-        date: iso,
-        lessons: (lessons ?? []).filter((lesson) => lesson.date === iso),
-        classes: (classes ?? []).filter((klass) => klass.date === iso),
-      };
-    });
+    const days = eachDayOfInterval({ start: monthStart, end: monthEnd }).map(
+      (date) => {
+        const iso = format(date, "yyyy-MM-dd");
+        return {
+          date: iso,
+          lessons: (lessons ?? []).filter((lesson) => lesson.date === iso),
+          classes: (classes ?? []).filter((_class) => _class.date === iso),
+        };
+      },
+    );
 
     return { data: { year, month, days }, error: null };
   },

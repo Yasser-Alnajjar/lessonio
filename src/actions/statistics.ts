@@ -132,13 +132,13 @@ async function buildStatCards(
     .reduce((sum, session) => sum + (session.duration_minutes ?? 0), 0);
 
   const recordedClasses = classes.filter(
-    (klass) => klass.attendance_status !== null,
+    (_class) => _class.attendance_status !== null,
   );
   const attendanceRate =
     recordedClasses.length > 0
       ? Math.round(
           (recordedClasses.filter(
-            (klass) => klass.attendance_status === "attended",
+            (_class) => _class.attendance_status === "attended",
           ).length /
             recordedClasses.length) *
             100,
@@ -312,13 +312,14 @@ async function buildAttendanceBreakdown(
     "cancelled",
   ];
   const recordedClasses = classes.filter(
-    (klass) => klass.attendance_status !== null,
+    (_class) => _class.attendance_status !== null,
   );
 
   return statuses.map((status) => ({
     label: t(status),
-    value: recordedClasses.filter((klass) => klass.attendance_status === status)
-      .length,
+    value: recordedClasses.filter(
+      (_class) => _class.attendance_status === status,
+    ).length,
   }));
 }
 
@@ -329,10 +330,10 @@ function buildSubjectDistribution(
   const subjectMap = new Map(subjects.map((subject) => [subject.id, subject]));
   const minutesBySubject = new Map<string, number>();
 
-  for (const klass of classes) {
+  for (const _class of classes) {
     minutesBySubject.set(
-      klass.subject_id,
-      (minutesBySubject.get(klass.subject_id) ?? 0) + klass.duration_minutes,
+      _class.subject_id,
+      (minutesBySubject.get(_class.subject_id) ?? 0) + _class.duration_minutes,
     );
   }
 

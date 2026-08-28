@@ -1,5 +1,7 @@
 import "server-only";
 
+import { cache } from "react";
+
 import { createClient } from "@/lib/supabase/server";
 import type { ActionResult } from "@/lib/types/common";
 import type {
@@ -9,7 +11,11 @@ import type {
   SubjectWithStats,
 } from "@/lib/types/subject";
 import type { Database } from "@/lib/types/database";
-import { createSubject, deleteSubject, updateSubject } from "./subjects.mutations";
+import {
+  createSubject,
+  deleteSubject,
+  updateSubject,
+} from "./subjects.mutations";
 
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
 type SubjectRow = Database["public"]["Tables"]["subjects"]["Row"];
@@ -48,7 +54,10 @@ interface StatsInputRows {
   lessons: Array<{ subject_id: string; study_status: string }>;
   classes: Array<{ subject_id: string; attendance_status: string | null }>;
   homework: Array<{ subject_id: string; completed: boolean }>;
-  sessions: Array<{ subject_id: string | null; duration_minutes: number | null }>;
+  sessions: Array<{
+    subject_id: string | null;
+    duration_minutes: number | null;
+  }>;
 }
 
 /** Aggregates stats per subject in memory — one bulk fetch per table, no N+1 queries. */
@@ -63,7 +72,9 @@ function computeStatsBySubject(
     const recordedClasses = rows.classes.filter(
       (row) => row.subject_id === subjectId && row.attendance_status !== null,
     );
-    const homework = rows.homework.filter((row) => row.subject_id === subjectId);
+    const homework = rows.homework.filter(
+      (row) => row.subject_id === subjectId,
+    );
     const totalStudyMinutes = rows.sessions
       .filter((row) => row.subject_id === subjectId)
       .reduce((sum, row) => sum + (row.duration_minutes ?? 0), 0);
@@ -72,7 +83,8 @@ function computeStatsBySubject(
       (row) => row.attendance_status === "attended",
     ).length;
     const studied = lessons.filter(
-      (row) => row.study_status === "completed" || row.study_status === "reviewed",
+      (row) =>
+        row.study_status === "completed" || row.study_status === "reviewed",
     ).length;
     const completedHomework = homework.filter((row) => row.completed).length;
 
@@ -98,30 +110,34 @@ async function fetchStatsRows(
     return { lessons: [], classes: [], homework: [], sessions: [] };
   }
 
-  const [{ data: lessonRows }, { data: classRows }, { data: homeworkRows }, { data: sessionRows }] =
-    await Promise.all([
-      supabase
-        .from("lessons")
-        .select("subject_id, study_status")
-        .eq("user_id", userId)
-        .eq("is_archived", false)
-        .in("subject_id", subjectIds),
-      supabase
-        .from("class_occurrences")
-        .select("subject_id, attendance_status")
-        .eq("user_id", userId)
-        .in("subject_id", subjectIds),
-      supabase
-        .from("homework")
-        .select("subject_id, completed")
-        .eq("user_id", userId)
-        .in("subject_id", subjectIds),
-      supabase
-        .from("study_sessions")
-        .select("subject_id, duration_minutes")
-        .eq("user_id", userId)
-        .in("subject_id", subjectIds),
-    ]);
+  const [
+    { data: lessonRows },
+    { data: classRows },
+    { data: homeworkRows },
+    { data: sessionRows },
+  ] = await Promise.all([
+    supabase
+      .from("lessons")
+      .select("subject_id, study_status")
+      .eq("user_id", userId)
+      .eq("is_archived", false)
+      .in("subject_id", subjectIds),
+    supabase
+      .from("class_occurrences")
+      .select("subject_id, attendance_status")
+      .eq("user_id", userId)
+      .in("subject_id", subjectIds),
+    supabase
+      .from("homework")
+      .select("subject_id, completed")
+      .eq("user_id", userId)
+      .in("subject_id", subjectIds),
+    supabase
+      .from("study_sessions")
+      .select("subject_id, duration_minutes")
+      .eq("user_id", userId)
+      .in("subject_id", subjectIds),
+  ]);
 
   return {
     lessons: lessonRows ?? [],
@@ -176,37 +192,45 @@ export const subjectsActions = {
     };
   },
 
-  async getById(id: string): Promise<ActionResult<SubjectWithStats>> {
-    const supabase = await createClient();
-    const { data: authData, error: authError } = await supabase.auth.getUser();
+  getById: cache(
+    async (id: string): Promise<ActionResult<SubjectWithStats>> => {
+      const supabase = await createClient();
+      const { data: authData, error: authError } =
+        await supabase.auth.getUser();
 
-    if (authError || !authData.user) {
-      return { data: null, error: null };
-    }
+      if (authError || !authData.user) {
+        return { data: null, error: null };
+      }
 
-    const { data: subjectRow, error } = await supabase
-      .from("subjects")
-      .select("*")
-      .eq("id", id)
-      .eq("user_id", authData.user.id)
-      .maybeSingle();
+      const { data: subjectRow, error } = await supabase
+        .from("subjects")
+        .select("*")
+        .eq("id", id)
+        .eq("user_id", authData.user.id)
+        .maybeSingle();
 
-    if (error) {
-      return { data: null, error: error.message };
-    }
-    if (!subjectRow) {
-      return { data: null, error: null };
-    }
+      if (error) {
+        return { data: null, error: error.message };
+      }
+      if (!subjectRow) {
+        return { data: null, error: null };
+      }
 
-    const subject = mapSubjectRow(subjectRow);
-    const statsRows = await fetchStatsRows(supabase, authData.user.id, [subject.id]);
-    const statsBySubject = computeStatsBySubject([subject.id], statsRows);
+      const subject = mapSubjectRow(subjectRow);
+      const statsRows = await fetchStatsRows(supabase, authData.user.id, [
+        subject.id,
+      ]);
+      const statsBySubject = computeStatsBySubject([subject.id], statsRows);
 
-    return {
-      data: { ...subject, stats: statsBySubject.get(subject.id) ?? emptyStats(subject.id) },
-      error: null,
-    };
-  },
+      return {
+        data: {
+          ...subject,
+          stats: statsBySubject.get(subject.id) ?? emptyStats(subject.id),
+        },
+        error: null,
+      };
+    },
+  ),
 
   create: createSubject,
   update: updateSubject,

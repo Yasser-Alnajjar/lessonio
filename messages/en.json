@@ -52,6 +52,10 @@
     "classroomAssignments": "Assignments"
   },
   "landing": {
+    "meta": {
+      "title": "Study tracker for lessons, homework, and exams",
+      "description": "Lessonio turns lessons, homework, exams, and study time into a single trend you can watch move forward."
+    },
     "nav": {
       "features": "Features",
       "docs": "Docs",

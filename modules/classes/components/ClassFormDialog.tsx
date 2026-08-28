@@ -423,12 +423,12 @@ export function ClassFormDialog({
                           {t("linkedClassNone")}
                         </SelectItem>
 
-                        {enrolledClasses.map((klass) => (
+                        {enrolledClasses.map((_class) => (
                           <SelectItem
-                            key={klass.teacherClassId}
-                            value={klass.teacherClassId}
+                            key={_class.teacherClassId}
+                            value={_class.teacherClassId}
                           >
-                            {klass.name}
+                            {_class.name}
                           </SelectItem>
                         ))}
                       </SelectContent>

@@ -59,7 +59,7 @@ function withRelations(
   classesById: Map<string, ClassSummary>,
 ): ClassOccurrenceWithRelations {
   const subject = subjectsById.get(occurrence.subjectId);
-  const klass = classesById.get(occurrence.classId);
+  const _class = classesById.get(occurrence.classId);
   return {
     ...occurrence,
     subjectName: subject?.name ?? "Unknown subject",
@@ -67,8 +67,8 @@ function withRelations(
     subjectIcon: subject?.icon ?? "book-open",
     // Teacher/location live on the recurring class, not on the occurrence —
     // read through the join rather than duplicated per date.
-    teacher: klass?.teacher ?? null,
-    location: klass?.location ?? null,
+    teacher: _class?.teacher ?? null,
+    location: _class?.location ?? null,
   };
 }
 
@@ -85,10 +85,16 @@ async function fetchRelations(
 
   const [{ data: subjectRows }, { data: classRows }] = await Promise.all([
     subjectIds.length > 0
-      ? supabase.from("subjects").select("id, name, color, icon").in("id", subjectIds)
+      ? supabase
+          .from("subjects")
+          .select("id, name, color, icon")
+          .in("id", subjectIds)
       : Promise.resolve({ data: [] }),
     classIds.length > 0
-      ? supabase.from("classes").select("id, teacher, location").in("id", classIds)
+      ? supabase
+          .from("classes")
+          .select("id, teacher, location")
+          .in("id", classIds)
       : Promise.resolve({ data: [] }),
   ]);
 
@@ -115,7 +121,10 @@ async function hydrate(
   const occurrences = rows.map(mapClassOccurrenceRow);
   if (occurrences.length === 0) return [];
 
-  const { subjectsById, classesById } = await fetchRelations(supabase, occurrences);
+  const { subjectsById, classesById } = await fetchRelations(
+    supabase,
+    occurrences,
+  );
   return occurrences.map((o) => withRelations(o, subjectsById, classesById));
 }
 
@@ -149,7 +158,8 @@ export const classOccurrencesActions = {
     if (filters?.subjectId) query = query.eq("subject_id", filters.subjectId);
     if (filters?.attendanceStatus)
       query = query.eq("attendance_status", filters.attendanceStatus);
-    if (filters?.examStatus) query = query.eq("exam_status", filters.examStatus);
+    if (filters?.examStatus)
+      query = query.eq("exam_status", filters.examStatus);
     if (filters?.dateFrom) query = query.gte("date", filters.dateFrom);
     if (filters?.dateTo) query = query.lte("date", filters.dateTo);
 
@@ -222,29 +232,34 @@ export const classOccurrencesActions = {
     const todayIso = localIsoDate(new Date(), profile?.timezone ?? null);
     const tomorrowIso = addDays(todayIso, 1);
 
-    const [{ data: todayRows, error: todayError }, { data: upcomingRows, error: upcomingError }] =
-      await Promise.all([
-        supabase
-          .from("class_occurrences")
-          .select("*")
-          .eq("user_id", userId)
-          .eq("date", todayIso)
-          .order("start_time", { ascending: true }),
-        supabase
-          .from("class_occurrences")
-          .select("*")
-          .eq("user_id", userId)
-          .eq("date", tomorrowIso)
-          .order("start_time", { ascending: true })
-          .limit(upcomingLimit),
-      ]);
+    const [
+      { data: todayRows, error: todayError },
+      { data: upcomingRows, error: upcomingError },
+    ] = await Promise.all([
+      supabase
+        .from("class_occurrences")
+        .select("*")
+        .eq("user_id", userId)
+        .eq("date", todayIso)
+        .order("start_time", { ascending: true }),
+      supabase
+        .from("class_occurrences")
+        .select("*")
+        .eq("user_id", userId)
+        .eq("date", tomorrowIso)
+        .order("start_time", { ascending: true })
+        .limit(upcomingLimit),
+    ]);
 
     if (todayError) return { data: null, error: todayError.message };
     if (upcomingError) return { data: null, error: upcomingError.message };
 
     // Hydrated in one pass so the two buckets share a single subjects/classes
     // lookup instead of issuing it twice.
-    const all = await hydrate(supabase, [...(todayRows ?? []), ...(upcomingRows ?? [])]);
+    const all = await hydrate(supabase, [
+      ...(todayRows ?? []),
+      ...(upcomingRows ?? []),
+    ]);
     const todayCount = (todayRows ?? []).length;
 
     return {

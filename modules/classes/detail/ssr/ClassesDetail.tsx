@@ -14,7 +14,7 @@ export const ClassesDetail = async ({ params }: ClassesDetailProps) => {
   const { classId } = await params;
 
   const [
-    { data: klass },
+    { data: _class },
     { data: occurrences },
     { data: subjects },
     { data: enrolledClasses },
@@ -27,7 +27,7 @@ export const ClassesDetail = async ({ params }: ClassesDetailProps) => {
 
   return (
     <ClassesDetailView
-      data={klass}
+      data={_class}
       occurrences={occurrences ?? []}
       subjects={subjects ?? []}
       enrolledClasses={enrolledClasses ?? []}

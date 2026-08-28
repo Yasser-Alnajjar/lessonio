@@ -14,7 +14,7 @@ const DocsLayout = async ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="bg-background flex min-h-svh flex-col">
       <header className="border-border/60 border-b">
-        <div className="mx-auto flex h-16 w-full max-w-7  xl items-center gap-4 px-6">
+        <div className="mx-auto flex h-16 w-full max-w-7xl items-center gap-4 px-6">
           <Link href="/" className="flex items-center gap-2">
             <LessonioMark className="h-6 w-auto" />
             <span className="text-md">Lessonio</span>

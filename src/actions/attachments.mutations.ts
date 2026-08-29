@@ -8,15 +8,17 @@
  * `src/actions/attachments.ts` re-exports these under `Actions.Attachments.*`
  * for SSR use. Same pattern as `subjects.mutations.ts`.
  *
- * Uploads go through this Server Action (rather than the browser Supabase
- * client) so every mutation keeps flowing through `Actions.*`, per the
- * architecture note in `lib/supabase/client.ts`. `next.config.ts` raises
- * `serverActions.bodySizeLimit` to clear the bucket's 50 MB file cap.
+ * Uploads go through this Server Action (rather than a direct browser upload)
+ * so every mutation keeps flowing through `Actions.*`, and so the bearer
+ * token attached by `src/lib/client/index.ts`'s interceptor covers the
+ * request. `next.config.ts` raises `serverActions.bodySizeLimit` to clear
+ * the backend's 50 MB file cap.
  */
 
 import { revalidatePath } from "next/cache";
 
-import { createClient } from "@/lib/supabase/server";
+import { axios } from "@/lib/client";
+import { getApiErrorMessage } from "@/lib/client/errors";
 import {
   attachmentKindForMimeType,
   MAX_ATTACHMENT_SIZE_BYTES,
@@ -24,135 +26,44 @@ import {
 import type { MutationResult } from "@/lib/types/common";
 import type { Attachment } from "@/lib/types/attachment";
 
-const BUCKET = "attachments";
-
 export type UploadAttachmentResult =
   | { success: true; error: null; attachment: Attachment }
   | { success: false; error: string; attachment: null };
-
-function publicUrlFor(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  storagePath: string,
-): string {
-  return supabase.storage.from(BUCKET).getPublicUrl(storagePath).data.publicUrl;
-}
-
-function sanitizeFileName(fileName: string): string {
-  return fileName.replace(/[^a-zA-Z0-9.\-_]/g, "_");
-}
 
 export async function uploadAttachment(
   lessonId: string,
   file: File,
 ): Promise<UploadAttachmentResult> {
-  const kind = attachmentKindForMimeType(file.type);
-  if (!kind) {
+  // Fast client-side rejection before spending a network round trip — the
+  // backend re-validates both independently and is the real authority.
+  if (!attachmentKindForMimeType(file.type)) {
     return { success: false, error: "Unsupported file type.", attachment: null };
   }
   if (file.size > MAX_ATTACHMENT_SIZE_BYTES) {
     return { success: false, error: "File is larger than the 50 MB limit.", attachment: null };
   }
 
-  const supabase = await createClient();
-  const { data: authData, error: authError } = await supabase.auth.getUser();
-  if (authError || !authData.user) {
-    return { success: false, error: "You must be signed in.", attachment: null };
+  const formData = new FormData();
+  formData.append("file", file);
+
+  try {
+    const { data } = await axios.post<{ data: Attachment }>(
+      `/api/v1/lessons/${lessonId}/attachments`,
+      formData,
+    );
+    revalidatePath("/", "layout");
+    return { success: true, error: null, attachment: data.data };
+  } catch (error) {
+    return { success: false, error: getApiErrorMessage(error), attachment: null };
   }
-
-  // Ownership of the lesson (and therefore the folder we're about to write
-  // into) must be verified server-side before touching Storage — the RLS
-  // policy on storage.objects only checks that the path's first segment is
-  // the caller's own user id, not that lessonId actually belongs to them.
-  const { data: lesson } = await supabase
-    .from("lessons")
-    .select("id")
-    .eq("id", lessonId)
-    .eq("user_id", authData.user.id)
-    .maybeSingle();
-  if (!lesson) {
-    return { success: false, error: "Lesson not found.", attachment: null };
-  }
-
-  const storagePath = `${authData.user.id}/${lessonId}/${Date.now()}-${sanitizeFileName(file.name)}`;
-
-  const { error: uploadError } = await supabase.storage
-    .from(BUCKET)
-    .upload(storagePath, file, { contentType: file.type, upsert: false });
-  if (uploadError) {
-    return { success: false, error: uploadError.message, attachment: null };
-  }
-
-  const { data: created, error: insertError } = await supabase
-    .from("attachments")
-    .insert({
-      lesson_id: lessonId,
-      user_id: authData.user.id,
-      kind,
-      file_name: file.name,
-      storage_path: storagePath,
-      size_bytes: file.size,
-      mime_type: file.type,
-    })
-    .select("*")
-    .single();
-
-  if (insertError || !created) {
-    await supabase.storage.from(BUCKET).remove([storagePath]);
-    return {
-      success: false,
-      error: insertError?.message ?? "Failed to save attachment.",
-      attachment: null,
-    };
-  }
-
-  revalidatePath("/", "layout");
-  return {
-    success: true,
-    error: null,
-    attachment: {
-      id: created.id,
-      lessonId: created.lesson_id,
-      userId: created.user_id,
-      kind: created.kind as Attachment["kind"],
-      fileName: created.file_name,
-      storagePath: created.storage_path,
-      publicUrl: publicUrlFor(supabase, created.storage_path),
-      sizeBytes: created.size_bytes,
-      mimeType: created.mime_type,
-      createdAt: created.created_at,
-      updatedAt: created.updated_at,
-    },
-  };
 }
 
 export async function deleteAttachment(id: string): Promise<MutationResult> {
-  const supabase = await createClient();
-  const { data: authData, error: authError } = await supabase.auth.getUser();
-  if (authError || !authData.user) {
-    return { success: false, error: "You must be signed in." };
+  try {
+    await axios.delete(`/api/v1/attachments/${id}`);
+  } catch (error) {
+    return { success: false, error: getApiErrorMessage(error) };
   }
-
-  const { data: attachment, error: fetchError } = await supabase
-    .from("attachments")
-    .select("storage_path")
-    .eq("id", id)
-    .eq("user_id", authData.user.id)
-    .maybeSingle();
-
-  if (fetchError) return { success: false, error: fetchError.message };
-  if (!attachment) return { success: false, error: "Attachment not found." };
-
-  const { error: storageError } = await supabase.storage
-    .from(BUCKET)
-    .remove([attachment.storage_path]);
-  if (storageError) return { success: false, error: storageError.message };
-
-  const { error: deleteError } = await supabase
-    .from("attachments")
-    .delete()
-    .eq("id", id)
-    .eq("user_id", authData.user.id);
-  if (deleteError) return { success: false, error: deleteError.message };
 
   revalidatePath("/", "layout");
   return { success: true, error: null };

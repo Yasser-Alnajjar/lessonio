@@ -9,46 +9,50 @@
 
 import { revalidatePath } from "next/cache";
 
-import { createClient } from "@/lib/supabase/server";
+import { axios } from "@/lib/client";
+import { getApiErrorMessage } from "@/lib/client/errors";
 import { requireRole } from "./auth.guards";
 import type { ActionResult, MutationResult } from "@/lib/types/common";
 
 /**
- * `join_class_by_code()` normalizes the code, guards the student role, and
- * upserts the enrollment (re-joining after leaving is idempotent). Returns
- * `invalid_join_code` as a plain error string for a wrong/unknown code —
- * never a stack trace the student would see.
+ * `POST classroom/classes/join` (ENROLL-002) normalizes the code, guards the
+ * student role, and upserts the enrollment (re-joining after leaving is
+ * idempotent) server-side. A wrong/unknown code comes back as a `404` whose
+ * body is the exact sentinel string `"invalid_join_code"` — `getApiErrorMessage`
+ * surfaces that string as-is (never a stack trace) for the UI to translate,
+ * same as the old RPC error message.
  */
 export async function joinClass(code: string): Promise<ActionResult<string>> {
-  const supabase = await createClient();
-  const auth = await requireRole(supabase, "student");
+  const auth = await requireRole("student");
   if ("error" in auth) return { data: null, error: auth.error };
 
-  const { data, error } = await supabase.rpc("join_class_by_code", {
-    p_code: code,
-  });
-
-  if (error) {
-    return { data: null, error: error.message };
+  let teacherClassId: string;
+  try {
+    const { data } = await axios.post<{ data: string }>(
+      "/api/v1/classroom/classes/join",
+      { code },
+    );
+    teacherClassId = data.data;
+  } catch (error) {
+    return { data: null, error: getApiErrorMessage(error) };
   }
 
   revalidatePath("/", "layout");
-  return { data, error: null };
+  return { data: teacherClassId, error: null };
 }
 
 /**
  * Sets the caller's own enrollment to "removed" — never deletes, so
- * historical submissions (Phase 4) survive a student leaving.
+ * historical submissions survive a student leaving.
  */
 export async function leaveClass(classId: string): Promise<MutationResult> {
-  const supabase = await createClient();
-  const auth = await requireRole(supabase, "student");
+  const auth = await requireRole("student");
   if ("error" in auth) return { success: false, error: auth.error };
 
-  const { error } = await supabase.rpc("leave_class", { p_class_id: classId });
-
-  if (error) {
-    return { success: false, error: error.message };
+  try {
+    await axios.post(`/api/v1/classroom/classes/${classId}/leave`);
+  } catch (error) {
+    return { success: false, error: getApiErrorMessage(error) };
   }
 
   revalidatePath("/", "layout");
@@ -56,25 +60,24 @@ export async function leaveClass(classId: string): Promise<MutationResult> {
 }
 
 /**
- * Teacher-only: sets a student's enrollment back to "removed". Allowed by
- * the `class_enrollments` UPDATE policy (teacher of the class only) — a
- * plain update, not an RPC, since RLS already scopes it correctly.
+ * Teacher-only: sets a student's enrollment back to "removed" (ENROLL-004).
+ * The route lives under `teaching/*`, not `classroom/*`, even though it acts
+ * on an enrollment — it's the teacher's own roster-management action.
  */
 export async function removeStudent(
   classId: string,
   studentId: string,
 ): Promise<MutationResult> {
-  const supabase = await createClient();
-  const auth = await requireRole(supabase, "teacher");
+  const auth = await requireRole("teacher");
   if ("error" in auth) return { success: false, error: auth.error };
 
-  const { error } = await supabase
-    .from("class_enrollments")
-    .update({ status: "removed" })
-    .eq("teacher_class_id", classId)
-    .eq("student_id", studentId);
-
-  if (error) return { success: false, error: error.message };
+  try {
+    await axios.delete(
+      `/api/v1/teaching/classes/${classId}/roster/${studentId}`,
+    );
+  } catch (error) {
+    return { success: false, error: getApiErrorMessage(error) };
+  }
 
   revalidatePath("/", "layout");
   return { success: true, error: null };

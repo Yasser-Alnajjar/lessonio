@@ -9,7 +9,7 @@ export interface Attachment extends AuditFields {
   userId: UUID;
   kind: AttachmentKind;
   fileName: string;
-  storagePath: string; // Supabase Storage object path
+  storagePath: string; // backend object storage path
   publicUrl: string;
   sizeBytes: number;
   mimeType: string;

@@ -10,73 +10,57 @@
  */
 
 import { revalidatePath } from "next/cache";
-import { format, startOfMonth, startOfWeek } from "date-fns";
 
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@auth";
+import { axios } from "@/lib/client";
+import { getApiErrorMessage } from "@/lib/client/errors";
 import type { MutationResult } from "@/lib/types/common";
-import type { CreateGoalInput, GoalPeriod, UpdateGoalInput } from "@/lib/types/goal";
-import type { Database } from "@/lib/types/database";
-
-type GoalUpdate = Database["public"]["Tables"]["goals"]["Update"];
-
-/** Matches the Monday-start week convention already used in src/actions/statistics.ts. */
-function currentPeriodStart(period: GoalPeriod): string {
-  const today = new Date();
-  const start = period === "weekly" ? startOfWeek(today, { weekStartsOn: 1 }) : startOfMonth(today);
-  return format(start, "yyyy-MM-dd");
-}
+import type { CreateGoalInput, UpdateGoalInput } from "@/lib/types/goal";
 
 /**
- * Sets (creates or overwrites) the goal for the current week/month. Uses
- * the table's `unique (user_id, period, period_start)` constraint as the
- * upsert key, so re-submitting for the same in-progress period just
- * updates its target rather than erroring.
+ * Sets (creates or overwrites) the goal for the current week/month
+ * (GAME-003, API_CONTRACT.md §7.22). `POST /gamification/goals` upserts on
+ * Laravel's `(user_id, period, period_start)` unique constraint — `period_start`
+ * is derived server-side from `period` and today's date, never client-supplied.
  */
 export async function setCurrentGoal(input: CreateGoalInput): Promise<MutationResult> {
-  const supabase = await createClient();
-  const { data: authData, error: authError } = await supabase.auth.getUser();
-
-  if (authError || !authData.user) {
+  const session = await auth();
+  if (!session?.user?.id) {
     return { success: false, error: "You must be signed in." };
   }
 
-  const { error } = await supabase.from("goals").upsert(
-    {
-      user_id: authData.user.id,
+  try {
+    await axios.post("/api/v1/gamification/goals", {
       period: input.period,
-      period_start: currentPeriodStart(input.period),
-      target_minutes: input.targetMinutes,
-    },
-    { onConflict: "user_id,period,period_start" },
-  );
-
-  if (error) {
-    return { success: false, error: error.message };
+      targetMinutes: input.targetMinutes,
+    });
+  } catch (error) {
+    return { success: false, error: getApiErrorMessage(error) };
   }
 
   revalidatePath("/", "layout");
   return { success: true, error: null };
 }
 
+/**
+ * GAME-004 — sparse update. Only `targetMinutes` is ever sent: Laravel's
+ * `UpdateGoalRequest` rejects `period` outright, since `period_start` is
+ * fixed at creation time and a lone `period` patch would break that
+ * invariant (see the backend's comment on that request class).
+ */
 export async function updateGoal(id: string, input: UpdateGoalInput): Promise<MutationResult> {
-  const supabase = await createClient();
-  const { data: authData, error: authError } = await supabase.auth.getUser();
-
-  if (authError || !authData.user) {
+  const session = await auth();
+  if (!session?.user?.id) {
     return { success: false, error: "You must be signed in." };
   }
 
-  const patch: GoalUpdate = {};
-  if (input.targetMinutes !== undefined) patch.target_minutes = input.targetMinutes;
+  try {
+    const patch: { targetMinutes?: number } = {};
+    if (input.targetMinutes !== undefined) patch.targetMinutes = input.targetMinutes;
 
-  const { error } = await supabase
-    .from("goals")
-    .update(patch)
-    .eq("id", id)
-    .eq("user_id", authData.user.id);
-
-  if (error) {
-    return { success: false, error: error.message };
+    await axios.patch(`/api/v1/gamification/goals/${id}`, patch);
+  } catch (error) {
+    return { success: false, error: getApiErrorMessage(error) };
   }
 
   revalidatePath("/", "layout");
@@ -84,21 +68,15 @@ export async function updateGoal(id: string, input: UpdateGoalInput): Promise<Mu
 }
 
 export async function deleteGoal(id: string): Promise<MutationResult> {
-  const supabase = await createClient();
-  const { data: authData, error: authError } = await supabase.auth.getUser();
-
-  if (authError || !authData.user) {
+  const session = await auth();
+  if (!session?.user?.id) {
     return { success: false, error: "You must be signed in." };
   }
 
-  const { error } = await supabase
-    .from("goals")
-    .delete()
-    .eq("id", id)
-    .eq("user_id", authData.user.id);
-
-  if (error) {
-    return { success: false, error: error.message };
+  try {
+    await axios.delete(`/api/v1/gamification/goals/${id}`);
+  } catch (error) {
+    return { success: false, error: getApiErrorMessage(error) };
   }
 
   revalidatePath("/", "layout");

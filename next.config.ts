@@ -9,13 +9,11 @@ const nextConfig: NextConfig = {
   typedRoutes: true,
 
   images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "*.supabase.co",
-        pathname: "/storage/v1/object/public/**",
-      },
-    ],
+    // Attachment `publicUrl`s now come from the Laravel backend's storage
+    // disk rather than Supabase Storage. Add a remotePattern for that host
+    // once the backend's storage domain (or same-origin nginx setup) is
+    // finalized — see BACKEND_URL / NEXT_PUBLIC_API_BASE_URL.
+    remotePatterns: [],
   },
 
   experimental: {
@@ -27,8 +25,8 @@ const nextConfig: NextConfig = {
       "date-fns",
     ],
     // Attachment uploads (Actions.Attachments.upload) send the file straight
-    // through a Server Action; the "attachments" Storage bucket allows up to
-    // 50 MB, so the request body limit must clear that plus multipart overhead.
+    // through a Server Action; the backend accepts up to 50 MB per file, so
+    // the request body limit must clear that plus multipart overhead.
     serverActions: {
       bodySizeLimit: "55mb",
     },

@@ -10,60 +10,25 @@
 
 import { revalidatePath } from "next/cache";
 
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@auth";
+import { axios } from "@/lib/client";
+import { getApiErrorMessage } from "@/lib/client/errors";
 import type { MutationResult } from "@/lib/types/common";
 import type { CreateHomeworkInput, UpdateHomeworkInput } from "@/lib/types/homework";
-import type { Database } from "@/lib/types/database";
-
-type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
-type HomeworkUpdate = Database["public"]["Tables"]["homework"]["Update"];
-
-async function getAuthedUserId(
-  supabase: SupabaseServerClient,
-): Promise<{ userId: string } | { error: string }> {
-  const { data, error } = await supabase.auth.getUser();
-  if (error || !data.user) {
-    return { error: "You must be signed in." };
-  }
-  return { userId: data.user.id };
-}
-
-/** Looks up the lesson's subject server-side — never trust a client-supplied subject id. */
-async function resolveSubjectId(
-  supabase: SupabaseServerClient,
-  userId: string,
-  lessonId: string,
-): Promise<{ subjectId: string } | { error: string }> {
-  const { data: lesson, error } = await supabase
-    .from("lessons")
-    .select("subject_id")
-    .eq("id", lessonId)
-    .eq("user_id", userId)
-    .maybeSingle();
-
-  if (error) return { error: error.message };
-  if (!lesson) return { error: "Lesson not found." };
-  return { subjectId: lesson.subject_id };
-}
 
 export async function createHomework(input: CreateHomeworkInput): Promise<MutationResult> {
-  const supabase = await createClient();
-  const auth = await getAuthedUserId(supabase);
-  if ("error" in auth) return { success: false, error: auth.error };
+  const session = await auth();
+  if (!session?.user?.id) return { success: false, error: "You must be signed in." };
 
-  const subject = await resolveSubjectId(supabase, auth.userId, input.lessonId);
-  if ("error" in subject) return { success: false, error: subject.error };
-
-  const { error } = await supabase.from("homework").insert({
-    user_id: auth.userId,
-    lesson_id: input.lessonId,
-    subject_id: subject.subjectId,
-    title: input.title,
-    deadline: input.deadline,
-  });
-
-  if (error) {
-    return { success: false, error: error.message };
+  try {
+    // subjectId is derived server-side from the lesson (HW-002) — never sent by the client.
+    await axios.post("/api/v1/homework", {
+      lessonId: input.lessonId,
+      title: input.title,
+      deadline: input.deadline,
+    });
+  } catch (error) {
+    return { success: false, error: getApiErrorMessage(error) };
   }
 
   revalidatePath("/", "layout");
@@ -74,33 +39,25 @@ export async function updateHomework(
   id: string,
   input: UpdateHomeworkInput,
 ): Promise<MutationResult> {
-  const supabase = await createClient();
-  const auth = await getAuthedUserId(supabase);
-  if ("error" in auth) return { success: false, error: auth.error };
+  const session = await auth();
+  if (!session?.user?.id) return { success: false, error: "You must be signed in." };
 
-  const patch: HomeworkUpdate = {};
+  const patch: Record<string, unknown> = {};
+  if (input.lessonId !== undefined) patch.lessonId = input.lessonId;
   if (input.title !== undefined) patch.title = input.title;
   if (input.deadline !== undefined) patch.deadline = input.deadline;
   if (input.completed !== undefined) patch.completed = input.completed;
-
-  if (input.lessonId !== undefined) {
-    const subject = await resolveSubjectId(supabase, auth.userId, input.lessonId);
-    if ("error" in subject) return { success: false, error: subject.error };
-    patch.lesson_id = input.lessonId;
-    patch.subject_id = subject.subjectId;
-  }
 
   if (Object.keys(patch).length === 0) {
     return { success: true, error: null };
   }
 
-  const { error } = await supabase
-    .from("homework")
-    .update(patch)
-    .eq("id", id)
-    .eq("user_id", auth.userId);
-
-  if (error) return { success: false, error: error.message };
+  try {
+    // HW-003 — sparse PATCH; changing lessonId re-derives subjectId server-side.
+    await axios.patch(`/api/v1/homework/${id}`, patch);
+  } catch (error) {
+    return { success: false, error: getApiErrorMessage(error) };
+  }
 
   revalidatePath("/", "layout");
   return { success: true, error: null };
@@ -110,34 +67,29 @@ export async function toggleHomeworkCompleted(
   id: string,
   completed: boolean,
 ): Promise<MutationResult> {
-  const supabase = await createClient();
-  const auth = await getAuthedUserId(supabase);
-  if ("error" in auth) return { success: false, error: auth.error };
+  const session = await auth();
+  if (!session?.user?.id) return { success: false, error: "You must be signed in." };
 
-  const { error } = await supabase
-    .from("homework")
-    .update({ completed })
-    .eq("id", id)
-    .eq("user_id", auth.userId);
-
-  if (error) return { success: false, error: error.message };
+  try {
+    // HW-004 — sets, not toggles: the caller supplies the target value.
+    await axios.patch(`/api/v1/homework/${id}/completed`, { completed });
+  } catch (error) {
+    return { success: false, error: getApiErrorMessage(error) };
+  }
 
   revalidatePath("/", "layout");
   return { success: true, error: null };
 }
 
 export async function deleteHomework(id: string): Promise<MutationResult> {
-  const supabase = await createClient();
-  const auth = await getAuthedUserId(supabase);
-  if ("error" in auth) return { success: false, error: auth.error };
+  const session = await auth();
+  if (!session?.user?.id) return { success: false, error: "You must be signed in." };
 
-  const { error } = await supabase
-    .from("homework")
-    .delete()
-    .eq("id", id)
-    .eq("user_id", auth.userId);
-
-  if (error) return { success: false, error: error.message };
+  try {
+    await axios.delete(`/api/v1/homework/${id}`);
+  } catch (error) {
+    return { success: false, error: getApiErrorMessage(error) };
+  }
 
   revalidatePath("/", "layout");
   return { success: true, error: null };

@@ -108,12 +108,6 @@ export async function requestPasswordReset(
   return { success: true, error: null };
 }
 
-/**
- * Laravel's reset flow needs `token`/`email` from the emailed link — unlike
- * Supabase, there's no recovery session already established client-side
- * (API_CONTRACT.md AUTH-008, RISK-06). `ResetPasswordForm` reads them from
- * the URL and passes them through here rather than as form fields.
- */
 export async function resetPassword(
   input: ResetPasswordInput,
   meta: { token: string; email: string },

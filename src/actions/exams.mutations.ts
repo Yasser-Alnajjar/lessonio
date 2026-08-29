@@ -10,62 +10,27 @@
 
 import { revalidatePath } from "next/cache";
 
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@auth";
+import { axios } from "@/lib/client";
+import { getApiErrorMessage } from "@/lib/client/errors";
 import type { MutationResult } from "@/lib/types/common";
 import type { CreateExamInput, UpdateExamInput } from "@/lib/types/exam";
-import type { Database } from "@/lib/types/database";
-
-type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
-type ExamUpdate = Database["public"]["Tables"]["exams"]["Update"];
-
-async function getAuthedUserId(
-  supabase: SupabaseServerClient,
-): Promise<{ userId: string } | { error: string }> {
-  const { data, error } = await supabase.auth.getUser();
-  if (error || !data.user) {
-    return { error: "You must be signed in." };
-  }
-  return { userId: data.user.id };
-}
-
-/** Looks up the lesson's subject server-side — never trust a client-supplied subject id. */
-async function resolveSubjectId(
-  supabase: SupabaseServerClient,
-  userId: string,
-  lessonId: string,
-): Promise<{ subjectId: string } | { error: string }> {
-  const { data: lesson, error } = await supabase
-    .from("lessons")
-    .select("subject_id")
-    .eq("id", lessonId)
-    .eq("user_id", userId)
-    .maybeSingle();
-
-  if (error) return { error: error.message };
-  if (!lesson) return { error: "Lesson not found." };
-  return { subjectId: lesson.subject_id };
-}
 
 export async function createExam(input: CreateExamInput): Promise<MutationResult> {
-  const supabase = await createClient();
-  const auth = await getAuthedUserId(supabase);
-  if ("error" in auth) return { success: false, error: auth.error };
+  const session = await auth();
+  if (!session?.user?.id) return { success: false, error: "You must be signed in." };
 
-  const subject = await resolveSubjectId(supabase, auth.userId, input.lessonId);
-  if ("error" in subject) return { success: false, error: subject.error };
-
-  const { error } = await supabase.from("exams").insert({
-    user_id: auth.userId,
-    lesson_id: input.lessonId,
-    subject_id: subject.subjectId,
-    title: input.title,
-    date: input.date,
-    total_score: input.totalScore,
-    score: input.score ?? null,
-  });
-
-  if (error) {
-    return { success: false, error: error.message };
+  try {
+    // subjectId is derived server-side from the lesson (EXAM-002) — never sent by the client.
+    await axios.post("/api/v1/exams", {
+      lessonId: input.lessonId,
+      title: input.title,
+      date: input.date,
+      totalScore: input.totalScore,
+      score: input.score ?? null,
+    });
+  } catch (error) {
+    return { success: false, error: getApiErrorMessage(error) };
   }
 
   revalidatePath("/", "layout");
@@ -73,68 +38,60 @@ export async function createExam(input: CreateExamInput): Promise<MutationResult
 }
 
 export async function updateExam(id: string, input: UpdateExamInput): Promise<MutationResult> {
-  const supabase = await createClient();
-  const auth = await getAuthedUserId(supabase);
-  if ("error" in auth) return { success: false, error: auth.error };
+  const session = await auth();
+  if (!session?.user?.id) return { success: false, error: "You must be signed in." };
 
-  const patch: ExamUpdate = {};
+  const patch: Record<string, unknown> = {};
+  if (input.lessonId !== undefined) patch.lessonId = input.lessonId;
   if (input.title !== undefined) patch.title = input.title;
   if (input.date !== undefined) patch.date = input.date;
-  if (input.totalScore !== undefined) patch.total_score = input.totalScore;
+  if (input.totalScore !== undefined) patch.totalScore = input.totalScore;
   if (input.score !== undefined) patch.score = input.score;
-
-  if (input.lessonId !== undefined) {
-    const subject = await resolveSubjectId(supabase, auth.userId, input.lessonId);
-    if ("error" in subject) return { success: false, error: subject.error };
-    patch.lesson_id = input.lessonId;
-    patch.subject_id = subject.subjectId;
-  }
 
   if (Object.keys(patch).length === 0) {
     return { success: true, error: null };
   }
 
-  const { error } = await supabase
-    .from("exams")
-    .update(patch)
-    .eq("id", id)
-    .eq("user_id", auth.userId);
-
-  if (error) return { success: false, error: error.message };
+  try {
+    // EXAM-003 — sparse PATCH; changing lessonId re-derives subjectId server-side.
+    await axios.patch(`/api/v1/exams/${id}`, patch);
+  } catch (error) {
+    return { success: false, error: getApiErrorMessage(error) };
+  }
 
   revalidatePath("/", "layout");
   return { success: true, error: null };
 }
 
+/**
+ * Dedicated `PATCH /api/v1/exams/{id}/score` (EXAM-004) — a distinct
+ * endpoint from the general update, backing the exams list's inline
+ * "record score" control. Mirrors the Supabase code's own split between a
+ * full-row update and a score-only update.
+ */
 export async function updateExamScore(id: string, score: number): Promise<MutationResult> {
-  const supabase = await createClient();
-  const auth = await getAuthedUserId(supabase);
-  if ("error" in auth) return { success: false, error: auth.error };
+  const session = await auth();
+  if (!session?.user?.id) return { success: false, error: "You must be signed in." };
 
-  const { error } = await supabase
-    .from("exams")
-    .update({ score })
-    .eq("id", id)
-    .eq("user_id", auth.userId);
-
-  if (error) return { success: false, error: error.message };
+  try {
+    await axios.patch(`/api/v1/exams/${id}/score`, { score });
+  } catch (error) {
+    return { success: false, error: getApiErrorMessage(error) };
+  }
 
   revalidatePath("/", "layout");
   return { success: true, error: null };
 }
 
 export async function deleteExam(id: string): Promise<MutationResult> {
-  const supabase = await createClient();
-  const auth = await getAuthedUserId(supabase);
-  if ("error" in auth) return { success: false, error: auth.error };
+  const session = await auth();
+  if (!session?.user?.id) return { success: false, error: "You must be signed in." };
 
-  const { error } = await supabase
-    .from("exams")
-    .delete()
-    .eq("id", id)
-    .eq("user_id", auth.userId);
-
-  if (error) return { success: false, error: error.message };
+  try {
+    await axios.delete(`/api/v1/exams/${id}`);
+  } catch (error) {
+    return { success: false, error: getApiErrorMessage(error) };
+  }
 
   revalidatePath("/", "layout");
   return { success: true, error: null };

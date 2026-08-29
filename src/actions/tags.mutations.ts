@@ -8,8 +8,8 @@
 
 import { revalidatePath } from "next/cache";
 
-import { createClient } from "@/lib/supabase/server";
-import { colorForTagName } from "@/lib/constants/tags";
+import { axios } from "@/lib/client";
+import { getApiErrorMessage } from "@/lib/client/errors";
 import type { Tag } from "@/lib/types/tag";
 
 export type CreateTagResult =
@@ -19,7 +19,12 @@ export type CreateTagResult =
 /**
  * Find-or-create by name (tags are unique per user by name — see the
  * `unique (user_id, name)` constraint), so picking an already-typed tag
- * never creates a duplicate row.
+ * never creates a duplicate row. `POST /api/v1/tags` (TAG-002) does the
+ * find-or-create server-side and always returns `200`, never `201`, since
+ * the row may have already existed.
+ *
+ * `color` is **not** sent — Laravel derives it server-side from the name via
+ * its own port of `colorForTagName()`; the client no longer chooses it.
  */
 export async function createTag(name: string): Promise<CreateTagResult> {
   const trimmed = name.trim();
@@ -27,60 +32,14 @@ export async function createTag(name: string): Promise<CreateTagResult> {
     return { success: false, error: "Tag name is required.", tag: null };
   }
 
-  const supabase = await createClient();
-  const { data: authData, error: authError } = await supabase.auth.getUser();
-
-  if (authError || !authData.user) {
-    return { success: false, error: "You must be signed in.", tag: null };
-  }
-
-  const { data: existing } = await supabase
-    .from("tags")
-    .select("*")
-    .eq("user_id", authData.user.id)
-    .eq("name", trimmed)
-    .maybeSingle();
-
-  if (existing) {
-    return {
-      success: true,
-      error: null,
-      tag: {
-        id: existing.id,
-        userId: existing.user_id,
-        name: existing.name,
-        color: existing.color,
-        createdAt: existing.created_at,
-        updatedAt: existing.updated_at,
-      },
-    };
-  }
-
-  const { data: created, error } = await supabase
-    .from("tags")
-    .insert({
-      user_id: authData.user.id,
+  try {
+    const { data } = await axios.post<{ data: Tag }>("/api/v1/tags", {
       name: trimmed,
-      color: colorForTagName(trimmed),
-    })
-    .select("*")
-    .single();
+    });
 
-  if (error || !created) {
-    return { success: false, error: error?.message ?? "Failed to create tag.", tag: null };
+    revalidatePath("/", "layout");
+    return { success: true, error: null, tag: data.data };
+  } catch (error) {
+    return { success: false, error: getApiErrorMessage(error), tag: null };
   }
-
-  revalidatePath("/", "layout");
-  return {
-    success: true,
-    error: null,
-    tag: {
-      id: created.id,
-      userId: created.user_id,
-      name: created.name,
-      color: created.color,
-      createdAt: created.created_at,
-      updatedAt: created.updated_at,
-    },
-  };
 }

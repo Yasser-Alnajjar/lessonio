@@ -11,34 +11,22 @@
 
 import { revalidatePath } from "next/cache";
 
-import { createClient } from "@/lib/supabase/server";
+import { axios } from "@/lib/client";
+import { getApiErrorMessage } from "@/lib/client/errors";
 import type { MutationResult } from "@/lib/types/common";
 
-type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
-
-async function getAuthedUserId(
-  supabase: SupabaseServerClient,
-): Promise<{ userId: string } | { error: string }> {
-  const { data, error } = await supabase.auth.getUser();
-  if (error || !data.user) {
-    return { error: "You must be signed in." };
-  }
-  return { userId: data.user.id };
-}
-
-/** Moves a lesson to a new date — the only calendar mutation, driven by drag-and-drop. */
+/**
+ * Moves a lesson to a new date — the only calendar mutation, driven by
+ * drag-and-drop. `PATCH /api/v1/lessons/{id}/reschedule` (LESSON-008) sets
+ * only `lessons.date`; it lives in the calendar domain because it backs
+ * month-view drag-and-drop, but it writes the `lessons` table.
+ */
 export async function rescheduleLesson(lessonId: string, newDate: string): Promise<MutationResult> {
-  const supabase = await createClient();
-  const auth = await getAuthedUserId(supabase);
-  if ("error" in auth) return { success: false, error: auth.error };
-
-  const { error } = await supabase
-    .from("lessons")
-    .update({ date: newDate })
-    .eq("id", lessonId)
-    .eq("user_id", auth.userId);
-
-  if (error) return { success: false, error: error.message };
+  try {
+    await axios.patch(`/api/v1/lessons/${lessonId}/reschedule`, { date: newDate });
+  } catch (error) {
+    return { success: false, error: getApiErrorMessage(error) };
+  }
 
   revalidatePath("/", "layout");
   return { success: true, error: null };

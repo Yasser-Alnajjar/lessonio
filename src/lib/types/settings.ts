@@ -1,5 +1,4 @@
 import type { UUID } from "./common";
-import type { Database } from "./database";
 import type { GradeScaleEntry } from "./grade";
 import type { NotificationType } from "./notification";
 
@@ -35,30 +34,31 @@ export interface UserSettings {
   gradeScale: GradeScaleEntry[];
 }
 
-type Tables = Database["public"]["Tables"];
+/** One exported row, shape unspecified — the backend returns raw table rows for this endpoint. */
+type ExportedRow = Record<string, unknown>;
 
 /**
  * A raw dump of every row the signed-in user owns, keyed by table. Built for
  * a one-shot "download my data" export rather than typed app consumption —
- * that's why it carries `Row` shapes straight from the generated schema
+ * that's why it carries loosely-typed row shapes straight from the backend
  * instead of the app's camelCase domain types.
  */
 export interface UserDataExport {
   exportedAt: string;
-  profile: Tables["profiles"]["Row"] | null;
-  settings: Tables["settings"]["Row"] | null;
-  subjects: Tables["subjects"]["Row"][];
-  classes: Tables["classes"]["Row"][];
-  classOccurrences: Tables["class_occurrences"]["Row"][];
-  lessons: Tables["lessons"]["Row"][];
-  lessonNotes: Tables["lesson_notes"]["Row"][];
-  attachments: Tables["attachments"]["Row"][];
-  studySessions: Tables["study_sessions"]["Row"][];
-  homework: Tables["homework"]["Row"][];
-  exams: Tables["exams"]["Row"][];
-  tags: Tables["tags"]["Row"][];
-  lessonTags: Tables["lesson_tags"]["Row"][];
-  notifications: Tables["notifications"]["Row"][];
-  goals: Tables["goals"]["Row"][];
-  achievements: Tables["user_achievements"]["Row"][];
+  profile: ExportedRow | null;
+  settings: ExportedRow | null;
+  subjects: ExportedRow[];
+  classes: ExportedRow[];
+  classOccurrences: ExportedRow[];
+  lessons: ExportedRow[];
+  lessonNotes: ExportedRow[];
+  attachments: ExportedRow[];
+  studySessions: ExportedRow[];
+  homework: ExportedRow[];
+  exams: ExportedRow[];
+  tags: ExportedRow[];
+  lessonTags: ExportedRow[];
+  notifications: ExportedRow[];
+  goals: ExportedRow[];
+  achievements: ExportedRow[];
 }

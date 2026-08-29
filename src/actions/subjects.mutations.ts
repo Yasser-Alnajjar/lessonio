@@ -12,31 +12,17 @@
 
 import { revalidatePath } from "next/cache";
 
-import { createClient } from "@/lib/supabase/server";
+import { axios } from "@/lib/client";
+import { getApiErrorMessage } from "@/lib/client/errors";
 import type { MutationResult } from "@/lib/types/common";
 import type { CreateSubjectInput, UpdateSubjectInput } from "@/lib/types/subject";
-import type { Database } from "@/lib/types/database";
-
-type SubjectUpdate = Database["public"]["Tables"]["subjects"]["Update"];
 
 export async function createSubject(input: CreateSubjectInput): Promise<MutationResult> {
-  const supabase = await createClient();
-  const { data: authData, error: authError } = await supabase.auth.getUser();
-
-  if (authError || !authData.user) {
-    return { success: false, error: "You must be signed in." };
-  }
-
-  const { error } = await supabase.from("subjects").insert({
-    user_id: authData.user.id,
-    name: input.name,
-    color: input.color,
-    icon: input.icon,
-    credit_hours: input.creditHours,
-  });
-
-  if (error) {
-    return { success: false, error: error.message };
+  try {
+    // CreateSubjectInput already matches SUBJ-003's body 1:1.
+    await axios.post("/api/v1/subjects", input);
+  } catch (error) {
+    return { success: false, error: getApiErrorMessage(error) };
   }
 
   revalidatePath("/", "layout");
@@ -47,28 +33,13 @@ export async function updateSubject(
   id: string,
   input: UpdateSubjectInput,
 ): Promise<MutationResult> {
-  const supabase = await createClient();
-  const { data: authData, error: authError } = await supabase.auth.getUser();
-
-  if (authError || !authData.user) {
-    return { success: false, error: "You must be signed in." };
-  }
-
-  const patch: SubjectUpdate = {};
-  if (input.name !== undefined) patch.name = input.name;
-  if (input.color !== undefined) patch.color = input.color;
-  if (input.icon !== undefined) patch.icon = input.icon;
-  if (input.creditHours !== undefined) patch.credit_hours = input.creditHours;
-  if (input.isArchived !== undefined) patch.is_archived = input.isArchived;
-
-  const { error } = await supabase
-    .from("subjects")
-    .update(patch)
-    .eq("id", id)
-    .eq("user_id", authData.user.id);
-
-  if (error) {
-    return { success: false, error: error.message };
+  try {
+    // A sparse PATCH: axios's JSON.stringify drops `undefined` keys, so only
+    // the fields the caller actually set reach Laravel's `sometimes` rules
+    // (SUBJ-004) — no need to build the patch object by hand.
+    await axios.patch(`/api/v1/subjects/${id}`, input);
+  } catch (error) {
+    return { success: false, error: getApiErrorMessage(error) };
   }
 
   revalidatePath("/", "layout");
@@ -81,21 +52,10 @@ export async function updateSubject(
  * attachments — the caller must warn about this before confirming.
  */
 export async function deleteSubject(id: string): Promise<MutationResult> {
-  const supabase = await createClient();
-  const { data: authData, error: authError } = await supabase.auth.getUser();
-
-  if (authError || !authData.user) {
-    return { success: false, error: "You must be signed in." };
-  }
-
-  const { error } = await supabase
-    .from("subjects")
-    .delete()
-    .eq("id", id)
-    .eq("user_id", authData.user.id);
-
-  if (error) {
-    return { success: false, error: error.message };
+  try {
+    await axios.delete(`/api/v1/subjects/${id}`);
+  } catch (error) {
+    return { success: false, error: getApiErrorMessage(error) };
   }
 
   revalidatePath("/", "layout");

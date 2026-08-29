@@ -9,22 +9,15 @@
  * rationale as `getRecentNotifications` in `notifications.mutations.ts`.
  */
 
-import { createClient } from "@/lib/supabase/server";
 import { runSearchQuery } from "@/lib/search/query";
 import type { ActionResult } from "@/lib/types/common";
 import type { SearchResultItem } from "@/lib/types/search";
 
-/** Smaller than the full results page — the palette only needs a quick preview per group. */
-const PALETTE_LIMIT = 6;
-
 export async function liveSearch(query: string): Promise<ActionResult<SearchResultItem[]>> {
-  const supabase = await createClient();
-  const { data: authData, error: authError } = await supabase.auth.getUser();
-
-  if (authError || !authData.user) {
+  try {
+    const data = await runSearchQuery("/api/v1/search/live", query);
+    return { data, error: null };
+  } catch {
     return { data: [], error: null };
   }
-
-  const data = await runSearchQuery(supabase, authData.user.id, query, PALETTE_LIMIT);
-  return { data, error: null };
 }

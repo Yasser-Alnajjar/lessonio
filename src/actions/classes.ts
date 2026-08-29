@@ -2,11 +2,9 @@ import "server-only";
 
 import { cache } from "react";
 
-import { createClient } from "@/lib/supabase/server";
+import { axios } from "@/lib/client";
 import type { ActionResult } from "@/lib/types/common";
-import type { Class, ClassMeeting, ClassWithSubject } from "@/lib/types/class";
-import type { SubjectIcon } from "@/lib/types/subject";
-import type { Database } from "@/lib/types/database";
+import type { ClassWithSubject } from "@/lib/types/class";
 import {
   createClass,
   deleteClass,
@@ -14,180 +12,40 @@ import {
   updateClass,
 } from "./classes.mutations";
 
-type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
-type ClassRow = Database["public"]["Tables"]["classes"]["Row"];
-
-interface SubjectSummary {
-  name: string;
-  color: string;
-  icon: SubjectIcon;
-}
-
-function mapClassRow(row: ClassRow): Class {
-  return {
-    id: row.id,
-    userId: row.user_id,
-    subjectId: row.subject_id,
-    teacher: row.teacher,
-    location: row.location,
-    // The `classes_meetings_valid` DB constraint guarantees this JSONB
-    // column already holds well-formed ClassMeeting objects.
-    meetings: row.meetings as unknown as ClassMeeting[],
-    isActive: row.is_active,
-    teacherClassId: row.teacher_class_id,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
-  };
-}
-
-function withSubject(
-  _class: Class,
-  subjectsById: Map<string, SubjectSummary>,
-  teacherClassNamesById: Map<string, string>,
-): ClassWithSubject {
-  const subject = subjectsById.get(_class.subjectId);
-  return {
-    ..._class,
-    subjectName: subject?.name ?? "Unknown subject",
-    subjectColor: subject?.color ?? "#94a3b8",
-    subjectIcon: subject?.icon ?? "book-open",
-    linkedTeacherClassName: _class.teacherClassId
-      ? (teacherClassNamesById.get(_class.teacherClassId) ?? null)
-      : null,
-  };
-}
-
-/** Fetches the subjects a set of classes belong to in one bulk query — no N+1s. */
-async function fetchSubjectsByIds(
-  supabase: SupabaseServerClient,
-  subjectIds: string[],
-): Promise<Map<string, SubjectSummary>> {
-  if (subjectIds.length === 0) return new Map();
-
-  const { data: rows } = await supabase
-    .from("subjects")
-    .select("id, name, color, icon")
-    .in("id", subjectIds);
-
-  return new Map(
-    (rows ?? []).map((row) => [
-      row.id,
-      { name: row.name, color: row.color, icon: row.icon as SubjectIcon },
-    ]),
-  );
-}
-
-/**
- * Fetches the names of a set of linked teacher_classes rows in one bulk
- * query — no N+1s. Most students never link a class, so this is skipped
- * entirely when nothing needs it.
- */
-async function fetchTeacherClassNamesByIds(
-  supabase: SupabaseServerClient,
-  teacherClassIds: string[],
-): Promise<Map<string, string>> {
-  if (teacherClassIds.length === 0) return new Map();
-
-  const { data: rows } = await supabase
-    .from("teacher_classes")
-    .select("id, name")
-    .in("id", teacherClassIds);
-
-  return new Map((rows ?? []).map((row) => [row.id, row.name]));
-}
-
 /**
  * SSR-facing surface for `Actions.Classes.*` — the *recurring* class, the
  * single source of truth for the domain. The dated instances that carry
  * attendance/exam state are `Actions.ClassOccurrences.*`.
  *
- * `getAll`/`getById` are plain SSR-only reads; the mutations are re-exported
- * references to the real Server Actions defined in `classes.mutations.ts`
- * (imported directly by Client Components — see that file's header comment
- * for why).
+ * `getAll`/`getById` are plain SSR-only reads — Laravel's `ClassResource`
+ * (API_CONTRACT.md CLASS-001/002) already eager-loads the subject and
+ * linked teacher class, so these are thin passthroughs. The mutations are
+ * re-exported references to the real Server Actions defined in
+ * `classes.mutations.ts` (imported directly by Client Components — see that
+ * file's header comment for why).
  */
 export const classesActions = {
   async getAll(): Promise<ActionResult<ClassWithSubject[]>> {
-    const supabase = await createClient();
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !authData.user) {
-      return { data: [], error: null };
+    try {
+      const { data } = await axios.get<{ data: ClassWithSubject[] }>(
+        "/api/v1/classes",
+      );
+      return { data: data.data, error: null };
+    } catch {
+      return { data: null, error: null };
     }
-
-    const { data: rows, error } = await supabase
-      .from("classes")
-      .select("*")
-      .eq("user_id", authData.user.id)
-      .order("created_at", { ascending: true });
-
-    if (error) {
-      return { data: null, error: error.message };
-    }
-
-    const classes = (rows ?? []).map(mapClassRow);
-    if (classes.length === 0) {
-      return { data: [], error: null };
-    }
-
-    const [subjectsById, teacherClassNamesById] = await Promise.all([
-      fetchSubjectsByIds(supabase, [
-        ...new Set(classes.map((_class) => _class.subjectId)),
-      ]),
-      fetchTeacherClassNamesByIds(supabase, [
-        ...new Set(
-          classes
-            .map((_class) => _class.teacherClassId)
-            .filter((id): id is string => id !== null),
-        ),
-      ]),
-    ]);
-
-    return {
-      data: classes.map((_class) =>
-        withSubject(_class, subjectsById, teacherClassNamesById),
-      ),
-      error: null,
-    };
   },
 
   getById: cache(
     async (id: string): Promise<ActionResult<ClassWithSubject>> => {
-      const supabase = await createClient();
-      const { data: authData, error: authError } =
-        await supabase.auth.getUser();
-
-      if (authError || !authData.user) {
+      try {
+        const { data } = await axios.get<{ data: ClassWithSubject | null }>(
+          `/api/v1/classes/${id}`,
+        );
+        return { data: data.data, error: null };
+      } catch {
         return { data: null, error: null };
       }
-
-      const { data: row, error } = await supabase
-        .from("classes")
-        .select("*")
-        .eq("id", id)
-        .eq("user_id", authData.user.id)
-        .maybeSingle();
-
-      if (error) {
-        return { data: null, error: error.message };
-      }
-      if (!row) {
-        return { data: null, error: null };
-      }
-
-      const _class = mapClassRow(row);
-      const [subjectsById, teacherClassNamesById] = await Promise.all([
-        fetchSubjectsByIds(supabase, [_class.subjectId]),
-        fetchTeacherClassNamesByIds(
-          supabase,
-          _class.teacherClassId ? [_class.teacherClassId] : [],
-        ),
-      ]);
-
-      return {
-        data: withSubject(_class, subjectsById, teacherClassNamesById),
-        error: null,
-      };
     },
   ),
 

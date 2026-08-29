@@ -9,34 +9,30 @@
 
 import { revalidatePath } from "next/cache";
 
-import { createClient } from "@/lib/supabase/server";
+import { axios } from "@/lib/client";
+import { getApiErrorMessage } from "@/lib/client/errors";
 import { requireRole } from "./auth.guards";
 import type { MutationResult, ActionResult } from "@/lib/types/common";
 import type {
   CreateTeacherClassInput,
   UpdateTeacherClassInput,
 } from "@/lib/types/teacher-class";
-import type { Database } from "@/lib/types/database";
 
-type TeacherClassUpdate =
-  Database["public"]["Tables"]["teacher_classes"]["Update"];
-
-/** `create_teacher_class()` inserts the class and its join code in one transaction. */
+/** `POST teaching/classes` inserts the class and its join code in one transaction (TCLASS-004). */
 export async function createTeacherClass(
   input: CreateTeacherClassInput,
 ): Promise<MutationResult> {
-  const supabase = await createClient();
-  const auth = await requireRole(supabase, "teacher");
+  const auth = await requireRole("teacher");
   if ("error" in auth) return { success: false, error: auth.error };
 
-  const { error } = await supabase.rpc("create_teacher_class", {
-    p_name: input.name,
-    p_subject_label: input.subjectLabel || undefined,
-    p_description: input.description || undefined,
-  });
-
-  if (error) {
-    return { success: false, error: error.message };
+  try {
+    await axios.post("/api/v1/teaching/classes", {
+      name: input.name,
+      subjectLabel: input.subjectLabel || undefined,
+      description: input.description || undefined,
+    });
+  } catch (error) {
+    return { success: false, error: getApiErrorMessage(error) };
   }
 
   revalidatePath("/", "layout");
@@ -47,61 +43,43 @@ export async function updateTeacherClass(
   id: string,
   input: UpdateTeacherClassInput,
 ): Promise<MutationResult> {
-  const supabase = await createClient();
-  const auth = await requireRole(supabase, "teacher");
+  const auth = await requireRole("teacher");
   if ("error" in auth) return { success: false, error: auth.error };
 
-  const patch: TeacherClassUpdate = {};
+  const patch: Record<string, unknown> = {};
   if (input.name !== undefined) patch.name = input.name;
   if (input.subjectLabel !== undefined)
-    patch.subject_label = input.subjectLabel || null;
+    patch.subjectLabel = input.subjectLabel || null;
   if (input.description !== undefined)
     patch.description = input.description || null;
-  if (input.isArchived !== undefined) patch.is_archived = input.isArchived;
+  if (input.isArchived !== undefined) patch.isArchived = input.isArchived;
 
   if (Object.keys(patch).length === 0) {
     return { success: true, error: null };
   }
 
-  const { error } = await supabase
-    .from("teacher_classes")
-    .update(patch)
-    .eq("id", id)
-    .eq("teacher_id", auth.userId);
-
-  if (error) {
-    return { success: false, error: error.message };
+  try {
+    await axios.patch(`/api/v1/teaching/classes/${id}`, patch);
+  } catch (error) {
+    return { success: false, error: getApiErrorMessage(error) };
   }
 
   revalidatePath("/", "layout");
   return { success: true, error: null };
 }
 
-/** Flips `is_archived`. Archiving hides a class from active use without deleting its roster/history. */
+/** Toggles `is_archived` server-side (TCLASS-006). Archiving hides a class from active use without deleting its roster/history. */
 export async function toggleArchivedTeacherClass(
   id: string,
 ): Promise<MutationResult> {
-  const supabase = await createClient();
-  const auth = await requireRole(supabase, "teacher");
+  const auth = await requireRole("teacher");
   if ("error" in auth) return { success: false, error: auth.error };
 
-  const { data: current, error: fetchError } = await supabase
-    .from("teacher_classes")
-    .select("is_archived")
-    .eq("id", id)
-    .eq("teacher_id", auth.userId)
-    .maybeSingle();
-
-  if (fetchError) return { success: false, error: fetchError.message };
-  if (!current) return { success: false, error: "Class not found." };
-
-  const { error } = await supabase
-    .from("teacher_classes")
-    .update({ is_archived: !current.is_archived })
-    .eq("id", id)
-    .eq("teacher_id", auth.userId);
-
-  if (error) return { success: false, error: error.message };
+  try {
+    await axios.post(`/api/v1/teaching/classes/${id}/archive`);
+  } catch (error) {
+    return { success: false, error: getApiErrorMessage(error) };
+  }
 
   revalidatePath("/", "layout");
   return { success: true, error: null };
@@ -109,21 +87,18 @@ export async function toggleArchivedTeacherClass(
 
 /**
  * Deletes the class permanently. Its join code and enrollments go with it
- * via `ON DELETE CASCADE` — there is no "undo" once a teacher deletes a
- * class, unlike leaving/removing a single student.
+ * via cascade — there is no "undo" once a teacher deletes a class, unlike
+ * leaving/removing a single student.
  */
 export async function deleteTeacherClass(id: string): Promise<MutationResult> {
-  const supabase = await createClient();
-  const auth = await requireRole(supabase, "teacher");
+  const auth = await requireRole("teacher");
   if ("error" in auth) return { success: false, error: auth.error };
 
-  const { error } = await supabase
-    .from("teacher_classes")
-    .delete()
-    .eq("id", id)
-    .eq("teacher_id", auth.userId);
-
-  if (error) return { success: false, error: error.message };
+  try {
+    await axios.delete(`/api/v1/teaching/classes/${id}`);
+  } catch (error) {
+    return { success: false, error: getApiErrorMessage(error) };
+  }
 
   revalidatePath("/", "layout");
   return { success: true, error: null };
@@ -132,18 +107,19 @@ export async function deleteTeacherClass(id: string): Promise<MutationResult> {
 export async function rotateJoinCode(
   classId: string,
 ): Promise<ActionResult<string>> {
-  const supabase = await createClient();
-  const auth = await requireRole(supabase, "teacher");
+  const auth = await requireRole("teacher");
   if ("error" in auth) return { data: null, error: auth.error };
 
-  const { data, error } = await supabase.rpc("rotate_join_code", {
-    p_class_id: classId,
-  });
-
-  if (error) {
-    return { data: null, error: error.message };
+  let newCode: string;
+  try {
+    const { data } = await axios.post<{ data: string }>(
+      `/api/v1/teaching/classes/${classId}/rotate-code`,
+    );
+    newCode = data.data;
+  } catch (error) {
+    return { data: null, error: getApiErrorMessage(error) };
   }
 
   revalidatePath("/", "layout");
-  return { data, error: null };
+  return { data: newCode, error: null };
 }

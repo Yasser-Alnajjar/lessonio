@@ -1,4 +1,4 @@
-import type { Json } from "@/lib/types/database";
+import type { Json } from "@/lib/types/common";
 import { DEFAULT_GRADE_SCALE, type GradeScaleEntry } from "@/lib/types/grade";
 
 /**

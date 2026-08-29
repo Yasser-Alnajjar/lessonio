@@ -535,7 +535,7 @@ Supported file categories include:
 - Video
 - Audio
 
-Files are stored using Supabase Storage.
+Files are stored via the Laravel backend's file storage.
 
 Available operations include:
 
@@ -938,9 +938,9 @@ Cancelled sessions are not treated as completed study time.
 
 # Privacy & Data
 
-Lessonio uses Supabase for authentication, database storage, and file storage.
+Lessonio uses a Laravel backend (with Sanctum + NextAuth) for authentication, database storage, and file storage.
 
-User data is protected through database-level Row Level Security (RLS).
+User data is protected through backend-enforced authorization scoping (policies and query scopes).
 
 Each user's academic data is isolated from other users.
 
@@ -1041,7 +1041,6 @@ Lessonio is built with:
 - **TanStack Table**
 - **Framer Motion**
 - **Recharts**
-- **Supabase**
 - **next-intl**
 
 ---
@@ -1099,7 +1098,7 @@ Business logic and server actions are kept separate from presentation.
 
 # Database
 
-Supabase PostgreSQL is used as the application's primary database.
+The Laravel backend's PostgreSQL database is the application's primary database.
 
 The data model contains domains including:
 
@@ -1199,16 +1198,6 @@ npx eslint .
 
 ```bash
 npx next build
-```
-
----
-
-## Supabase Types
-
-After database migrations:
-
-```bash
-npm run supabase:types
 ```
 
 ---

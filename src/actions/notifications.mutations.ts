@@ -15,29 +15,11 @@
 
 import { revalidatePath } from "next/cache";
 
-import { sendEmail } from "@/lib/email";
-import { notificationTypeLabel, resolveLocale } from "@/lib/notifications/copy";
-import { renderNotificationEmail } from "@/lib/notifications/email-template";
-import { mapNotificationRow } from "@/lib/notifications/map";
-import { createClient } from "@/lib/supabase/server";
+import { axios } from "@/lib/client";
+import { getApiErrorMessage } from "@/lib/client/errors";
+import { mapNotificationRow, type BackendNotification } from "@/lib/notifications/map";
 import type { ActionResult, MutationResult } from "@/lib/types/common";
 import type { Notification } from "@/lib/types/notification";
-import { ensureNotificationsForUser } from "./notifications.generate";
-
-type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
-
-/** How many notifications the bell keeps in memory per poll. */
-const RECENT_LIMIT = 10;
-
-async function getAuthedUserId(
-  supabase: SupabaseServerClient,
-): Promise<{ userId: string; email: string | null } | { error: string }> {
-  const { data, error } = await supabase.auth.getUser();
-  if (error || !data.user) {
-    return { error: "You must be signed in." };
-  }
-  return { userId: data.user.id, email: data.user.email ?? null };
-}
 
 export interface RecentNotifications {
   items: Notification[];
@@ -45,129 +27,63 @@ export interface RecentNotifications {
 }
 
 /**
- * Polled by the notification bell — returns the latest few plus the badge count.
- *
- * This poll is also what drives notification generation now that nothing is
- * scheduled: `ensureNotificationsForUser` throttles itself, so the common poll
- * costs one extra `settings` read and the generation itself happens at most
- * once per refresh interval per user.
+ * Polled by the notification bell — returns the latest few plus the badge
+ * count. The backend's `/notifications/recent` endpoint has a write side
+ * effect: it runs the on-demand notification generator before reading, which
+ * is what makes new notifications appear between cron sweeps. That's a
+ * deliberate backend decision (documented in API_CONTRACT.md §7.21), not
+ * something this action needs to trigger separately.
  */
 export async function getRecentNotifications(): Promise<ActionResult<RecentNotifications>> {
-  const supabase = await createClient();
-  const auth = await getAuthedUserId(supabase);
-  if ("error" in auth) return { data: null, error: auth.error };
-
-  await ensureNotificationsForUser(supabase, auth.userId, auth.email);
-
-  const [{ data: rows, error }, { count, error: countError }] = await Promise.all([
-    supabase
-      .from("notifications")
-      .select("*")
-      .eq("user_id", auth.userId)
-      .order("created_at", { ascending: false })
-      .limit(RECENT_LIMIT),
-    supabase
-      .from("notifications")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", auth.userId)
-      .is("read_at", null),
-  ]);
-
-  if (error) return { data: null, error: error.message };
-  if (countError) return { data: null, error: countError.message };
-
-  return {
-    data: {
-      items: (rows ?? []).map(mapNotificationRow),
-      unreadCount: count ?? 0,
-    },
-    error: null,
-  };
+  try {
+    const { data } = await axios.get<{
+      data: { items: BackendNotification[]; unreadCount: number };
+    }>("/api/v1/notifications/recent");
+    return {
+      data: {
+        items: data.data.items.map(mapNotificationRow),
+        unreadCount: data.data.unreadCount,
+      },
+      error: null,
+    };
+  } catch {
+    return { data: null, error: null };
+  }
 }
 
 export async function markNotificationAsRead(id: string): Promise<MutationResult> {
-  const supabase = await createClient();
-  const auth = await getAuthedUserId(supabase);
-  if ("error" in auth) return { success: false, error: auth.error };
-
-  const { error } = await supabase
-    .from("notifications")
-    .update({ read_at: new Date().toISOString() })
-    .eq("id", id)
-    .eq("user_id", auth.userId)
-    .is("read_at", null);
-
-  if (error) return { success: false, error: error.message };
+  try {
+    await axios.post(`/api/v1/notifications/${id}/read`);
+  } catch (error) {
+    return { success: false, error: getApiErrorMessage(error) };
+  }
 
   revalidatePath("/", "layout");
   return { success: true, error: null };
 }
 
 export async function markAllNotificationsAsRead(): Promise<MutationResult> {
-  const supabase = await createClient();
-  const auth = await getAuthedUserId(supabase);
-  if ("error" in auth) return { success: false, error: auth.error };
-
-  const { error } = await supabase
-    .from("notifications")
-    .update({ read_at: new Date().toISOString() })
-    .eq("user_id", auth.userId)
-    .is("read_at", null);
-
-  if (error) return { success: false, error: error.message };
+  try {
+    await axios.post("/api/v1/notifications/read-all");
+  } catch (error) {
+    return { success: false, error: getApiErrorMessage(error) };
+  }
 
   revalidatePath("/", "layout");
   return { success: true, error: null };
 }
 
 /**
- * Emails a single notification to the signed-in user on demand — the manual
- * counterpart to the automatic sends in `notifications.generate.ts`. Both the row lookup and the
- * recipient come from the session, so a user can only ever email themselves
- * their own notification.
+ * Emails a single notification to the signed-in user on demand. Both the
+ * notification and the recipient address are resolved server-side from the
+ * session — this action never accepts or forwards a recipient.
  */
 export async function sendNotificationToEmail(id: string): Promise<MutationResult> {
-  const supabase = await createClient();
-  const { data: authData, error: authError } = await supabase.auth.getUser();
-
-  if (authError || !authData.user?.email) {
-    return { success: false, error: "You must be signed in." };
+  try {
+    await axios.post(`/api/v1/notifications/${id}/email`);
+  } catch (error) {
+    return { success: false, error: getApiErrorMessage(error) };
   }
-
-  const [{ data: row, error }, { data: settings }] = await Promise.all([
-    supabase
-      .from("notifications")
-      .select("*")
-      .eq("id", id)
-      .eq("user_id", authData.user.id)
-      .maybeSingle(),
-    supabase.from("settings").select("locale").eq("user_id", authData.user.id).maybeSingle(),
-  ]);
-
-  if (error) return { success: false, error: error.message };
-  if (!row) return { success: false, error: "Notification not found." };
-
-  const notification = mapNotificationRow(row);
-  const locale = resolveLocale(settings?.locale);
-
-  const result = await sendEmail({
-    to: authData.user.email,
-    subject: `${notificationTypeLabel(notification.type, locale)} — ${notification.title}`,
-    html: renderNotificationEmail({
-      title: notification.title,
-      body: notification.body,
-      linkPath: notification.linkPath,
-      locale,
-    }),
-  });
-
-  if (!result.success) return result;
-
-  await supabase
-    .from("notifications")
-    .update({ emailed_at: new Date().toISOString() })
-    .eq("id", id)
-    .eq("user_id", authData.user.id);
 
   return { success: true, error: null };
 }

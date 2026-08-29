@@ -1,4 +1,4 @@
-import type { Json } from "@/lib/types/database";
+import type { Json } from "@/lib/types/common";
 import { NOTIFICATION_TYPES, type NotificationType } from "@/lib/types/notification";
 import {
   DEFAULT_NOTIFICATION_PREFERENCES,

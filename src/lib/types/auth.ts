@@ -20,5 +20,5 @@ export type UpdateProfileInput = z.infer<
   ReturnType<typeof createUpdateProfileSchema>
 >;
 
-/** Supabase OAuth provider IDs — "azure" is Microsoft (Azure AD). */
+/** OAuth provider IDs, matching the backend's `auth/oauth/{provider}` routes — "azure" is Microsoft (Azure AD). */
 export type OAuthProvider = "google" | "azure";

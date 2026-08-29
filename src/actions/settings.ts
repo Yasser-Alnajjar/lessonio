@@ -1,9 +1,9 @@
 import "server-only";
 
+import { axios } from "@/lib/client";
 import { parseGradeScale } from "@/lib/grades/scale";
 import { parseNotificationPreferences } from "@/lib/notifications/preferences";
-import { createClient } from "@/lib/supabase/server";
-import type { ActionResult } from "@/lib/types/common";
+import type { ActionResult, Json } from "@/lib/types/common";
 import type { ThemeMode, UserSettings } from "@/lib/types/settings";
 import { THEME_MODES } from "@/lib/types/settings";
 import {
@@ -13,6 +13,14 @@ import {
   updateNotificationPreferences,
 } from "./settings.mutations";
 
+interface BackendSettings {
+  userId: string;
+  theme: string;
+  locale: string;
+  notificationPreferences: Json;
+  gradeScale: Json;
+}
+
 function toThemeMode(value: string): ThemeMode {
   return (THEME_MODES as readonly string[]).includes(value)
     ? (value as ThemeMode)
@@ -21,39 +29,26 @@ function toThemeMode(value: string): ThemeMode {
 
 export const settingsActions = {
   async get(): Promise<ActionResult<UserSettings>> {
-    const supabase = await createClient();
-    const { data: authData, error: authError } = await supabase.auth.getUser();
+    try {
+      const { data } = await axios.get<{ data: BackendSettings | null }>("/api/v1/settings");
+      if (!data.data) {
+        return { data: null, error: null };
+      }
 
-    if (authError || !authData.user) {
+      const row = data.data;
+      return {
+        data: {
+          userId: row.userId,
+          theme: toThemeMode(row.theme),
+          locale: row.locale,
+          notificationPreferences: parseNotificationPreferences(row.notificationPreferences),
+          gradeScale: parseGradeScale(row.gradeScale),
+        },
+        error: null,
+      };
+    } catch {
       return { data: null, error: null };
     }
-
-    const { data: row, error } = await supabase
-      .from("settings")
-      .select("*")
-      .eq("user_id", authData.user.id)
-      .maybeSingle();
-
-    if (error) {
-      return { data: null, error: error.message };
-    }
-
-    if (!row) {
-      return { data: null, error: null };
-    }
-
-    return {
-      data: {
-        userId: row.user_id,
-        theme: toThemeMode(row.theme),
-        locale: row.locale,
-        notificationPreferences: parseNotificationPreferences(
-          row.notification_preferences,
-        ),
-        gradeScale: parseGradeScale(row.grade_scale),
-      },
-      error: null,
-    };
   },
 
   updateNotificationPreferences,

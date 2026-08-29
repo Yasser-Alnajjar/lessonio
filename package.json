@@ -16,8 +16,7 @@
     "format:fix": "prettier --write --list-different .",
     "deps:update": "npx npm-check-updates --interactive --format group",
     "type-check": "npx tsc --noEmit",
-    "list:unused-dependencies": "bunx depcheck",
-    "supabase:types": "supabase gen types typescript --project-id \"$SUPABASE_PROJECT_ID\" --schema public > src/lib/types/database.ts"
+    "list:unused-dependencies": "bunx depcheck"
   },
   "dependencies": {
     "@fontsource-variable/fraunces": "^5.3.0",
@@ -36,8 +35,6 @@
     "@radix-ui/react-tabs": "1.1.21",
     "@radix-ui/react-toast": "1.2.23",
     "@radix-ui/react-tooltip": "1.2.16",
-    "@supabase/ssr": "0.12.4",
-    "@supabase/supabase-js": "2.112.1",
     "@tanstack/react-table": "9.0.0",
     "axios": "^1.20.0",
     "class-variance-authority": "0.7.1",

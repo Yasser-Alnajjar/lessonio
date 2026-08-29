@@ -41,8 +41,7 @@ export interface Class extends AuditFields {
    * Optional link to a `teacher_classes` row the student is enrolled in —
    * purely informational, set by the student themselves. Never implies the
    * reverse: most `Class` rows have this `null`, including every one that
-   * existed before a student ever joined a teacher's class. See
-   * `supabase/migrations/20260826140000_classes_teacher_link.sql`.
+   * existed before a student ever joined a teacher's class.
    */
   teacherClassId: UUID | null;
 }

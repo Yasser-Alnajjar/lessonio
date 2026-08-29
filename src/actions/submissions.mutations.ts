@@ -9,48 +9,34 @@
 
 import { revalidatePath } from "next/cache";
 
-import { createClient } from "@/lib/supabase/server";
+import { axios } from "@/lib/client";
+import { getApiErrorMessage } from "@/lib/client/errors";
 import { requireRole } from "./auth.guards";
 import type { MutationResult } from "@/lib/types/common";
 import type {
   GradeSubmissionInput,
   SubmitAssignmentInput,
 } from "@/lib/types/submission";
-import type { Database } from "@/lib/types/database";
-
-type SubmissionInsert =
-  Database["public"]["Tables"]["assignment_submissions"]["Insert"];
-type SubmissionUpdate =
-  Database["public"]["Tables"]["assignment_submissions"]["Update"];
 
 /**
- * Upserts on (assignment_id, student_id): a first call inserts, a later
- * call before grading resubmits by updating the same row. RLS backs both
- * paths — insert requires `can_submit_assignment()`, update requires the
- * caller to be the submitting student — and `enforce_submission_write_scope()`
- * blocks the update once `graded_at` is set.
+ * `PUT classroom/assignments/{id}/submission` (SUBMIT-003) upserts on
+ * `(assignment_id, student_id)` server-side: a first call inserts, a later
+ * call before grading resubmits by updating the same row.
+ * `submittedAt` is stamped server-side on every submit — never sent here.
  */
 export async function submitAssignment(
   assignmentId: string,
   input: SubmitAssignmentInput,
 ): Promise<MutationResult> {
-  const supabase = await createClient();
-  const auth = await requireRole(supabase, "student");
+  const auth = await requireRole("student");
   if ("error" in auth) return { success: false, error: auth.error };
 
-  const payload: SubmissionInsert = {
-    assignment_id: assignmentId,
-    student_id: auth.userId,
-    content: input.content,
-    submitted_at: new Date().toISOString(),
-  };
-
-  const { error } = await supabase
-    .from("assignment_submissions")
-    .upsert(payload, { onConflict: "assignment_id,student_id" });
-
-  if (error) {
-    return { success: false, error: error.message };
+  try {
+    await axios.put(`/api/v1/classroom/assignments/${assignmentId}/submission`, {
+      content: input.content,
+    });
+  } catch (error) {
+    return { success: false, error: getApiErrorMessage(error) };
   }
 
   revalidatePath("/", "layout");
@@ -58,42 +44,27 @@ export async function submitAssignment(
 }
 
 /**
- * `graded_by`/`graded_at` are never sent here — `enforce_submission_write_scope()`
- * stamps them itself, and the trigger also validates `score` against the
- * assignment's `total_points` server-side.
+ * `PATCH teaching/submissions/{id}/grade` (SUBMIT-004). `gradedBy`/`gradedAt`
+ * are never sent here — the backend's `SubmissionPolicy::grade()` +
+ * `GradingService` stamp them itself and validate `score` against the
+ * assignment's `totalPoints` server-side. The notification fan-out
+ * (`assignment_graded`, best-effort, dispatched after commit) now happens
+ * server-side as part of this same call — no separate notify call needed.
  */
 export async function gradeSubmission(
   submissionId: string,
   input: GradeSubmissionInput,
 ): Promise<MutationResult> {
-  const supabase = await createClient();
-  const auth = await requireRole(supabase, "teacher");
+  const auth = await requireRole("teacher");
   if ("error" in auth) return { success: false, error: auth.error };
 
-  const patch: SubmissionUpdate = {
-    score: input.score,
-    feedback: input.feedback || null,
-  };
-
-  const { error } = await supabase
-    .from("assignment_submissions")
-    .update(patch)
-    .eq("id", submissionId);
-
-  if (error) {
-    return { success: false, error: error.message };
-  }
-
-  // Best-effort: a notification failure must never block the grade itself.
-  const { error: notifyError } = await supabase.rpc(
-    "notify_submission_graded",
-    { p_submission_id: submissionId },
-  );
-  if (notifyError) {
-    console.error("[gradeSubmission] notify_submission_graded failed", {
-      submissionId,
-      error: notifyError,
+  try {
+    await axios.patch(`/api/v1/teaching/submissions/${submissionId}/grade`, {
+      score: input.score,
+      feedback: input.feedback || undefined,
     });
+  } catch (error) {
+    return { success: false, error: getApiErrorMessage(error) };
   }
 
   revalidatePath("/", "layout");

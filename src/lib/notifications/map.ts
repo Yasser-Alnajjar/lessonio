@@ -1,28 +1,37 @@
-import type { Database } from "@/lib/types/database";
 import type { Notification } from "@/lib/types/notification";
 import { isNotificationType } from "./preferences";
 
-type NotificationRow = Database["public"]["Tables"]["notifications"]["Row"];
+export interface BackendNotification {
+  id: string;
+  userId: string;
+  type: string;
+  title: string;
+  body: string;
+  readAt: string | null;
+  linkPath: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 /**
- * snake_case row → camelCase domain type, mirroring `mapHomeworkRow` in
- * `src/actions/homework.ts`. It lives in `lib/` rather than beside its callers
- * because `notifications.mutations.ts` is a `"use server"` module, where every
- * export must be an async function.
+ * Backend JSON → domain type. It lives in `lib/` rather than beside its
+ * callers because `notifications.mutations.ts` is a `"use server"` module,
+ * where every export must be an async function.
  */
-export function mapNotificationRow(row: NotificationRow): Notification {
+export function mapNotificationRow(row: BackendNotification): Notification {
   return {
     id: row.id,
-    userId: row.user_id,
-    // The column is a plain `text` with a CHECK constraint, so narrow it back
-    // to the union rather than asserting — an unrecognized value degrades to
-    // a daily reminder instead of breaking the icon lookup in the UI.
+    userId: row.userId,
+    // The backend column is a plain `text` with a CHECK constraint, so narrow
+    // it back to the union rather than asserting — an unrecognized value
+    // (e.g. a type added by a migration this client doesn't know yet)
+    // degrades to a daily reminder instead of breaking the icon lookup.
     type: isNotificationType(row.type) ? row.type : "daily_reminder",
     title: row.title,
     body: row.body,
-    readAt: row.read_at,
-    linkPath: row.link_path,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
+    readAt: row.readAt,
+    linkPath: row.linkPath,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
   };
 }

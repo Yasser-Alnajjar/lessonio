@@ -922,7 +922,18 @@
       "deleteTitle": "حذف المرفق؟",
       "deleteDescription": "سيؤدي هذا إلى حذف \"{name}\" نهائيًا. لا يمكن التراجع عن هذا.",
       "deleteConfirm": "حذف",
-      "deleteCancel": "إلغاء"
+      "deleteCancel": "إلغاء",
+      "share": {
+        "trigger": "مشاركة",
+        "title": "مشاركة المرفق",
+        "createLink": "إنشاء رابط مشاركة",
+        "copy": "نسخ الرابط",
+        "shownOnce": "يظهر هذا الرابط مرة واحدة فقط — انسخه الآن.",
+        "noShares": "لا توجد روابط مشاركة نشطة.",
+        "expiresOn": "تنتهي الصلاحية في {date}",
+        "noExpiry": "بدون انتهاء",
+        "revoke": "إلغاء"
+      }
     }
   },
   "flashcards": {
@@ -2255,6 +2266,15 @@
           }
         ]
       }
+    }
+  },
+  "share": {
+    "attachment": {
+      "download": "تنزيل",
+      "downloading": "جارٍ التنزيل…",
+      "downloadError": "تعذّر تنزيل هذا الملف. حاول مرة أخرى.",
+      "invalidTitle": "الرابط غير متاح",
+      "invalidDescription": "رابط المشاركة هذا غير صالح أو انتهت صلاحيته."
     }
   }
 }

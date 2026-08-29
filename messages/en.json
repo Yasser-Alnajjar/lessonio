@@ -922,7 +922,18 @@
       "deleteTitle": "Delete attachment?",
       "deleteDescription": "This permanently deletes \"{name}\". This cannot be undone.",
       "deleteConfirm": "Delete",
-      "deleteCancel": "Cancel"
+      "deleteCancel": "Cancel",
+      "share": {
+        "trigger": "Share",
+        "title": "Share attachment",
+        "createLink": "Create share link",
+        "copy": "Copy link",
+        "shownOnce": "This link is shown only once — copy it now.",
+        "noShares": "No active share links.",
+        "expiresOn": "Expires {date}",
+        "noExpiry": "No expiry",
+        "revoke": "Revoke"
+      }
     }
   },
   "flashcards": {
@@ -2255,6 +2266,15 @@
           }
         ]
       }
+    }
+  },
+  "share": {
+    "attachment": {
+      "download": "Download",
+      "downloading": "Downloading…",
+      "downloadError": "Couldn't download this file. Try again.",
+      "invalidTitle": "Link unavailable",
+      "invalidDescription": "This share link is invalid or has expired."
     }
   }
 }

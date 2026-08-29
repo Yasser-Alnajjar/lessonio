@@ -12,6 +12,12 @@ import type { AppRole } from "@/lib/types/user";
  */
 const PUBLIC_SEGMENTS = new Set<string>(["", "docs", "auth/reset-password"]);
 
+/**
+ * Segment prefixes that never require a session. Unlike `PUBLIC_SEGMENTS`,
+ * these carry a variable suffix (a share token) so an exact match won't do.
+ */
+const PUBLIC_PREFIXES = ["share/"];
+
 /** Auth routes a signed-in user should be bounced away from. */
 const SIGNED_OUT_ONLY_SEGMENTS = new Set<string>([
   "auth/login",
@@ -87,6 +93,7 @@ export function guardRequest(
   if (
     !userId &&
     !PUBLIC_SEGMENTS.has(segment) &&
+    !PUBLIC_PREFIXES.some((prefix) => segment.startsWith(prefix)) &&
     !SIGNED_OUT_ONLY_SEGMENTS.has(segment)
   ) {
     const url = request.nextUrl.clone();

@@ -24,7 +24,7 @@ import {
   MAX_ATTACHMENT_SIZE_BYTES,
 } from "@/lib/constants/attachments";
 import type { MutationResult } from "@/lib/types/common";
-import type { Attachment } from "@/lib/types/attachment";
+import type { Attachment, AttachmentShare, CreatedAttachmentShare } from "@/lib/types/attachment";
 
 export type UploadAttachmentResult =
   | { success: true; error: null; attachment: Attachment }
@@ -66,5 +66,49 @@ export async function deleteAttachment(id: string): Promise<MutationResult> {
   }
 
   revalidatePath("/", "layout");
+  return { success: true, error: null };
+}
+
+export type ListAttachmentSharesResult =
+  | { success: true; error: null; shares: AttachmentShare[] }
+  | { success: false; error: string; shares: null };
+
+export async function listAttachmentShares(attachmentId: string): Promise<ListAttachmentSharesResult> {
+  try {
+    const { data } = await axios.get<{ data: AttachmentShare[] }>(
+      `/api/v1/attachments/${attachmentId}/shares`,
+    );
+    return { success: true, error: null, shares: data.data };
+  } catch (error) {
+    return { success: false, error: getApiErrorMessage(error), shares: null };
+  }
+}
+
+export type CreateAttachmentShareResult =
+  | { success: true; error: null; share: CreatedAttachmentShare }
+  | { success: false; error: string; share: null };
+
+export async function createAttachmentShare(
+  attachmentId: string,
+  expiresInDays?: number,
+): Promise<CreateAttachmentShareResult> {
+  try {
+    const { data } = await axios.post<{ data: CreatedAttachmentShare }>(
+      `/api/v1/attachments/${attachmentId}/shares`,
+      expiresInDays ? { expiresInDays } : {},
+    );
+    return { success: true, error: null, share: data.data };
+  } catch (error) {
+    return { success: false, error: getApiErrorMessage(error), share: null };
+  }
+}
+
+export async function revokeAttachmentShare(id: string): Promise<MutationResult> {
+  try {
+    await axios.delete(`/api/v1/attachment-shares/${id}`);
+  } catch (error) {
+    return { success: false, error: getApiErrorMessage(error) };
+  }
+
   return { success: true, error: null };
 }

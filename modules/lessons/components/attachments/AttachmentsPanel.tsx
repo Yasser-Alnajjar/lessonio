@@ -2,9 +2,18 @@
 
 import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { DownloadIcon, EyeIcon, Trash2Icon, UploadIcon } from "lucide-react";
+import {
+  DownloadIcon,
+  EyeIcon,
+  Share2Icon,
+  Trash2Icon,
+  UploadIcon,
+} from "lucide-react";
 
-import { deleteAttachment, uploadAttachment } from "@/actions/attachments.mutations";
+import {
+  deleteAttachment,
+  uploadAttachment,
+} from "@/actions/attachments.mutations";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ConfirmDialog } from "@/components/ui-system/confirm-dialog";
@@ -20,6 +29,7 @@ import {
 } from "@/lib/constants/attachments";
 import type { Attachment, AttachmentKind } from "@/lib/types/attachment";
 import { AttachmentPreviewDialog } from "./AttachmentPreviewDialog";
+import { AttachmentShareDialog } from "./AttachmentShareDialog";
 
 export interface AttachmentsPanelProps {
   lessonId: string;
@@ -41,18 +51,24 @@ function formatFileSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-export function AttachmentsPanel({ lessonId, attachments: initialAttachments }: AttachmentsPanelProps) {
+export function AttachmentsPanel({
+  lessonId,
+  attachments: initialAttachments,
+}: AttachmentsPanelProps) {
   const t = useTranslations("lessons.attachments");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [attachments, setAttachments] = useState(initialAttachments);
   const [pending, setPending] = useState<PendingUpload[]>([]);
   const [previewTarget, setPreviewTarget] = useState<Attachment | null>(null);
+  const [shareTarget, setShareTarget] = useState<Attachment | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Attachment | null>(null);
 
   const runUpload = async (pendingUpload: PendingUpload) => {
     setPending((prev) =>
       prev.map((item) =>
-        item.key === pendingUpload.key ? { ...item, status: "uploading" } : item,
+        item.key === pendingUpload.key
+          ? { ...item, status: "uploading" }
+          : item,
       ),
     );
 
@@ -60,7 +76,9 @@ export function AttachmentsPanel({ lessonId, attachments: initialAttachments }: 
 
     if (result.success) {
       setAttachments((prev) => [result.attachment, ...prev]);
-      setPending((prev) => prev.filter((item) => item.key !== pendingUpload.key));
+      setPending((prev) =>
+        prev.filter((item) => item.key !== pendingUpload.key),
+      );
     } else {
       setPending((prev) =>
         prev.map((item) =>
@@ -82,19 +100,39 @@ export function AttachmentsPanel({ lessonId, attachments: initialAttachments }: 
       if (!kind) {
         setPending((prev) => [
           ...prev,
-          { key, file, fileName: file.name, kind: "pdf", status: "failed", error: t("unsupportedType") },
+          {
+            key,
+            file,
+            fileName: file.name,
+            kind: "pdf",
+            status: "failed",
+            error: t("unsupportedType"),
+          },
         ]);
         continue;
       }
       if (file.size > MAX_ATTACHMENT_SIZE_BYTES) {
         setPending((prev) => [
           ...prev,
-          { key, file, fileName: file.name, kind, status: "failed", error: t("tooLarge") },
+          {
+            key,
+            file,
+            fileName: file.name,
+            kind,
+            status: "failed",
+            error: t("tooLarge"),
+          },
         ]);
         continue;
       }
 
-      const pendingUpload: PendingUpload = { key, file, fileName: file.name, kind, status: "uploading" };
+      const pendingUpload: PendingUpload = {
+        key,
+        file,
+        fileName: file.name,
+        kind,
+        status: "uploading",
+      };
       setPending((prev) => [...prev, pendingUpload]);
       void runUpload(pendingUpload);
     }
@@ -104,7 +142,9 @@ export function AttachmentsPanel({ lessonId, attachments: initialAttachments }: 
     if (!deleteTarget) return;
     const result = await deleteAttachment(deleteTarget.id);
     if (result.success) {
-      setAttachments((prev) => prev.filter((item) => item.id !== deleteTarget.id));
+      setAttachments((prev) =>
+        prev.filter((item) => item.id !== deleteTarget.id),
+      );
     }
     setDeleteTarget(null);
   };
@@ -113,7 +153,12 @@ export function AttachmentsPanel({ lessonId, attachments: initialAttachments }: 
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <p className="text-xs text-muted-foreground">{t("hint")}</p>
-        <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => fileInputRef.current?.click()}
+        >
           <UploadIcon />
           {t("upload")}
         </Button>
@@ -138,15 +183,24 @@ export function AttachmentsPanel({ lessonId, attachments: initialAttachments }: 
               fileName={item.fileName}
               kind={item.kind}
               status={item.status}
-              onRetry={item.status === "failed" ? () => void runUpload(item) : undefined}
-              onRemove={() => setPending((prev) => prev.filter((p) => p.key !== item.key))}
+              onRetry={
+                item.status === "failed"
+                  ? () => void runUpload(item)
+                  : undefined
+              }
+              onRemove={() =>
+                setPending((prev) => prev.filter((p) => p.key !== item.key))
+              }
             />
           ))}
         </div>
       )}
 
       {attachments.length === 0 && pending.length === 0 ? (
-        <EmptyState title={t("emptyTitle")} description={t("emptyDescription")} />
+        <EmptyState
+          title={t("emptyTitle")}
+          description={t("emptyDescription")}
+        />
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {attachments.map((attachment) => (
@@ -169,12 +223,14 @@ export function AttachmentsPanel({ lessonId, attachments: initialAttachments }: 
                 >
                   <EyeIcon className="size-4" />
                 </Button>
-                <Button asChild variant="ghost" size="icon-sm" aria-label={t("download")}>
-                  <a
-                    href={`${attachment.publicUrl}?download=${encodeURIComponent(attachment.fileName)}`}
-                  >
-                    <DownloadIcon className="size-4" />
-                  </a>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={() => setShareTarget(attachment)}
+                  aria-label={t("share.trigger")}
+                >
+                  <Share2Icon className="size-4" />
                 </Button>
                 <Button
                   type="button"
@@ -198,13 +254,22 @@ export function AttachmentsPanel({ lessonId, attachments: initialAttachments }: 
         }}
       />
 
+      <AttachmentShareDialog
+        attachment={shareTarget}
+        onOpenChange={(open) => {
+          if (!open) setShareTarget(null);
+        }}
+      />
+
       <ConfirmDialog
         open={Boolean(deleteTarget)}
         onOpenChange={(open) => {
           if (!open) setDeleteTarget(null);
         }}
         title={t("deleteTitle")}
-        description={t("deleteDescription", { name: deleteTarget?.fileName ?? "" })}
+        description={t("deleteDescription", {
+          name: deleteTarget?.fileName ?? "",
+        })}
         confirmLabel={t("deleteConfirm")}
         cancelLabel={t("deleteCancel")}
         variant="destructive"

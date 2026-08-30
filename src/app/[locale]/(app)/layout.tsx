@@ -42,7 +42,6 @@ export default async function AppLayout({ children }: AppLayoutProps) {
 
   if (!user) {
     redirect("/api/auth/session-invalid");
-    return null;
   }
 
   // The bell lives in the header on every page, so its browser-popup

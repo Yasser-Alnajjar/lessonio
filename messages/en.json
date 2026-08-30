@@ -1509,6 +1509,19 @@
       "subtitle": "Choose how Lessonio looks and which language it speaks.",
       "themeTitle": "Theme",
       "themeDescription": "Switch between light, dark, or match your system.",
+      "skinTitle": "Skin",
+      "skinDescription": "Pick a color palette for the app.",
+      "skins": {
+        "pickerLabel": "Skin",
+        "default": "Default",
+        "blueprint": "Blueprint",
+        "field-notes": "Field Notes",
+        "fountain-pen": "Fountain Pen",
+        "graphite-pencil": "Graphite Pencil",
+        "highlighter-tab": "Highlighter Tab",
+        "ledger": "Ledger",
+        "washi-tape": "Washi Tape"
+      },
       "languageTitle": "Language",
       "languageDescription": "Switch the interface between English and Arabic."
     },

@@ -1,0 +1,104 @@
+/* ============================================================
+   Study Line — Theme: Fountain Pen
+   ------------------------------------------------------------
+   Plum ink and copper on parchment — considered and a little
+   formal, for long study sessions. Alternative to the default
+   "ink & highlighter" theme in globals.css.
+
+   Not wired up. To use: replace the :root and .dark blocks in
+   src/app/globals.css with the ones below (keep everything else
+   in that file — the @theme inline mapping, @layer base, etc.
+   — unchanged).
+   ============================================================ */
+
+[data-skin="fountain-pen"] {
+  --radius: 0.75rem;
+
+  --background: oklch(0.975 0.01 75);
+  --foreground: oklch(0.24 0.025 320);
+  --card: oklch(0.995 0.006 75);
+  --card-foreground: oklch(0.24 0.025 320);
+  --popover: oklch(0.995 0.006 75);
+  --popover-foreground: oklch(0.24 0.025 320);
+
+  --primary: oklch(0.38 0.12 322);
+  --primary-foreground: oklch(0.97 0.01 75);
+  --secondary: oklch(0.93 0.02 70);
+  --secondary-foreground: oklch(0.3 0.03 320);
+
+  --muted: oklch(0.94 0.014 72);
+  --muted-foreground: oklch(0.52 0.02 320);
+  --accent: oklch(0.9 0.035 60);
+  --accent-foreground: oklch(0.32 0.06 55);
+
+  --destructive: oklch(0.55 0.19 24);
+  --destructive-foreground: oklch(0.98 0.008 24);
+  --success: oklch(0.56 0.1 150);
+  --success-foreground: oklch(0.98 0.01 150);
+  --highlighter: oklch(0.74 0.13 60);
+  --highlighter-foreground: oklch(0.24 0.05 60);
+
+  --border: oklch(0.89 0.014 68);
+  --input: oklch(0.89 0.014 68);
+  --ring: oklch(0.38 0.12 322);
+
+  --chart-1: oklch(0.38 0.12 322);
+  --chart-2: oklch(0.74 0.13 60);
+  --chart-3: oklch(0.56 0.1 150);
+  --chart-4: oklch(0.58 0.16 24);
+  --chart-5: oklch(0.5 0.09 250);
+
+  --sidebar: oklch(0.955 0.012 74);
+  --sidebar-foreground: oklch(0.24 0.025 320);
+  --sidebar-primary: oklch(0.38 0.12 322);
+  --sidebar-primary-foreground: oklch(0.97 0.01 75);
+  --sidebar-accent: oklch(0.9 0.035 60);
+  --sidebar-accent-foreground: oklch(0.32 0.06 55);
+  --sidebar-border: oklch(0.895 0.014 68);
+  --sidebar-ring: oklch(0.38 0.12 322);
+}
+
+[data-skin="fountain-pen"].dark {
+  --background: oklch(0.18 0.02 322);
+  --foreground: oklch(0.93 0.012 75);
+  --card: oklch(0.22 0.024 322);
+  --card-foreground: oklch(0.93 0.012 75);
+  --popover: oklch(0.22 0.024 322);
+  --popover-foreground: oklch(0.93 0.012 75);
+
+  --primary: oklch(0.73 0.11 322);
+  --primary-foreground: oklch(0.18 0.02 322);
+  --secondary: oklch(0.28 0.022 320);
+  --secondary-foreground: oklch(0.9 0.012 75);
+
+  --muted: oklch(0.27 0.02 320);
+  --muted-foreground: oklch(0.67 0.016 75);
+  --accent: oklch(0.3 0.04 60);
+  --accent-foreground: oklch(0.87 0.04 60);
+
+  --destructive: oklch(0.65 0.18 24);
+  --destructive-foreground: oklch(0.18 0.02 24);
+  --success: oklch(0.67 0.11 150);
+  --success-foreground: oklch(0.18 0.02 150);
+  --highlighter: oklch(0.76 0.12 60);
+  --highlighter-foreground: oklch(0.22 0.04 60);
+
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 14%);
+  --ring: oklch(0.73 0.11 322);
+
+  --chart-1: oklch(0.73 0.11 322);
+  --chart-2: oklch(0.76 0.12 60);
+  --chart-3: oklch(0.67 0.11 150);
+  --chart-4: oklch(0.67 0.15 24);
+  --chart-5: oklch(0.62 0.09 250);
+
+  --sidebar: oklch(0.2 0.022 322);
+  --sidebar-foreground: oklch(0.93 0.012 75);
+  --sidebar-primary: oklch(0.73 0.11 322);
+  --sidebar-primary-foreground: oklch(0.18 0.02 322);
+  --sidebar-accent: oklch(0.3 0.04 60);
+  --sidebar-accent-foreground: oklch(0.87 0.04 60);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.73 0.11 322);
+}

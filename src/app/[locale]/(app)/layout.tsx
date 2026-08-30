@@ -6,6 +6,7 @@ import { Actions } from "@/actions";
 import { AppSidebar } from "@/components/shared/app-sidebar";
 import { GlobalSearch } from "@/components/shared/global-search";
 import { NotificationBell } from "@/components/shared/notification-bell";
+import { SkinSync } from "@/components/providers/skin-sync";
 import {
   SidebarInset,
   SidebarProvider,
@@ -51,6 +52,7 @@ export default async function AppLayout({ children }: AppLayoutProps) {
 
   return (
     <SidebarProvider>
+      <SkinSync skin={settings?.skin ?? null} />
       <AppSidebar user={user} />
       <SidebarInset>
         <header className="border-border bg-background/80 sticky top-0 z-40 flex h-16 items-center gap-2 border-b px-4 backdrop-blur-md">

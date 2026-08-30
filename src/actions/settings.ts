@@ -4,18 +4,20 @@ import { axios } from "@/lib/client";
 import { parseGradeScale } from "@/lib/grades/scale";
 import { parseNotificationPreferences } from "@/lib/notifications/preferences";
 import type { ActionResult, Json } from "@/lib/types/common";
-import type { ThemeMode, UserSettings } from "@/lib/types/settings";
-import { THEME_MODES } from "@/lib/types/settings";
+import type { Skin, ThemeMode, UserSettings } from "@/lib/types/settings";
+import { SKINS, THEME_MODES } from "@/lib/types/settings";
 import {
   deleteAccount,
   exportData,
   updateGradeScale,
   updateNotificationPreferences,
+  updateSkin,
 } from "./settings.mutations";
 
 interface BackendSettings {
   userId: string;
   theme: string;
+  skin: string;
   locale: string;
   notificationPreferences: Json;
   gradeScale: Json;
@@ -25,6 +27,12 @@ function toThemeMode(value: string): ThemeMode {
   return (THEME_MODES as readonly string[]).includes(value)
     ? (value as ThemeMode)
     : "system";
+}
+
+function toSkin(value: string): Skin {
+  return (SKINS as readonly string[]).includes(value)
+    ? (value as Skin)
+    : "default";
 }
 
 export const settingsActions = {
@@ -42,6 +50,7 @@ export const settingsActions = {
         data: {
           userId: row.userId,
           theme: toThemeMode(row.theme),
+          skin: toSkin(row.skin),
           locale: row.locale,
           notificationPreferences: parseNotificationPreferences(
             row.notificationPreferences,
@@ -57,6 +66,7 @@ export const settingsActions = {
 
   updateNotificationPreferences,
   updateGradeScale,
+  updateSkin,
   exportData,
   deleteAccount,
 };

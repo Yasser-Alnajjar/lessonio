@@ -5,9 +5,17 @@ import { useTranslations } from "next-intl";
 import { Separator } from "@/components/ui/separator";
 import { LanguageSwitch } from "@/components/shared/language-switch";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
+import type { Skin } from "@/lib/types/settings";
 import { SettingsNav } from "../../components/SettingsNav";
+import { SkinPicker } from "./SkinPicker";
 
-export const SettingsAppearanceView = () => {
+interface SettingsAppearanceViewProps {
+  skin: Skin;
+}
+
+export const SettingsAppearanceView = ({
+  skin,
+}: SettingsAppearanceViewProps) => {
   const t = useTranslations("settings.appearance");
 
   return (
@@ -30,6 +38,18 @@ export const SettingsAppearanceView = () => {
             </p>
           </div>
           <ThemeToggle />
+        </section>
+
+        <Separator />
+
+        <section className="flex flex-col gap-3">
+          <div className="flex flex-col gap-0.5">
+            <h2 className="text-sm font-semibold">{t("skinTitle")}</h2>
+            <p className="text-muted-foreground text-sm">
+              {t("skinDescription")}
+            </p>
+          </div>
+          <SkinPicker initialSkin={skin} />
         </section>
 
         <Separator />

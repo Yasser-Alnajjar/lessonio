@@ -5,6 +5,19 @@ import type { NotificationType } from "./notification";
 export const THEME_MODES = ["light", "dark", "system"] as const;
 export type ThemeMode = (typeof THEME_MODES)[number];
 
+/** Color skin, independent of the light/dark `ThemeMode` above. */
+export const SKINS = [
+  "default",
+  "blueprint",
+  "field-notes",
+  "fountain-pen",
+  "graphite-pencil",
+  "highlighter-tab",
+  "ledger",
+  "washi-tape",
+] as const;
+export type Skin = (typeof SKINS)[number];
+
 export interface NotificationChannelPreferences {
   in_app: boolean;
   email: boolean;
@@ -44,6 +57,7 @@ export const DEFAULT_NOTIFICATION_PREFERENCES: NotificationPreferences = {
 export interface UserSettings {
   userId: UUID;
   theme: ThemeMode;
+  skin: Skin;
   locale: string;
   notificationPreferences: NotificationPreferences;
   gradeScale: GradeScaleEntry[];

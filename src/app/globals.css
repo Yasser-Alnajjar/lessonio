@@ -1,117 +1,16 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 @import "tw-animate-css";
+@import "./themes/default-theme.css";
+@import "./themes/theme-blueprint.css";
+@import "./themes/theme-field-notes.css";
+@import "./themes/theme-fountain-pen.css";
+@import "./themes/theme-graphite-pencil.css";
+@import "./themes/theme-highlighter-tab.css";
+@import "./themes/theme-ledger.css";
+@import "./themes/theme-washi-tape.css";
 
 @custom-variant dark (&:is(.dark *));
-
-/* ============================================================
-   Study Line — Design Tokens
-   ------------------------------------------------------------
-   Palette: "ink & highlighter" — a deep ballpoint-ink indigo as
-   primary (focus, trust), goldenrod highlighter used sparingly
-   for streaks/XP/achievements, sage for attendance/completion,
-   and a margin-red for destructive actions. Light mode reads as
-   paper; dark mode reads as a chalkboard.
-   ============================================================ */
-
-:root {
-  --radius: 0.75rem;
-
-  /* Surfaces */
-  --background: oklch(0.98 0.006 260); /* Paper */
-  --foreground: oklch(0.22 0.014 262); /* Graphite */
-  --card: oklch(0.995 0.002 260);
-  --card-foreground: oklch(0.22 0.014 262);
-  --popover: oklch(0.995 0.002 260);
-  --popover-foreground: oklch(0.22 0.014 262);
-
-  /* Brand */
-  --primary: oklch(0.4 0.135 264); /* Ink */
-  --primary-foreground: oklch(0.98 0.008 260);
-  --secondary: oklch(0.95 0.008 260);
-  --secondary-foreground: oklch(0.28 0.02 262);
-
-  /* Neutral supporting surfaces */
-  --muted: oklch(0.95 0.008 260);
-  --muted-foreground: oklch(0.52 0.018 262);
-  --accent: oklch(0.94 0.022 264);
-  --accent-foreground: oklch(0.32 0.06 264);
-
-  /* Semantic */
-  --destructive: oklch(0.56 0.19 25); /* Margin red */
-  --destructive-foreground: oklch(0.98 0.008 25);
-  --success: oklch(0.56 0.11 152); /* Sage */
-  --success-foreground: oklch(0.98 0.01 152);
-  --highlighter: oklch(0.79 0.152 87); /* Goldenrod */
-  --highlighter-foreground: oklch(0.24 0.04 87);
-
-  /* Chrome */
-  --border: oklch(0.9 0.007 260);
-  --input: oklch(0.9 0.007 260);
-  --ring: oklch(0.4 0.135 264);
-
-  /* Charts — derived from the same palette family */
-  --chart-1: oklch(0.4 0.135 264); /* Ink */
-  --chart-2: oklch(0.79 0.152 87); /* Highlighter */
-  --chart-3: oklch(0.56 0.11 152); /* Sage */
-  --chart-4: oklch(0.6 0.16 25); /* Margin */
-  --chart-5: oklch(0.55 0.11 320); /* Plum */
-
-  /* Sidebar — recedes slightly behind card surfaces */
-  --sidebar: oklch(0.97 0.006 260);
-  --sidebar-foreground: oklch(0.22 0.014 262);
-  --sidebar-primary: oklch(0.4 0.135 264);
-  --sidebar-primary-foreground: oklch(0.98 0.008 260);
-  --sidebar-accent: oklch(0.94 0.022 264);
-  --sidebar-accent-foreground: oklch(0.32 0.06 264);
-  --sidebar-border: oklch(0.91 0.007 260);
-  --sidebar-ring: oklch(0.4 0.135 264);
-}
-
-.dark {
-  --background: oklch(0.17 0.018 265); /* Chalkboard */
-  --foreground: oklch(0.94 0.008 260); /* Chalk */
-  --card: oklch(0.21 0.02 265);
-  --card-foreground: oklch(0.94 0.008 260);
-  --popover: oklch(0.21 0.02 265);
-  --popover-foreground: oklch(0.94 0.008 260);
-
-  --primary: oklch(0.75 0.11 264); /* Chalk-stroke indigo */
-  --primary-foreground: oklch(0.17 0.02 265);
-  --secondary: oklch(0.27 0.02 265);
-  --secondary-foreground: oklch(0.92 0.008 260);
-
-  --muted: oklch(0.27 0.02 265);
-  --muted-foreground: oklch(0.68 0.014 260);
-  --accent: oklch(0.3 0.035 264);
-  --accent-foreground: oklch(0.88 0.03 264);
-
-  --destructive: oklch(0.65 0.18 25);
-  --destructive-foreground: oklch(0.17 0.02 25);
-  --success: oklch(0.68 0.12 152);
-  --success-foreground: oklch(0.17 0.02 152);
-  --highlighter: oklch(0.78 0.14 88);
-  --highlighter-foreground: oklch(0.2 0.03 88);
-
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 14%);
-  --ring: oklch(0.75 0.11 264);
-
-  --chart-1: oklch(0.75 0.11 264);
-  --chart-2: oklch(0.78 0.14 88);
-  --chart-3: oklch(0.68 0.12 152);
-  --chart-4: oklch(0.68 0.16 25);
-  --chart-5: oklch(0.65 0.12 320);
-
-  --sidebar: oklch(0.19 0.02 265);
-  --sidebar-foreground: oklch(0.94 0.008 260);
-  --sidebar-primary: oklch(0.75 0.11 264);
-  --sidebar-primary-foreground: oklch(0.17 0.02 265);
-  --sidebar-accent: oklch(0.3 0.035 264);
-  --sidebar-accent-foreground: oklch(0.88 0.03 264);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.75 0.11 264);
-}
 
 @theme inline {
   --color-background: var(--background);

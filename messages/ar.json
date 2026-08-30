@@ -1509,6 +1509,19 @@
       "subtitle": "اختر شكل Lessonio واللغة التي يتحدث بها.",
       "themeTitle": "المظهر",
       "themeDescription": "بدّل بين الفاتح والداكن أو طابق إعدادات نظامك.",
+      "skinTitle": "المظهر اللوني",
+      "skinDescription": "اختر لوحة ألوان للتطبيق.",
+      "skins": {
+        "pickerLabel": "المظهر اللوني",
+        "default": "الافتراضي",
+        "blueprint": "المخطط الأزرق",
+        "field-notes": "ملاحظات ميدانية",
+        "fountain-pen": "قلم حبر",
+        "graphite-pencil": "قلم رصاص",
+        "highlighter-tab": "قلم تمييز",
+        "ledger": "دفتر الحسابات",
+        "washi-tape": "شريط واشي"
+      },
       "languageTitle": "اللغة",
       "languageDescription": "بدّل واجهة التطبيق بين الإنجليزية والعربية."
     },

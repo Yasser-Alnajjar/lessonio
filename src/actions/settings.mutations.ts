@@ -8,6 +8,7 @@
  */
 
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 
 import { signOut } from "@auth";
 import { axios } from "@/lib/client";
@@ -16,8 +17,11 @@ import type { ActionResult, MutationResult } from "@/lib/types/common";
 import type { GradeScaleEntry } from "@/lib/types/grade";
 import type {
   NotificationPreferences,
+  Skin,
   UserDataExport,
 } from "@/lib/types/settings";
+
+const SKIN_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 
 const MAX_GRADE_POINTS = 4.3;
 
@@ -69,6 +73,27 @@ export async function updateNotificationPreferences(
   } catch (error) {
     return { success: false, error: getApiErrorMessage(error) };
   }
+
+  revalidatePath("/", "layout");
+  return { success: true, error: null };
+}
+
+/**
+ * Persists the color skin and stamps it on the `skin` cookie so the next SSR
+ * render of the root layout applies it via `<html data-skin>` with no flash.
+ */
+export async function updateSkin(skin: Skin): Promise<MutationResult> {
+  try {
+    await axios.patch("/api/v1/settings/skin", { skin });
+  } catch (error) {
+    return { success: false, error: getApiErrorMessage(error) };
+  }
+
+  const cookieStore = await cookies();
+  cookieStore.set("skin", skin, {
+    path: "/",
+    maxAge: SKIN_COOKIE_MAX_AGE,
+  });
 
   revalidatePath("/", "layout");
   return { success: true, error: null };

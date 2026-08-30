@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
 
 import { Open_Sans, Cairo } from "next/font/google";
 
@@ -12,8 +13,15 @@ import { localeOpenGraph, siteUrl } from "@/lib/seo";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { SessionProvider } from "@/components/providers/session-provider";
 import { OfflineBanner } from "@/components/shared/offline-banner";
+import { SKINS, type Skin } from "@/lib/types/settings";
 import "../globals.css";
 import { cn } from "@/lib/utils";
+
+function readSkinCookie(value: string | undefined): Skin {
+  return (SKINS as readonly string[]).includes(value ?? "")
+    ? (value as Skin)
+    : "default";
+}
 
 interface LocaleLayoutProps {
   children: React.ReactNode;
@@ -93,11 +101,14 @@ export default async function LocaleLayout({
   if (!messages) notFound();
 
   const direction = localeDirections[locale as AppLocale];
+  const cookieStore = await cookies();
+  const skin = readSkinCookie(cookieStore.get("skin")?.value);
 
   return (
     <html
       lang={locale}
       dir={direction}
+      data-skin={skin}
       suppressHydrationWarning
       data-scroll-behavior="smooth"
     >

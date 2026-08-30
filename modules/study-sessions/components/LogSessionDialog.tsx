@@ -314,11 +314,7 @@ export function LogSessionDialog({
                 {t("cancel")}
               </Button>
 
-              <Button
-                type="submit"
-                disabled={isPending}
-                className="gap-2"
-              >
+              <Button type="submit" disabled={isPending} className="gap-2">
                 {isPending && <LessonioSpinner className="size-4" />}
 
                 {isPending

@@ -5,7 +5,11 @@ import { axios } from "@/lib/client";
 import type { ActionResult } from "@/lib/types/common";
 import type { GradesOverviewData } from "@/lib/types/grade";
 
-const EMPTY_OVERVIEW: GradesOverviewData = { subjects: [], gpa: null, trend: [] };
+const EMPTY_OVERVIEW: GradesOverviewData = {
+  subjects: [],
+  gpa: null,
+  trend: [],
+};
 
 /**
  * `GET /api/v1/grades/overview` (GRADE-001, soft-empty — API_CONTRACT.md

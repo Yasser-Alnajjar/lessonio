@@ -17,7 +17,9 @@ export async function generateMetadata({
 
   return privatePageMetadata(
     _class?.subjectName ?? "Class",
-    _class ? `Your ${_class.subjectName} class schedule and details.` : undefined,
+    _class
+      ? `Your ${_class.subjectName} class schedule and details.`
+      : undefined,
   );
 }
 

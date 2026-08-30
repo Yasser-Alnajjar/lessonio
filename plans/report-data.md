@@ -20,20 +20,20 @@ on backend filtering logic I couldn't read, it's marked **(inferred)**.
 
 Portal-facing indices, from `_cat/indices`:
 
-| Index | Docs | Feeds | Verdict |
-|---|---|---|---|
-| `home_content` | **0** | Portal home `/` | Empty — home is a bare banner |
-| `publications` | **0** | `/cybersecurity-publications` | Empty page |
-| `justifications` | **0** | `/violations-justifications` | Empty tab |
-| `training_progress` | **0** | Training completion state | No progress to show |
-| `policies` | 44 | `/policy-center` | Only **5** have `is_published: true` (2 are junk: "ibm", "test") |
-| `policy_assignments` | 12 | Policy Center per-user | admin has **2** (both `pending`) |
-| `policy_acknowledgments` | 1 | Acknowledged state | Belongs to a different user |
-| `violations` | 10 | `/violations-justifications` | Real data, but **no assignee field** |
-| `exception_types` | 6 | `/policy-exception-requests` | Enabled, fully bilingual — best content in the portal |
-| `exception_requests` | 3 | Same | All requested by `admin@falconfocus.io` |
-| `training_modules` | 4 | `/mandatory-training` | Richest content — but likely filtered out (see below) |
-| `tenant_settings` | 1 | Portal branding | **Every branding field is an empty string** |
+| Index                    | Docs  | Feeds                         | Verdict                                                          |
+| ------------------------ | ----- | ----------------------------- | ---------------------------------------------------------------- |
+| `home_content`           | **0** | Portal home `/`               | Empty — home is a bare banner                                    |
+| `publications`           | **0** | `/cybersecurity-publications` | Empty page                                                       |
+| `justifications`         | **0** | `/violations-justifications`  | Empty tab                                                        |
+| `training_progress`      | **0** | Training completion state     | No progress to show                                              |
+| `policies`               | 44    | `/policy-center`              | Only **5** have `is_published: true` (2 are junk: "ibm", "test") |
+| `policy_assignments`     | 12    | Policy Center per-user        | admin has **2** (both `pending`)                                 |
+| `policy_acknowledgments` | 1     | Acknowledged state            | Belongs to a different user                                      |
+| `violations`             | 10    | `/violations-justifications`  | Real data, but **no assignee field**                             |
+| `exception_types`        | 6     | `/policy-exception-requests`  | Enabled, fully bilingual — best content in the portal            |
+| `exception_requests`     | 3     | Same                          | All requested by `admin@falconfocus.io`                          |
+| `training_modules`       | 4     | `/mandatory-training`         | Richest content — but likely filtered out (see below)            |
+| `tenant_settings`        | 1     | Portal branding               | **Every branding field is an empty string**                      |
 
 The dashboard side, by contrast, is full: 858 controls, 1042 framework controls, 22
 frameworks, 585 technology standards, 159 integrations, 1507 agent tasks, 79k logs.

@@ -16,17 +16,17 @@ This is a refactor of an implemented app. No phases are restarted and no new arc
 
 ### Decisions already made
 
-| Decision | Choice |
-|---|---|
-| Occurrence storage | New `classes` table; `class_schedules` untouched |
-| Lesson scheduling fields | `teacher`, `location`, `time`, `duration_minutes` all move to Class; Lesson keeps its own `date` + `subject_id` |
-| `exam_status` | Stays a simple manual flag on Class — **not** derived from the `exams` table (pre-existing duplication is out of scope) |
-| Occurrence creation | On-demand materialization from `class_schedules`, mirroring `ensureNotificationsForUser()` |
-| Nav naming | New occurrences module takes "Classes"; existing `/class-schedules/list` is relabeled "Schedule" |
+| Decision                 | Choice                                                                                                                  |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| Occurrence storage       | New `classes` table; `class_schedules` untouched                                                                        |
+| Lesson scheduling fields | `teacher`, `location`, `time`, `duration_minutes` all move to Class; Lesson keeps its own `date` + `subject_id`         |
+| `exam_status`            | Stays a simple manual flag on Class — **not** derived from the `exams` table (pre-existing duplication is out of scope) |
+| Occurrence creation      | On-demand materialization from `class_schedules`, mirroring `ensureNotificationsForUser()`                              |
+| Nav naming               | New occurrences module takes "Classes"; existing `/class-schedules/list` is relabeled "Schedule"                        |
 
 ### One design consequence to confirm
 
-`classes.attendance_status` must be **nullable**, with `NULL` = "not recorded yet". On-demand materialization creates *future* occurrences, and a class that has not happened yet cannot be `attended`. The four status values are unchanged (`attended | absent | late | cancelled`) — the TS type becomes `AttendanceStatus | null`. This also makes "untouched occurrence" unambiguous (needed for re-materialization after a schedule edit) and fixes a latent bug: today's `default 'attended'` inflates the attendance-rate statistic for lessons nobody ever marked.
+`classes.attendance_status` must be **nullable**, with `NULL` = "not recorded yet". On-demand materialization creates _future_ occurrences, and a class that has not happened yet cannot be `attended`. The four status values are unchanged (`attended | absent | late | cancelled`) — the TS type becomes `AttendanceStatus | null`. This also makes "untouched occurrence" unambiguous (needed for re-materialization after a schedule edit) and fixes a latent bug: today's `default 'attended'` inflates the attendance-rate statistic for lessons nobody ever marked.
 
 ---
 
@@ -86,7 +86,7 @@ from public.classes c where c.source_lesson_id = l.id;
 alter table public.classes drop column source_lesson_id;
 ```
 
-3. **Rebuild `search_vector` before dropping columns.** `lessons.search_vector` is a *generated* column over `title`(A), `teacher`(B), `location`(C) (`20260807120005_lessons.sql:24-28`), and `idx_lessons_search` is a GIN index on it. Postgres cannot alter a generation expression, so: `drop index idx_lessons_search;` → `alter table public.lessons drop column search_vector;` → re-add it as `title`-only → recreate the GIN index. Do this *before* step 4.
+3. **Rebuild `search_vector` before dropping columns.** `lessons.search_vector` is a _generated_ column over `title`(A), `teacher`(B), `location`(C) (`20260807120005_lessons.sql:24-28`), and `idx_lessons_search` is a GIN index on it. Postgres cannot alter a generation expression, so: `drop index idx_lessons_search;` → `alter table public.lessons drop column search_vector;` → re-add it as `title`-only → recreate the GIN index. Do this _before_ step 4.
 4. `alter table public.lessons drop column attendance_status, drop column exam_status, drop column teacher, drop column location, drop column "time", drop column duration_minutes;`
 5. Update the `comment on table public.lessons` to state the new Lesson/Class split.
 
@@ -123,7 +123,7 @@ alter table public.classes drop column source_lesson_id;
 
 **Trigger points:** first call inside `dashboardActions.getOverview()`, `calendarActions.getMonth()`, and `classesActions.getAll()`. The compare-and-set guard makes repeat calls cheap.
 
-**Template edited or deactivated** (`src/actions/class-schedules.mutations.ts` update + delete): delete *future, untouched* occurrences for that schedule — `date > today and attendance_status is null and exam_status = 'none' and not exists (select 1 from lessons where lessons.class_id = classes.id)` — then let the next `ensureClassesForUser()` re-materialize. Past and recorded occurrences are never touched. This is the reason attendance is nullable.
+**Template edited or deactivated** (`src/actions/class-schedules.mutations.ts` update + delete): delete _future, untouched_ occurrences for that schedule — `date > today and attendance_status is null and exam_status = 'none' and not exists (select 1 from lessons where lessons.class_id = classes.id)` — then let the next `ensureClassesForUser()` re-materialize. Past and recorded occurrences are never touched. This is the reason attendance is nullable.
 
 ---
 
@@ -149,16 +149,16 @@ alter table public.classes drop column source_lesson_id;
 
 Every site below reads a column that is moving. All were confirmed by grep.
 
-| File | Change |
-|---|---|
-| `src/actions/dashboard.ts:74-139` | `fetchLessonsWithRelations` → `fetchClassesWithRelations`, querying `classes` (`date >= today`, order by `date`,`start_time`). Keep the existing in-memory split (`:133-138`) into today (`date === todayIso`) / upcoming (`slice(0,5)`). Drop the attendance/exam mapping at `:45,49`. Call `ensureClassesForUser()` first. |
-| `src/lib/types/dashboard.ts:23` | `todayLessons`/`upcomingLessons` → `todayClasses`/`upcomingClasses`, typed `ClassWithRelations[]`. |
-| `modules/dashboard/overview/csr/DashboardOverviewView.tsx:55-66` + `lesson-list-card.tsx` | Rename to `class-list-card.tsx` rendering `ClassCard`; retitle to the classes i18n keys. |
-| `src/actions/statistics.ts:38,64,130,308` | Attendance rate + `buildAttendanceBreakdown()` read `classes`, counting only `attendance_status is not null`. **Also `:323`** — `minutesBySubject` sums `lesson.duration_minutes`; that column is moving, so this chart must sum `classes.duration_minutes`. Split `fetchRawData`'s single `lessons` query into a lessons query (date/subject/study_status) and a classes query (date/subject/duration/attendance). |
-| `src/actions/subjects.ts:48,67,98` | Per-subject `attendanceRate` reads `classes` instead of `lessons`. Type `src/lib/types/subject.ts:30` and `modules/subjects/detail/csr/SubjectsDetailView.tsx:63-65` keep their shape. |
-| `src/lib/search/query.ts:45,79,94` | The lessons `select("id, title, teacher, location")` drops teacher/location and its result `subtitle` becomes `null`; the teacher facet (`:57-62`, an `ilike` — no tsvector needed) queries `classes.teacher`; the teacher result's `path` points at the classes list rather than `LESSONS_LIST_PATH`. Consider adding classes as a search kind. |
-| `src/actions/calendar.ts` | `getMonth` currently buckets lessons only. Add classes per day (`CalendarDay` in `src/lib/types/calendar.ts` gains `classes: ClassWithRelations[]`), reusing `classesActions.getAll({dateFrom,dateTo})` the same way it reuses `lessonsActions.getAll`. `rescheduleLesson` only updates `date`, so it still works unchanged; `CalendarMonthView.tsx` renders both lists. |
-| `src/actions/notifications.generate.ts` | Generate `upcoming_class` from materialized `classes` rows instead of weekday math over the JSONB (simpler, and the rows now exist). `upcoming_lesson` stays date-based but loses `time: lesson.time` (`:246`) — drop the time argument from `upcomingLessonCopy` in `src/lib/notifications/copy.ts`. `UPCOMING_CLASS_LEAD_MINUTES` and the notification types/prefs/icons are otherwise unchanged. |
+| File                                                                                      | Change                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/actions/dashboard.ts:74-139`                                                         | `fetchLessonsWithRelations` → `fetchClassesWithRelations`, querying `classes` (`date >= today`, order by `date`,`start_time`). Keep the existing in-memory split (`:133-138`) into today (`date === todayIso`) / upcoming (`slice(0,5)`). Drop the attendance/exam mapping at `:45,49`. Call `ensureClassesForUser()` first.                                                                                        |
+| `src/lib/types/dashboard.ts:23`                                                           | `todayLessons`/`upcomingLessons` → `todayClasses`/`upcomingClasses`, typed `ClassWithRelations[]`.                                                                                                                                                                                                                                                                                                                  |
+| `modules/dashboard/overview/csr/DashboardOverviewView.tsx:55-66` + `lesson-list-card.tsx` | Rename to `class-list-card.tsx` rendering `ClassCard`; retitle to the classes i18n keys.                                                                                                                                                                                                                                                                                                                            |
+| `src/actions/statistics.ts:38,64,130,308`                                                 | Attendance rate + `buildAttendanceBreakdown()` read `classes`, counting only `attendance_status is not null`. **Also `:323`** — `minutesBySubject` sums `lesson.duration_minutes`; that column is moving, so this chart must sum `classes.duration_minutes`. Split `fetchRawData`'s single `lessons` query into a lessons query (date/subject/study_status) and a classes query (date/subject/duration/attendance). |
+| `src/actions/subjects.ts:48,67,98`                                                        | Per-subject `attendanceRate` reads `classes` instead of `lessons`. Type `src/lib/types/subject.ts:30` and `modules/subjects/detail/csr/SubjectsDetailView.tsx:63-65` keep their shape.                                                                                                                                                                                                                              |
+| `src/lib/search/query.ts:45,79,94`                                                        | The lessons `select("id, title, teacher, location")` drops teacher/location and its result `subtitle` becomes `null`; the teacher facet (`:57-62`, an `ilike` — no tsvector needed) queries `classes.teacher`; the teacher result's `path` points at the classes list rather than `LESSONS_LIST_PATH`. Consider adding classes as a search kind.                                                                    |
+| `src/actions/calendar.ts`                                                                 | `getMonth` currently buckets lessons only. Add classes per day (`CalendarDay` in `src/lib/types/calendar.ts` gains `classes: ClassWithRelations[]`), reusing `classesActions.getAll({dateFrom,dateTo})` the same way it reuses `lessonsActions.getAll`. `rescheduleLesson` only updates `date`, so it still works unchanged; `CalendarMonthView.tsx` renders both lists.                                            |
+| `src/actions/notifications.generate.ts`                                                   | Generate `upcoming_class` from materialized `classes` rows instead of weekday math over the JSONB (simpler, and the rows now exist). `upcoming_lesson` stays date-based but loses `time: lesson.time` (`:246`) — drop the time argument from `upcomingLessonCopy` in `src/lib/notifications/copy.ts`. `UPCOMING_CLASS_LEAD_MINUTES` and the notification types/prefs/icons are otherwise unchanged.                 |
 
 ---
 
@@ -191,7 +191,7 @@ Every site below reads a column that is moving. All were confirmed by grep.
   - Create a `class_schedules` template with a recurring weekday, reload the dashboard, and confirm occurrences were materialized; reload again and confirm **no duplicates** (the unique index + claim guard hold).
   - Open a Class detail, set attendance to `absent` and exam to `upcoming`, confirm persistence and that the badges render in both LTR and RTL (`/ar`).
   - Open a Lesson detail: only study/review/homework controls remain; no teacher/location/time; the optional Class link works.
-  - Deactivate the schedule and confirm future *untouched* occurrences disappear while the `absent`-marked one survives.
+  - Deactivate the schedule and confirm future _untouched_ occurrences disappear while the `absent`-marked one survives.
   - **Statistics** attendance-rate card + pie chart, and **Subject detail** attendance rate, all still render off `classes`.
   - **Calendar** month shows both classes and lessons; drag-reschedule of a lesson still works.
   - **Search** for a teacher name returns the teacher facet and routes to the classes list.

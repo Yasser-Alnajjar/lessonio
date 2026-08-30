@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { APP_ROLES } from "@/lib/types/user";
+import { SELECTABLE_ROLES } from "@/lib/types/user";
 
 /**
  * Auth forms build their schema at render time via `useTranslations`, so
@@ -20,7 +20,7 @@ export function createLoginSchema(t: Translator) {
 export function createRegisterSchema(t: Translator) {
   return z
     .object({
-      role: z.enum(APP_ROLES, { message: t("errors.roleRequired") }),
+      role: z.enum(SELECTABLE_ROLES, { message: t("errors.roleRequired") }),
       fullName: z
         .string()
         .trim()

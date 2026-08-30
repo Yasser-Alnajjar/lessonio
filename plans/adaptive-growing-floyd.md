@@ -13,6 +13,7 @@ Research into the actual codebase (not the outdated README) surfaced the real, c
 - Notifications are generated as a side effect of reading (bell poll or cron), throttled, not tied to a single user action — a frequent source of "why didn't I get notified" confusion.
 
 Decisions already confirmed with the user:
+
 1. Build a comprehensive in-app Help Center as the main deliverable; add contextual "What is this?" help to only 3 genuinely confusing spots (Class Occurrence attendance/exam status, Lesson's 3 statuses, Grade scale settings) rather than rewriting every screen's empty states.
 2. Ship full English **and** Arabic content now (matching the app's existing bilingual/RTL standard), not English-only.
 3. Leave the public `/docs` marketing page untouched; the Help Center is a new post-login section.
@@ -21,7 +22,7 @@ Decisions already confirmed with the user:
 
 Confirmed pattern from `subjects/list`, `homework/list`, etc.: `page.tsx` (thin) → `modules/<domain>/<feature>/ssr/*` (server, calls `Actions.*`, null-safe) → `modules/<domain>/<feature>/csr/*` ("use client", interactivity). Barrel via `modules/index.ts` → `export * as Help from "./help"`. Since Help content is static (no DB table needed — it's authored knowledge, not user data), SSR components render directly from a typed content registry instead of calling `Actions.Help.*`.
 
-**Single source of truth**: a content **registry** in code (slugs, section, related links) + all actual copy in `messages/en.json` / `messages/ar.json` under a new `help` namespace, mirrored exactly like the existing `docs` namespace. Both the Help Center pages and the 3 contextual popovers pull from the *same* i18n keys (e.g. the attendance-status meanings), so there is never a duplicated explanation to keep in sync.
+**Single source of truth**: a content **registry** in code (slugs, section, related links) + all actual copy in `messages/en.json` / `messages/ar.json` under a new `help` namespace, mirrored exactly like the existing `docs` namespace. Both the Help Center pages and the 3 contextual popovers pull from the _same_ i18n keys (e.g. the attendance-status meanings), so there is never a duplicated explanation to keep in sync.
 
 ### Routes (data-driven, not one file per topic)
 
@@ -55,6 +56,7 @@ modules/help/components/
 ```
 
 Exact status vocabulary to document (verified, not guessed):
+
 - Class Occurrence `attendanceStatus`: `null` (not recorded) | `attended` | `absent` | `late` | `cancelled`
 - Class Occurrence `examStatus`: `none` | `upcoming` | `completed`
 - Lesson `studyStatus`: `not_started` | `studying` | `completed` | `reviewed`
@@ -89,7 +91,7 @@ Exact status vocabulary to document (verified, not guessed):
 - **Tracking Progress**: statistics, grades (+ GPA explained plainly), goals-achievements (XP/level/streaks explained as "recalculated automatically," not "awarded instantly").
 - **Common Tasks** (`type: "journey"`): first week checklist, add first subject & class, record attendance, start studying & track time, track homework & exams, know what to study today, missed a class, review past activity, change something entered earlier.
 - **Troubleshooting** (`type: "faq"`, one page, accordion): stats show zero, XP/level didn't change, no notifications, dashboard missing today's activity, accidentally started a session — corrected against real behavior (e.g. notifications are throttled/generated on read, not instant).
-- **Glossary**: every domain term above plus Streak, XP, Level, Materialization *(explained only as "your upcoming classes appear automatically")* — no raw technical words exposed without a plain explanation first.
+- **Glossary**: every domain term above plus Streak, XP, Level, Materialization _(explained only as "your upcoming classes appear automatically")_ — no raw technical words exposed without a plain explanation first.
 
 Given the content volume (~25 topics × 6 template fields + ~15 glossary terms + 6 status groups, in 2 languages), I'll draft the full bilingual copy directly against this registry/schema, then do a pass myself for domain accuracy against the verified facts above and tone consistency before wiring it into the components.
 

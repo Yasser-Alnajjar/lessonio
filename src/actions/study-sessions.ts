@@ -3,7 +3,10 @@ import "server-only";
 import { auth } from "@auth";
 import { axios } from "@/lib/client";
 import type { ActionResult } from "@/lib/types/common";
-import type { StudySessionSummary, StudySessionWithRelations } from "@/lib/types/study-session";
+import type {
+  StudySessionSummary,
+  StudySessionWithRelations,
+} from "@/lib/types/study-session";
 import {
   cancelStudySession,
   deleteStudySession,
@@ -48,9 +51,9 @@ export const studySessionsActions = {
     if (!session?.user?.id) return { data: null, error: null };
 
     try {
-      const { data } = await axios.get<{ data: StudySessionWithRelations | null }>(
-        "/api/v1/study-sessions/running",
-      );
+      const { data } = await axios.get<{
+        data: StudySessionWithRelations | null;
+      }>("/api/v1/study-sessions/running");
       return { data: data.data, error: null };
     } catch {
       return { data: null, error: null };

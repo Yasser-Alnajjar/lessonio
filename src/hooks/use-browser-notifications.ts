@@ -32,7 +32,11 @@ function readSeen(): Set<string> {
   try {
     const raw = window.localStorage.getItem(SEEN_STORAGE_KEY);
     const parsed: unknown = raw ? JSON.parse(raw) : [];
-    return new Set(Array.isArray(parsed) ? parsed.filter((id) => typeof id === "string") : []);
+    return new Set(
+      Array.isArray(parsed)
+        ? parsed.filter((id) => typeof id === "string")
+        : [],
+    );
   } catch {
     // Private-mode quota errors and malformed JSON both land here; an empty
     // set just means a notification may pop a second time, never a crash.
@@ -126,5 +130,11 @@ export function useBrowserNotifications() {
     writeSeen(seen);
   }, []);
 
-  return { supported, permission, requestPermission, showNotification, markAsShown };
+  return {
+    supported,
+    permission,
+    requestPermission,
+    showNotification,
+    markAsShown,
+  };
 }

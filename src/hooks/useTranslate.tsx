@@ -1,6 +1,6 @@
-import { useTranslations } from 'next-intl';
+import { useTranslations } from "next-intl";
 
 const useTranslate = (namespace?: string) => {
-  return useTranslations(namespace || 'Index');
+  return useTranslations(namespace || "Index");
 };
 export default useTranslate;

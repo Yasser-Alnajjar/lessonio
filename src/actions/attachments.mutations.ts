@@ -24,7 +24,11 @@ import {
   MAX_ATTACHMENT_SIZE_BYTES,
 } from "@/lib/constants/attachments";
 import type { MutationResult } from "@/lib/types/common";
-import type { Attachment, AttachmentShare, CreatedAttachmentShare } from "@/lib/types/attachment";
+import type {
+  Attachment,
+  AttachmentShare,
+  CreatedAttachmentShare,
+} from "@/lib/types/attachment";
 
 export type UploadAttachmentResult =
   | { success: true; error: null; attachment: Attachment }
@@ -37,10 +41,18 @@ export async function uploadAttachment(
   // Fast client-side rejection before spending a network round trip — the
   // backend re-validates both independently and is the real authority.
   if (!attachmentKindForMimeType(file.type)) {
-    return { success: false, error: "Unsupported file type.", attachment: null };
+    return {
+      success: false,
+      error: "Unsupported file type.",
+      attachment: null,
+    };
   }
   if (file.size > MAX_ATTACHMENT_SIZE_BYTES) {
-    return { success: false, error: "File is larger than the 50 MB limit.", attachment: null };
+    return {
+      success: false,
+      error: "File is larger than the 50 MB limit.",
+      attachment: null,
+    };
   }
 
   const formData = new FormData();
@@ -54,7 +66,11 @@ export async function uploadAttachment(
     revalidatePath("/", "layout");
     return { success: true, error: null, attachment: data.data };
   } catch (error) {
-    return { success: false, error: getApiErrorMessage(error), attachment: null };
+    return {
+      success: false,
+      error: getApiErrorMessage(error),
+      attachment: null,
+    };
   }
 }
 
@@ -73,7 +89,9 @@ export type ListAttachmentSharesResult =
   | { success: true; error: null; shares: AttachmentShare[] }
   | { success: false; error: string; shares: null };
 
-export async function listAttachmentShares(attachmentId: string): Promise<ListAttachmentSharesResult> {
+export async function listAttachmentShares(
+  attachmentId: string,
+): Promise<ListAttachmentSharesResult> {
   try {
     const { data } = await axios.get<{ data: AttachmentShare[] }>(
       `/api/v1/attachments/${attachmentId}/shares`,
@@ -103,7 +121,9 @@ export async function createAttachmentShare(
   }
 }
 
-export async function revokeAttachmentShare(id: string): Promise<MutationResult> {
+export async function revokeAttachmentShare(
+  id: string,
+): Promise<MutationResult> {
   try {
     await axios.delete(`/api/v1/attachment-shares/${id}`);
   } catch (error) {

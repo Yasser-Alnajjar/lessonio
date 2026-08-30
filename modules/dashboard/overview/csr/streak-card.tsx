@@ -11,7 +11,10 @@ interface StreakCardProps {
   longestStreakDays: number;
 }
 
-export function StreakCard({ currentStreakDays, longestStreakDays }: StreakCardProps) {
+export function StreakCard({
+  currentStreakDays,
+  longestStreakDays,
+}: StreakCardProps) {
   const t = useTranslate("dashboard.streak");
   const isActive = currentStreakDays > 0;
 

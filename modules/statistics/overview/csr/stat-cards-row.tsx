@@ -1,6 +1,13 @@
 "use client";
 
-import { Award, BookOpen, CalendarCheck, ClipboardCheck, Clock, Flame } from "lucide-react";
+import {
+  Award,
+  BookOpen,
+  CalendarCheck,
+  ClipboardCheck,
+  Clock,
+  Flame,
+} from "lucide-react";
 
 import { StatisticCard } from "@/components/ui-system/statistic-card";
 import type { StatCard } from "@/lib/types/statistics";
@@ -22,7 +29,11 @@ export function StatCardsRow({ cards }: StatCardsRowProps) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
       {cards.map((stat) => (
-        <StatisticCard key={stat.key} stat={stat} icon={ICONS_BY_KEY[stat.key]} />
+        <StatisticCard
+          key={stat.key}
+          stat={stat}
+          icon={ICONS_BY_KEY[stat.key]}
+        />
       ))}
     </div>
   );

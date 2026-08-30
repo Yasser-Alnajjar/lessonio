@@ -3,7 +3,7 @@ import type { Session } from "next-auth";
 
 import { routing } from "@/i18n/routing";
 import { ROLE_HOME } from "@/lib/constants/navigation";
-import type { AppRole } from "@/lib/types/user";
+import { APP_ROLES, type AppRole } from "@/lib/types/user";
 
 /**
  * Path segments (locale prefix stripped) that never require a session.
@@ -33,6 +33,7 @@ const SIGNED_OUT_ONLY_SEGMENTS = new Set<string>([
 const ROLE_PREFIXES: Record<string, AppRole> = {
   teaching: "teacher",
   classroom: "student",
+  admin: "admin",
 };
 
 const ONBOARDING_SEGMENT = "onboarding/role";
@@ -70,7 +71,7 @@ function isSafeNextPath(path: string): boolean {
 }
 
 function isAppRole(value: unknown): value is AppRole {
-  return value === "student" || value === "teacher";
+  return (APP_ROLES as readonly unknown[]).includes(value);
 }
 
 /**
@@ -131,8 +132,7 @@ export function guardRequest(
       }
 
       for (const [prefix, requiredRole] of Object.entries(ROLE_PREFIXES)) {
-        const inPrefix =
-          segment === prefix || segment.startsWith(`${prefix}/`);
+        const inPrefix = segment === prefix || segment.startsWith(`${prefix}/`);
         if (inPrefix && role !== requiredRole) {
           const url = request.nextUrl.clone();
           url.pathname = `${localePrefix}${ROLE_HOME[role]}`;

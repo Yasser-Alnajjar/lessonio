@@ -48,6 +48,15 @@ export const authActions = {
       const { data } = await axios.get<{ data: BackendUser | null }>(
         "/api/v1/auth/me",
       );
+
+      // `data.data === null` means the NextAuth JWT cookie is still valid
+      // (it's self-contained, unverified against the backend) but the
+      // Sanctum token it carries has been revoked. This read-only action
+      // can't clear that cookie itself — Server Components can't mutate
+      // cookies during render — so it just reports "no user"; callers that
+      // gate on this must route through `/api/auth/session-invalid` rather
+      // than redirecting to `/auth/login` directly, or `guard.ts` will see
+      // the still-valid cookie and immediately bounce them back in.
       return { data: data.data ? mapUser(data.data) : null, error: null };
     } catch {
       return { data: null, error: null };

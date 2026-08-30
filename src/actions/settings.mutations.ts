@@ -77,7 +77,9 @@ export async function updateNotificationPreferences(
 /** Dumps every row the signed-in user owns into one JSON-serializable object ("download my data"). */
 export async function exportData(): Promise<ActionResult<UserDataExport>> {
   try {
-    const { data } = await axios.get<{ data: UserDataExport }>("/api/v1/settings/export");
+    const { data } = await axios.get<{ data: UserDataExport }>(
+      "/api/v1/settings/export",
+    );
     return { data: data.data, error: null };
   } catch (error) {
     return { data: null, error: getApiErrorMessage(error) };

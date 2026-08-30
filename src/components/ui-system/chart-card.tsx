@@ -1,10 +1,19 @@
 import { AlertTriangleIcon } from "lucide-react";
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { EmptyState, type EmptyStateProps } from "@/components/ui-system/empty-state";
+import {
+  EmptyState,
+  type EmptyStateProps,
+} from "@/components/ui-system/empty-state";
 
 export interface ChartCardProps extends React.ComponentProps<"div"> {
   title: string;
@@ -33,16 +42,25 @@ export function ChartCard({
   ...props
 }: ChartCardProps) {
   return (
-    <Card data-slot="chart-card" data-status={status} className={cn("gap-4", className)} {...props}>
+    <Card
+      data-slot="chart-card"
+      data-status={status}
+      className={cn("gap-4", className)}
+      {...props}
+    >
       <CardHeader className="flex-row items-start justify-between gap-3 space-y-0">
         <div className="flex flex-col gap-1">
           <CardTitle className="text-base font-medium">{title}</CardTitle>
           {description && <CardDescription>{description}</CardDescription>}
         </div>
-        {action && status === "ready" && <div className="shrink-0">{action}</div>}
+        {action && status === "ready" && (
+          <div className="shrink-0">{action}</div>
+        )}
       </CardHeader>
       <CardContent style={{ minHeight: height }}>
-        {status === "loading" && <Skeleton className="h-full w-full" style={{ height }} />}
+        {status === "loading" && (
+          <Skeleton className="h-full w-full" style={{ height }} />
+        )}
 
         {status === "empty" && (
           <EmptyState
@@ -61,7 +79,9 @@ export function ChartCard({
             style={{ height }}
           >
             <AlertTriangleIcon className="size-6 text-destructive" />
-            <p className="max-w-xs text-sm text-muted-foreground">{errorMessage}</p>
+            <p className="max-w-xs text-sm text-muted-foreground">
+              {errorMessage}
+            </p>
             {onRetry && (
               <Button size="sm" variant="outline" onClick={onRetry}>
                 Retry

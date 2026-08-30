@@ -1,3 +1,4 @@
+import { adminActions } from "./admin";
 import { assignmentsActions } from "./assignments";
 import { attachmentsActions } from "./attachments";
 import { authActions } from "./auth";
@@ -52,4 +53,5 @@ export const Actions = {
   Enrollments: enrollmentsActions,
   Assignments: assignmentsActions,
   Submissions: submissionsActions,
+  Admin: adminActions,
 };

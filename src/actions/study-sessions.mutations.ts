@@ -36,7 +36,8 @@ export async function startStudySession(
   input: StartStudySessionInput,
 ): Promise<MutationResult> {
   const session = await auth();
-  if (!session?.user?.id) return { success: false, error: "You must be signed in." };
+  if (!session?.user?.id)
+    return { success: false, error: "You must be signed in." };
 
   try {
     const { data: running } = await axios.get<{ data: unknown | null }>(
@@ -65,7 +66,8 @@ export async function startStudySession(
 /** `POST /api/v1/study-sessions/{id}/stop` (SESSION-005) — idempotent: a double-stop silently no-ops server-side. */
 export async function stopStudySession(id: string): Promise<MutationResult> {
   const session = await auth();
-  if (!session?.user?.id) return { success: false, error: "You must be signed in." };
+  if (!session?.user?.id)
+    return { success: false, error: "You must be signed in." };
 
   try {
     await axios.post(`/api/v1/study-sessions/${id}/stop`);
@@ -80,7 +82,8 @@ export async function stopStudySession(id: string): Promise<MutationResult> {
 /** Discards a session that was started by mistake — only while it's still running. `POST /api/v1/study-sessions/{id}/cancel` (SESSION-006) deletes the row rather than ending it. */
 export async function cancelStudySession(id: string): Promise<MutationResult> {
   const session = await auth();
-  if (!session?.user?.id) return { success: false, error: "You must be signed in." };
+  if (!session?.user?.id)
+    return { success: false, error: "You must be signed in." };
 
   try {
     await axios.post(`/api/v1/study-sessions/${id}/cancel`);
@@ -94,7 +97,8 @@ export async function cancelStudySession(id: string): Promise<MutationResult> {
 
 export async function deleteStudySession(id: string): Promise<MutationResult> {
   const session = await auth();
-  if (!session?.user?.id) return { success: false, error: "You must be signed in." };
+  if (!session?.user?.id)
+    return { success: false, error: "You must be signed in." };
 
   try {
     await axios.delete(`/api/v1/study-sessions/${id}`);
@@ -116,7 +120,8 @@ export async function logManualSession(
   input: LogStudySessionInput,
 ): Promise<MutationResult> {
   const session = await auth();
-  if (!session?.user?.id) return { success: false, error: "You must be signed in." };
+  if (!session?.user?.id)
+    return { success: false, error: "You must be signed in." };
 
   if (Number.isNaN(new Date(input.startedAt).getTime())) {
     return { success: false, error: "Invalid start time." };
@@ -148,7 +153,8 @@ export async function updateStudySession(
   input: LogStudySessionInput,
 ): Promise<MutationResult> {
   const session = await auth();
-  if (!session?.user?.id) return { success: false, error: "You must be signed in." };
+  if (!session?.user?.id)
+    return { success: false, error: "You must be signed in." };
 
   if (Number.isNaN(new Date(input.startedAt).getTime())) {
     return { success: false, error: "Invalid start time." };

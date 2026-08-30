@@ -10,7 +10,7 @@ Research already completed (grounded in code, not guesses):
 - **Backend** (`falcon-backend`, Go/Gin/Elasticsearch): `POST /reports/generate` already accepts `format: "json"` and, in that case, returns the raw `ReportData` struct (`Project`, `Policies`, `Controls`, `Violations`, `Comments`, `Evidence`, `Risks`, `Assets`, `Summary`, `GeneratedAt`, `TimeFrame`) **without touching any binary renderer** — `internal/handlers/report_handlers.go:127-131`. **No backend changes are needed.** Two known backend gaps to design around instead of fixing server-side (per the user's "don't change the backend unnecessarily" instruction):
   - `time_frame`/`start_date`/`end_date` are accepted but never actually filter the query server-side — the backend always returns the full unfiltered dataset per section.
   - `include_charts` is parsed but unused.
-  Both are solvable entirely on the frontend: since the backend already returns the **full** dataset, `normalizeReportData()` can apply the time-frame filter itself (using each item's `created_at`/`detected_at`), and charts are generated client-side regardless.
+    Both are solvable entirely on the frontend: since the backend already returns the **full** dataset, `normalizeReportData()` can apply the time-frame filter itself (using each item's `created_at`/`detected_at`), and charts are generated client-side regardless.
   - Field-name drift exists between the Go model and actual ES documents (e.g. a comment may have `text`/`message`, `author`/`author_email`) — the normalizer must read defensively (`??` chains), not trust one field name.
   - There is no "Network report" vs "System report" concept anywhere in the backend or frontend — the two reference DOCX files are the same underlying report shape (audit-style findings) applied to different projects. The generic renderer naturally covers both; no per-type branching is needed.
 - **Reference DOCX visual analysis** (rendered to images and inspected via unzipped OOXML): both reference files share **byte-identical colors** (confirmed via `w:fill`/`w:color` extraction) — navy `#1F3864` (table header/label cells), cream `#FBF6EC` (value cells), heading blue `#2A3890`, severity colors High `#ED7D31` / Medium `#FFC000` / Low `#70AD47`. Fonts differ only because the two files were exported from different Word template defaults (Cambria/Calibri vs. Aptos) — not an intentional per-report-type design choice, so the generic renderer will standardize on one font pairing rather than branch on it.
@@ -31,6 +31,7 @@ For **violations specifically**, the normalizer groups raw violation documents b
 ## Files
 
 ### Types — `src/lib/types/report.ts` (new)
+
 - `ReportOptions` (selectedSections, timeFrame, startDate?, endDate?, reportTitle, includeCharts, format)
 - `BackendReportResponse` — loosely-typed mirror of the Go `ReportData` struct (`Record<string, unknown>` arrays per section + `project`/`summary`/`generated_at`/`time_frame`), since the real ES documents aren't schema-enforced server-side. No `any`.
 - `ReportData`, `ReportMetadata`, `ReportSummary` (counts + `controlsByStatus`/`violationsBySeverity`/`risksByLevel` breakdowns, mirroring the backend's `buildReportSummary`)
@@ -41,10 +42,13 @@ For **violations specifically**, the normalizer groups raw violation documents b
 - `ReportLabels` — the translated-strings bag threaded into the normalizer/renderer (section titles, table column labels, footer text, cover subtitle) so no user-facing string is hardcoded in generation code.
 
 ### Backend call — `src/lib/actions/project/report.ts` (new)
+
 Follows the existing `Evidence`-style action module pattern (`src/lib/actions/project/evidence.ts`): `Report.getData(projectId, options): Promise<IResult>`, POSTing to `/api/projects/${projectId}/reports/generate` with `format: "json"` via the shared `axios` client (`@lib/client`) — replacing `ExportReport.tsx`'s manual `fetch()` + manual header-building. Registered into the global `Actions` namespace (`src/lib/actions/index.ts`) alongside `Evidence`, `Policy`, etc.
 
 ### Normalizer — `src/lib/report-generation/normalize-report-data.ts` (new)
+
 `normalizeReportData(backendData: BackendReportResponse, options: ReportOptions, labels: ReportLabels): ReportData`
+
 - Builds `metadata`/`summary` from `backendData.project`/`backendData.summary`.
 - Applies client-side time-frame filtering (the backend gap noted above) per section using each item's best-available date field.
 - Per-section item mapping: one small pure function per section (`mapPolicyItem`, `mapControlItem`, `mapViolationItem`, ... — private helpers in the same file, not separate renderer classes) that reads raw fields defensively and produces `ReportItem.fields`.
@@ -52,9 +56,11 @@ Follows the existing `Evidence`-style action module pattern (`src/lib/actions/pr
 - Builds `charts: ReportChart[]` from the summary breakdowns when `options.includeCharts` is true (severity donut, top-findings-by-count bar) — empty array otherwise, so downstream code never branches on the flag again.
 
 ### Chart image pipeline — `src/lib/report-generation/charts/render-chart-image.ts` (new)
+
 Headless PNG generation shared by DOCX and PPTX: `renderChartImage(chart: ReportChart): Promise<string>` (data URL) using the already-installed `echarts` core package — `echarts.init()` on a detached, sized, off-DOM container, `chart.getDataURL({ type: "png", pixelRatio: 2, backgroundColor: "#fff" })`, then `dispose()`. No React, no `dom-to-image` (avoids screenshotting real UI, produces a proper embeddable raster image as the spec requires). Colors reuse the severity palette from `docx/styles.ts`.
 
 ### DOCX generator — `src/lib/report-generation/docx/` (new)
+
 - `styles.ts` — shared constants: hex colors (`NAVY = "1F3864"`, `CREAM = "FBF6EC"`, severity map, heading blue `2A3890`), font family, spacing/margins, `WidthType.DXA` table column widths, direction-aware paragraph alignment helper (`dir: "ltr" | "rtl"` param).
 - `generate-docx.ts` — `generateDocx(report: ReportData, dir: "ltr" | "rtl"): Promise<Blob>`; lazy `const { Document, Packer, ... } = await import("docx")`; assembles sections via the functions below; `Packer.toBlob()`.
 - `sections/cover.ts` — `renderCoverPage(report, labels)`: title, subtitle, gradient graphic reproduced via docx shape/vector drawing (or a pre-exported PNG asset if vector reproduction proves impractical — decided during implementation, documented either way).
@@ -66,17 +72,21 @@ Headless PNG generation shared by DOCX and PPTX: `renderChartImage(chart: Report
 - Selected sections not in `options.selectedSections` are simply skipped by the orchestrator — no per-section `if` chains beyond "is this id in the selected set."
 
 ### PPTX generator — `src/lib/report-generation/pptx/generate-pptx.ts` (new, isolated)
+
 `generatePptx(report: ReportData): Promise<Blob>` using `pptxgenjs` (new dependency), lazy-imported. Consumes the same `ReportData` — title slide, summary slide (severity table + the same chart images from `renderChartImage`), one slide-group per selected section rendering `ReportItem.fields` as a table. Kept functionally complete but visually simpler than the DOCX (no reference PPTX was supplied to match pixel-for-pixel); isolated in its own file/folder per the "isolate so it can be implemented without changing the architecture" fallback instruction.
 
 ### Download utility — `src/lib/report-generation/download-report.ts` (new)
+
 `downloadBlob(blob: Blob, filename: string): void` — anchor-click + `URL.createObjectURL`/`revokeObjectURL`, no `file-saver` dependency needed.
 
 ### Component refactor
+
 - `src/modules/dashboard/projects/project/csr/useExportReport.ts` (new) — extracts all state/handlers currently inline in `ExportReport.tsx`: `fetchReportData` (via `Actions.Report.getData`), `normalizeReportData` call, `handleExport` (branches on `format` to call `generateDocx`/`generatePptx`, lazy-imported so neither `docx` nor `pptxgenjs` cost bundle size until export is clicked), `downloadBlob`, and preview derivation. Preview counts are now computed by calling `Actions.Report.getData` once and deriving both the on-screen preview panel and the export from the **same** normalized `ReportData` — the "avoid duplicate API calls" requirement — replacing the separate `/reports/preview` call entirely.
 - `src/modules/dashboard/projects/project/csr/ExportReport.tsx` (refactor in place, same file/props/export) — keeps 100% of the existing UI (title input, format toggle, time-frame select + custom dates, sections checklist, include-charts checkbox, preview panel, action buttons) untouched; only swaps its internals to call the new hook, replaces `useTranslations("project_misc")` → `useTranslate("project_misc")`, replaces raw `sonner` `toast` → the project's `useToast` (`toMessage()` for safe error rendering), and types `preview` properly instead of `any`. All error paths (no sections selected, empty data, invalid custom dates, failed fetch, generation failure, download failure) surface via `toast`.
 - Translation keys: extend `messages/en.json` / `messages/ar.json` under the existing `project_misc` namespace (or a new `reports` namespace if it gets large) with the report-content strings (section titles, table column labels, footer/cover text) consumed by `ReportLabels`.
 
 ### Packages
+
 `npm install docx pptxgenjs` — both are lazy-imported (`await import(...)`) inside the generator entry points only, so they don't load until a user actually exports, per the perf requirement.
 
 ## Data flow
@@ -90,6 +100,7 @@ User opens dialog → configures options (unchanged UI)
 ```
 
 ## Verification
+
 - `npm run build` / `tsc --noEmit` for strict-type-safety (no `any`) across new files.
 - Manual browser check via dev server: open the dialog on a real project, select all/subset of sections, try `all`/`last_30_days`/`custom` time frames, toggle `includeCharts`, export both `docx` and `pptx`, open the generated files (LibreOffice available locally) and visually diff against the reference screenshots already captured for cover/exec-summary/findings-table/footer fidelity.
 - Test RTL: switch locale to `ar`, confirm dialog `dir` still works (unchanged) and exported DOCX paragraph alignment mirrors.

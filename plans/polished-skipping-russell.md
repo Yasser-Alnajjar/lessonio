@@ -16,10 +16,11 @@ them. Three pieces of infrastructure don't exist in this repo yet and get introd
 a service-role Supabase client, a cron-triggered route handler, and an email sender.
 
 Confirmed decisions:
+
 - **Generation** — Next.js route handler + external cron (Vercel Cron), not `pg_cron`.
 - **Delivery to browser** — TanStack Query polling (already a dependency), not Supabase Realtime.
-- **Email** — Resend. *You must add `RESEND_API_KEY` to `.env.local` yourself; until then the
-  code is real and correct but delivery returns a clear "email is not configured" error.*
+- **Email** — Resend. _You must add `RESEND_API_KEY` to `.env.local` yourself; until then the
+  code is real and correct but delivery returns a clear "email is not configured" error._
 
 ## 1. Database
 
@@ -58,7 +59,7 @@ in [src/lib/types/settings.ts](src/lib/types/settings.ts).
 ## 3. Notification copy (i18n for stored content)
 
 **`src/lib/notifications/copy.ts`** — `buildNotificationCopy(type, locale, params)` returning
-`{ title, body, linkPath }`, with `en`/`ar` records. Notification text is *persisted* in the DB,
+`{ title, body, linkPath }`, with `en`/`ar` records. Notification text is _persisted_ in the DB,
 so it must be rendered in the user's `settings.locale` at generation time. Deliberately **not**
 `next-intl`'s `getTranslations` — the cron job renders copy for many users in both locales in one
 pass, outside any single request's locale scope.
@@ -73,12 +74,12 @@ deps (`date-fns-tz` is not installed).
 `runScheduledNotificationsJob()`. One pass: load every settings row joined to its profile, then
 per user, honouring `notification_preferences.types[...]`:
 
-| Type | Rule | Reuses |
-|---|---|---|
-| `upcoming_lesson` | `lessons` with `date` in [today, tomorrow] | `lessons` columns `date`/`time`/`duration_minutes` ([src/actions/lessons.ts:39-58](src/actions/lessons.ts)) |
-| `homework_due` | `homework` where `not completed` and `deadline <= today + 2d` | index `idx_homework_pending` already covers this exact predicate |
-| `daily_reminder` | one per user per local day, body summarizing today's lesson + due-homework counts | counts computed from the two queries above |
-| `review_reminder` | `lessons` with `review_status <> 'reviewed'` and `date < today - 7d`, capped per run | `REVIEW_STATUSES` ([src/lib/types/lesson.ts:19-23](src/lib/types/lesson.ts)) |
+| Type              | Rule                                                                                 | Reuses                                                                                                      |
+| ----------------- | ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| `upcoming_lesson` | `lessons` with `date` in [today, tomorrow]                                           | `lessons` columns `date`/`time`/`duration_minutes` ([src/actions/lessons.ts:39-58](src/actions/lessons.ts)) |
+| `homework_due`    | `homework` where `not completed` and `deadline <= today + 2d`                        | index `idx_homework_pending` already covers this exact predicate                                            |
+| `daily_reminder`  | one per user per local day, body summarizing today's lesson + due-homework counts    | counts computed from the two queries above                                                                  |
+| `review_reminder` | `lessons` with `review_status <> 'reviewed'` and `date < today - 7d`, capped per run | `REVIEW_STATUSES` ([src/lib/types/lesson.ts:19-23](src/lib/types/lesson.ts))                                |
 
 There is no spaced-repetition scheduler in this codebase, so `review_reminder` is
 "you have lessons you haven't marked reviewed" — not an SRS interval.

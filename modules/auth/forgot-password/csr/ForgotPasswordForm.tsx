@@ -104,11 +104,7 @@ export const ForgotPasswordForm = () => {
                 </p>
               )}
 
-              <Button
-                type="submit"
-                disabled={isPending}
-                className="mt-2"
-              >
+              <Button type="submit" disabled={isPending} className="mt-2">
                 {isPending ? <LessonioSpinner /> : <Send />}
                 {isPending ? t("submitting") : t("submit")}
               </Button>

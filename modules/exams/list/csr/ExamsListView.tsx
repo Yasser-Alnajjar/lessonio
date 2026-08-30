@@ -32,15 +32,24 @@ interface FormState {
   exam: ExamWithRelations | null;
 }
 
-export const ExamsListView = ({ data, lessons, subjects }: ExamsListViewProps) => {
+export const ExamsListView = ({
+  data,
+  lessons,
+  subjects,
+}: ExamsListViewProps) => {
   const t = useTranslate("exams");
   const router = useRouter();
 
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<FilterSidebarValue>(EMPTY_FILTER_VALUE);
   const [showPast, setShowPast] = useState(false);
-  const [formState, setFormState] = useState<FormState>({ open: false, exam: null });
-  const [deleteTarget, setDeleteTarget] = useState<ExamWithRelations | null>(null);
+  const [formState, setFormState] = useState<FormState>({
+    open: false,
+    exam: null,
+  });
+  const [deleteTarget, setDeleteTarget] = useState<ExamWithRelations | null>(
+    null,
+  );
 
   const subjectOptions = subjects.map((subject) => ({
     value: subject.id,
@@ -58,7 +67,10 @@ export const ExamsListView = ({ data, lessons, subjects }: ExamsListViewProps) =
       ) {
         return false;
       }
-      if (filter.subjectIds.length > 0 && !filter.subjectIds.includes(item.subjectId)) {
+      if (
+        filter.subjectIds.length > 0 &&
+        !filter.subjectIds.includes(item.subjectId)
+      ) {
         return false;
       }
       if (filter.dateFrom && item.date < filter.dateFrom) return false;
@@ -82,9 +94,13 @@ export const ExamsListView = ({ data, lessons, subjects }: ExamsListViewProps) =
       return (
         <EmptyState
           variant={data.length === 0 ? "no-data" : "no-results"}
-          title={data.length === 0 ? t("list.emptyTitle") : t("list.noResultsTitle")}
+          title={
+            data.length === 0 ? t("list.emptyTitle") : t("list.noResultsTitle")
+          }
           description={
-            data.length === 0 ? t("list.emptyDescription") : t("list.noResultsDescription")
+            data.length === 0
+              ? t("list.emptyDescription")
+              : t("list.noResultsDescription")
           }
           action={
             data.length === 0 && lessons.length > 0
@@ -125,7 +141,9 @@ export const ExamsListView = ({ data, lessons, subjects }: ExamsListViewProps) =
     <div className="flex flex-col gap-6 p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold text-foreground">{t("list.title")}</h1>
+          <h1 className="text-xl font-semibold text-foreground">
+            {t("list.title")}
+          </h1>
           <p className="text-sm text-muted-foreground">{t("list.subtitle")}</p>
         </div>
         <Button
@@ -138,7 +156,9 @@ export const ExamsListView = ({ data, lessons, subjects }: ExamsListViewProps) =
       </div>
 
       {lessons.length === 0 && (
-        <p className="text-sm text-muted-foreground">{t("list.noLessonsHint")}</p>
+        <p className="text-sm text-muted-foreground">
+          {t("list.noLessonsHint")}
+        </p>
       )}
 
       <div className="flex flex-wrap items-center gap-3">

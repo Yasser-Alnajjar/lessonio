@@ -20,9 +20,12 @@ import type {
   UpdateFlashcardInput,
 } from "@/lib/types/flashcard";
 
-export async function createFlashcard(input: CreateFlashcardInput): Promise<MutationResult> {
+export async function createFlashcard(
+  input: CreateFlashcardInput,
+): Promise<MutationResult> {
   const session = await auth();
-  if (!session?.user?.id) return { success: false, error: "You must be signed in." };
+  if (!session?.user?.id)
+    return { success: false, error: "You must be signed in." };
 
   try {
     // subjectId is derived server-side from the lesson (FLASH-004) — never sent by the client.
@@ -45,7 +48,8 @@ export async function updateFlashcard(
   input: UpdateFlashcardInput,
 ): Promise<MutationResult> {
   const session = await auth();
-  if (!session?.user?.id) return { success: false, error: "You must be signed in." };
+  if (!session?.user?.id)
+    return { success: false, error: "You must be signed in." };
 
   const patch: Record<string, unknown> = {};
   if (input.front !== undefined) patch.front = input.front;
@@ -68,7 +72,8 @@ export async function updateFlashcard(
 
 export async function deleteFlashcard(id: string): Promise<MutationResult> {
   const session = await auth();
-  if (!session?.user?.id) return { success: false, error: "You must be signed in." };
+  if (!session?.user?.id)
+    return { success: false, error: "You must be signed in." };
 
   try {
     await axios.delete(`/api/v1/flashcards/${id}`);
@@ -93,7 +98,8 @@ export async function recordFlashcardReview(
   grade: FlashcardGrade,
 ): Promise<MutationResult> {
   const session = await auth();
-  if (!session?.user?.id) return { success: false, error: "You must be signed in." };
+  if (!session?.user?.id)
+    return { success: false, error: "You must be signed in." };
 
   try {
     await axios.post(`/api/v1/flashcards/${id}/reviews`, { grade });

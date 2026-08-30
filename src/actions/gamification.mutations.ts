@@ -23,7 +23,9 @@ import type { CreateGoalInput, UpdateGoalInput } from "@/lib/types/goal";
  * Laravel's `(user_id, period, period_start)` unique constraint — `period_start`
  * is derived server-side from `period` and today's date, never client-supplied.
  */
-export async function setCurrentGoal(input: CreateGoalInput): Promise<MutationResult> {
+export async function setCurrentGoal(
+  input: CreateGoalInput,
+): Promise<MutationResult> {
   const session = await auth();
   if (!session?.user?.id) {
     return { success: false, error: "You must be signed in." };
@@ -48,7 +50,10 @@ export async function setCurrentGoal(input: CreateGoalInput): Promise<MutationRe
  * fixed at creation time and a lone `period` patch would break that
  * invariant (see the backend's comment on that request class).
  */
-export async function updateGoal(id: string, input: UpdateGoalInput): Promise<MutationResult> {
+export async function updateGoal(
+  id: string,
+  input: UpdateGoalInput,
+): Promise<MutationResult> {
   const session = await auth();
   if (!session?.user?.id) {
     return { success: false, error: "You must be signed in." };
@@ -56,7 +61,8 @@ export async function updateGoal(id: string, input: UpdateGoalInput): Promise<Mu
 
   try {
     const patch: { targetMinutes?: number } = {};
-    if (input.targetMinutes !== undefined) patch.targetMinutes = input.targetMinutes;
+    if (input.targetMinutes !== undefined)
+      patch.targetMinutes = input.targetMinutes;
 
     await axios.patch(`/api/v1/gamification/goals/${id}`, patch);
   } catch (error) {

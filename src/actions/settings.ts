@@ -30,7 +30,9 @@ function toThemeMode(value: string): ThemeMode {
 export const settingsActions = {
   async get(): Promise<ActionResult<UserSettings>> {
     try {
-      const { data } = await axios.get<{ data: BackendSettings | null }>("/api/v1/settings");
+      const { data } = await axios.get<{ data: BackendSettings | null }>(
+        "/api/v1/settings",
+      );
       if (!data.data) {
         return { data: null, error: null };
       }
@@ -41,7 +43,9 @@ export const settingsActions = {
           userId: row.userId,
           theme: toThemeMode(row.theme),
           locale: row.locale,
-          notificationPreferences: parseNotificationPreferences(row.notificationPreferences),
+          notificationPreferences: parseNotificationPreferences(
+            row.notificationPreferences,
+          ),
           gradeScale: parseGradeScale(row.gradeScale),
         },
         error: null,

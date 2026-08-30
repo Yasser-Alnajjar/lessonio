@@ -2,13 +2,14 @@
 
 ## Context
 
-Three feature areas are currently stubbed placeholders in this Next.js/Supabase study-tracker: global search (`src/actions/search.ts` returns `[]`, no UI, no nav entry point), gamification (XP/level are hardcoded `PLACEHOLDER_XP` in `src/actions/dashboard.ts`; achievements/goals actions are empty stubs; both have `FeaturePlaceholder` views), and filters (already fully built for lessons/homework/exams — confirmed complete, no work needed there). This phase replaces the stubs with real, working features, following the repo's mandatory `page → SSR → CSR` architecture and its established pattern of *deriving* gamification stats on read (streaks already work this way) rather than persisting counters.
+Three feature areas are currently stubbed placeholders in this Next.js/Supabase study-tracker: global search (`src/actions/search.ts` returns `[]`, no UI, no nav entry point), gamification (XP/level are hardcoded `PLACEHOLDER_XP` in `src/actions/dashboard.ts`; achievements/goals actions are empty stubs; both have `FeaturePlaceholder` views), and filters (already fully built for lessons/homework/exams — confirmed complete, no work needed there). This phase replaces the stubs with real, working features, following the repo's mandatory `page → SSR → CSR` architecture and its established pattern of _deriving_ gamification stats on read (streaks already work this way) rather than persisting counters.
 
 Streaks are already real (`computeStreaks()` in `dashboard.ts`, driven by `study_sessions`) — no changes needed there beyond reuse.
 
 ## 1. XP / Level (derived on-the-fly, no new persisted columns)
 
 New `src/lib/constants/gamification.ts`:
+
 ```
 XP_PER_COMPLETED_LESSON = 10   // lessons.study_status in ('completed','reviewed')
 XP_PER_STUDY_HOUR = 5          // floor(totalMinutes/60) * 5
@@ -19,9 +20,11 @@ XP_PER_UNLOCKED_ACHIEVEMENT = 50
 XP_LEVEL_BASE = 50
 ACHIEVEMENT_ICONS: Record<string, LucideIcon>  // "sparkles" | "flame" | "clock" | "check-circle" | "award" -> icon component, mirrors SUBJECT_ICON_COMPONENTS in src/lib/constants/subjects.ts
 ```
+
 Level curve: `level = floor(sqrt(xp / XP_LEVEL_BASE)) + 1`; `xpToNextLevel = level^2 * XP_LEVEL_BASE - xp`.
 
 New pure module `src/lib/gamification/xp.ts` (no `"use server"`/`"server-only"` — pure math):
+
 - `computeXp(counts): number`
 - `computeLevel(xp): { level, xpToNextLevel }`
 
@@ -32,6 +35,7 @@ New pure module `src/lib/gamification/xp.ts` (no `"use server"`/`"server-only"` 
 New migration `supabase/migrations/20260809120018_gamification_sync.sql` — `sync_user_achievements()`, no params, reads `auth.uid()` internally (same trust boundary as every RLS policy in this schema), `SECURITY DEFINER`, `grant execute ... to authenticated`. This is the sanctioned write path `user_achievements` currently lacks (its migration explicitly defers writes to "a SECURITY DEFINER function ... built out alongside the relevant CRUD phases").
 
 Computes and upserts progress/unlock for all six catalog keys from real data:
+
 - `first-lesson`: any lesson with `study_status in ('completed','reviewed')`.
 - `streak-7` / `streak-30`: longest run of consecutive `study_sessions` days, via a `date_trunc('day', started_at)` distinct-dates CTE grouped by the `day - row_number()` consecutive-run trick — mirrors `computeStreaks()` in `dashboard.ts` since there's no persisted streak column.
 - `hundred-hours`: `sum(study_sessions.duration_minutes) >= 6000`.
@@ -51,6 +55,7 @@ New `src/lib/validations/goal.ts`: `createGoalSchema(t)` mirroring the translato
 `src/lib/types/goal.ts`: add `CreateGoalInput { period: GoalPeriod; targetMinutes: number }` (mirrors `CreateSubjectInput`/`UpdateSubjectInput` shape in `src/lib/types/subject.ts`).
 
 New `src/actions/gamification.mutations.ts` (`"use server"`, modeled on `src/actions/subjects.mutations.ts`):
+
 - `setCurrentGoal(input: CreateGoalInput): Promise<MutationResult>` — computes `period_start` server-side (never trust a client date) via `date-fns` `startOfWeek(new Date(), { weekStartsOn: 1 })` (matches the Monday-start convention already used in `src/actions/statistics.ts`) or `startOfMonth(new Date())`, formatted `yyyy-MM-dd`; upserts via `.upsert(..., { onConflict: "user_id,period,period_start" })` against the table's existing unique constraint — this is the "set my goal for the current period" flow.
 - `updateGoal(id, input: Partial<CreateGoalInput>): Promise<MutationResult>` and `deleteGoal(id): Promise<MutationResult>` — scoped by `id` + `user_id`, for editing/removing any goal (including past ones), same shape as `subjects.mutations.ts`.
 - All three end with `revalidatePath("/", "layout")`.
@@ -74,6 +79,7 @@ New shared helper `src/lib/search/query.ts` (`"server-only"`, exports `runSearch
 New `src/actions/search.mutations.ts` (`"use server"`): `liveSearch(query): Promise<ActionResult<SearchResultItem[]>>`, same helper, smaller limit — this is the CSR-invokable path, same precedent as `getRecentNotifications` in `notifications.mutations.ts`.
 
 **UI**:
+
 - `modules/search/results/csr/SearchResultsView.tsx`: replace `FeaturePlaceholder` — group `data` by `kind`, icon per kind (subject→BookOpen, lesson→NotebookText, teacher→GraduationCap, note→FileText, tag→Tag), each a `Link` (from `@/i18n/navigation`) to `item.path`; `EmptyState` when no query or no results.
 - New `src/components/ui-system/search-result-item.tsx`: one shared row renderer (icon + title + subtitle), reused by both the results page and the command palette.
 - New `src/components/shared/global-search.tsx` (`"use client"`): Cmd/Ctrl+K command palette using the existing `CommandDialog` from `src/components/ui/command.tsx` (already Dialog-wrapped, no primitive work needed). Local `open` state + `keydown` listener; `CommandInput` bound via the existing `useDebouncedValue` hook (same one `search-input.tsx` uses, ~250ms); TanStack Query (`useQuery`, `queryKey: ["search","live",debouncedQuery]`, `enabled` on non-empty query) calling `liveSearch`. Results grouped into `CommandGroup`s by kind; selecting an item navigates via `router.push(item.path)` and closes; a trailing "View all results for '{query}'" item routes to `/search/results?q=...` — this is how the palette (instant-answer) composes with the existing full results page (exhaustive). RTL: `dir={isArabic ? "rtl" : "ltr"}` on the dialog content, same pattern as `filter-sidebar.tsx`'s `isRtl` handling.
@@ -86,6 +92,7 @@ Confirmed already fully implemented for lessons/homework/exams via `FilterSideba
 ## 6. i18n
 
 New/updated `messages/en.json` **and** `messages/ar.json` (must stay key-mirrored — currently 559/559 keys match) namespaces:
+
 - `search`: `palette.{placeholder,empty,prompt,viewAll,groups.subject/lesson/teacher/note/tag}`, `results.{title,subtitle,emptyTitle,emptyDescription,promptTitle,promptDescription}`, `trigger.label`.
 - `gamification.achievements`: `title,subtitle,unlockedOn,locked,progressLabel,emptyTitle,emptyDescription`, plus `items.<camelCaseKey>.{title,description}` for each of the six achievement keys (`firstLesson`, `streak7`, `streak30`, `hundredHours`, `perfectAttendance`, `examAce`) — sourced by `achievement.key`, not the DB row, for bilingual parity.
 - `gamification.goals`: `title,subtitle,currentPeriod,weekly,monthly,noGoalTitle,noGoalDescription,setGoal,achievedOfTarget,pastGoals,noPastGoals`, `form.{createTitle,editTitle,createDescription,editDescription,periodLabel,targetMinutesLabel,targetMinutesPlaceholder,cancel,submitting,submitCreate,submitEdit,errors.targetRequired}`, `delete.{title,description,confirm,cancel,genericError}`.

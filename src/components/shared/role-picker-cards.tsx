@@ -1,12 +1,12 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { APP_ROLES, type AppRole } from "@/lib/types/user";
+import { SELECTABLE_ROLES, type SelectableAppRole } from "@/lib/types/user";
 
 interface RolePickerCardsProps {
-  value: AppRole | undefined;
-  onChange: (role: AppRole) => void;
-  labels: Record<AppRole, { label: string; hint: string }>;
+  value: SelectableAppRole | undefined;
+  onChange: (role: SelectableAppRole) => void;
+  labels: Record<SelectableAppRole, { label: string; hint: string }>;
 }
 
 /**
@@ -23,7 +23,7 @@ export function RolePickerCards({
 }: RolePickerCardsProps) {
   return (
     <div className="grid grid-cols-2 gap-3">
-      {APP_ROLES.map((role) => (
+      {SELECTABLE_ROLES.map((role) => (
         <button
           key={role}
           type="button"

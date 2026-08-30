@@ -2,13 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import {
-  DownloadIcon,
-  EyeIcon,
-  Share2Icon,
-  Trash2Icon,
-  UploadIcon,
-} from "lucide-react";
+import { EyeIcon, Share2Icon, Trash2Icon, UploadIcon } from "lucide-react";
 
 import {
   deleteAttachment,

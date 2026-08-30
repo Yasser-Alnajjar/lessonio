@@ -13,7 +13,12 @@ export interface DeleteGoalDialogProps {
   onDeleted?: () => void;
 }
 
-export function DeleteGoalDialog({ open, onOpenChange, goal, onDeleted }: DeleteGoalDialogProps) {
+export function DeleteGoalDialog({
+  open,
+  onOpenChange,
+  goal,
+  onDeleted,
+}: DeleteGoalDialogProps) {
   const t = useTranslations("gamification.goals.delete");
   const tPeriod = useTranslations("gamification.goals");
 

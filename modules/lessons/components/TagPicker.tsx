@@ -42,7 +42,9 @@ export function TagPicker({
 
   const toggle = (tagId: string) => {
     onChange(
-      value.includes(tagId) ? value.filter((id) => id !== tagId) : [...value, tagId],
+      value.includes(tagId)
+        ? value.filter((id) => id !== tagId)
+        : [...value, tagId],
     );
   };
 
@@ -54,7 +56,9 @@ export function TagPicker({
     setCreating(false);
     if (result.success) {
       onTagCreated?.(result.tag);
-      onChange(value.includes(result.tag.id) ? value : [...value, result.tag.id]);
+      onChange(
+        value.includes(result.tag.id) ? value : [...value, result.tag.id],
+      );
       setNewTagName("");
     }
   };
@@ -63,14 +67,21 @@ export function TagPicker({
     <div className="flex flex-col gap-2">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button type="button" variant="outline" size="sm" className="w-fit gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="w-fit gap-2"
+          >
             <TagIcon className="size-4" />
             {triggerLabel}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-56">
           {tags.length === 0 && (
-            <p className="px-2 py-1.5 text-xs text-muted-foreground">{emptyLabel}</p>
+            <p className="px-2 py-1.5 text-xs text-muted-foreground">
+              {emptyLabel}
+            </p>
           )}
           {tags.map((tag) => (
             <DropdownMenuCheckboxItem

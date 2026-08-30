@@ -49,7 +49,8 @@
     "teachingClasses": "الحصص",
     "teachingAssignments": "الواجبات المسندة",
     "classroomClasses": "حصصي",
-    "classroomAssignments": "مهام الحصص"
+    "classroomAssignments": "مهام الحصص",
+    "adminNotificationSettings": "إعدادات الإشعارات"
   },
   "landing": {
     "meta": {
@@ -1284,13 +1285,37 @@
   },
   "notifications": {
     "types": {
-      "upcoming_lesson": "درس قادم",
-      "homework_due": "واجب مستحق",
-      "daily_reminder": "تذكير يومي",
-      "upcoming_class": "حصة قادمة",
-      "review_reminder": "تذكير بالمراجعة",
-      "assignment_assigned": "واجب جديد",
-      "assignment_graded": "تم تصحيح الواجب"
+      "lesson": {
+        "upcoming": "درس قادم",
+        "review_due": "تذكير بالمراجعة"
+      },
+      "homework": {
+        "due_soon": "واجب مستحق"
+      },
+      "class": {
+        "reminder": "حصة قادمة"
+      },
+      "digest": {
+        "daily": "تذكير يومي"
+      },
+      "assignment": {
+        "published": "واجب جديد",
+        "updated": "تحديث على واجب",
+        "due_soon": "واجب قارب موعده"
+      },
+      "submission": {
+        "created": "تسليم جديد",
+        "graded": "تم تصحيح الواجب"
+      },
+      "exam": {
+        "reminder": "امتحان قادم"
+      },
+      "achievement": {
+        "unlocked": "إنجاز جديد"
+      },
+      "goal": {
+        "completed": "تم تحقيق الهدف"
+      }
     },
     "bell": {
       "label": "الإشعارات",
@@ -1303,7 +1328,9 @@
       "viewAll": "عرض الكل",
       "enable": "تفعيل إشعارات المتصفح",
       "enabled": "إشعارات المتصفح مفعّلة",
-      "blocked": "إشعارات المتصفح محظورة في إعدادات متصفحك."
+      "blocked": "إشعارات المتصفح محظورة في إعدادات متصفحك.",
+      "loading": "جارٍ تحميل الإشعارات...",
+      "loadError": "تعذّر تحميل الإشعارات."
     },
     "center": {
       "title": "الإشعارات",
@@ -1324,7 +1351,8 @@
       "emptyDescription": "ستظهر هنا التذكيرات الخاصة بالدروس والواجبات والمراجعة.",
       "emptyUnreadTitle": "لا يوجد غير مقروء",
       "emptyUnreadDescription": "قرأت كل شيء. انتقل إلى الكل لعرض الإشعارات السابقة.",
-      "genericError": "حدث خطأ ما. حاول مرة أخرى."
+      "genericError": "حدث خطأ ما. حاول مرة أخرى.",
+      "loadError": "تعذّر تحميل إشعاراتك. حاول إعادة تحميل الصفحة."
     },
     "preferences": {
       "title": "تفضيلات الإشعارات",
@@ -1344,7 +1372,106 @@
       "saving": "جارٍ الحفظ...",
       "saved": "تم حفظ التفضيلات.",
       "genericError": "حدث خطأ ما. حاول مرة أخرى.",
-      "missingSettings": "تعذر تحميل إعداداتك. جرّب إعادة تحميل الصفحة."
+      "missingSettings": "تعذر تحميل إعداداتك. جرّب إعادة تحميل الصفحة.",
+      "channelInApp": "داخل التطبيق",
+      "channelEmail": "البريد الإلكتروني"
+    },
+    "content": {
+      "lesson": {
+        "upcoming": {
+          "title": "{isToday, select, true {درس اليوم} other {درس غدًا}}",
+          "body": "{lessonTitle} ({subjectName})."
+        },
+        "review_due": {
+          "title": "وقت المراجعة",
+          "body": "لم تراجع بعد \"{lessonTitle}\" ({subjectName})."
+        }
+      },
+      "homework": {
+        "due_soon": {
+          "title": "{daysUntilDue, plural, =0 {واجب مستحق اليوم} other {واجب قارب موعده}}",
+          "body": "{homeworkTitle} ({subjectName}) مستحق {daysUntilDue, plural, =0 {اليوم} =1 {غدًا} other {خلال # أيام}}."
+        }
+      },
+      "class": {
+        "reminder": {
+          "title": "حصة قادمة",
+          "body": "{subjectName} تبدأ {minutesUntil, plural, =0 {الآن} =1 {خلال دقيقة} other {خلال # دقيقة}}."
+        }
+      },
+      "digest": {
+        "daily": {
+          "title": "ملخص اليوم",
+          "body": "لديك {lessonCount, plural, =0 {لا دروس} =1 {درس واحد} other {# دروس}} و{dueCount, plural, =0 {لا واجبات مستحقة} =1 {واجب واحد مستحق} other {# واجبات مستحقة}} اليوم."
+        }
+      },
+      "assignment": {
+        "published": {
+          "title": "واجب جديد",
+          "body": "{assignmentTitle} — تم تكليفك بواجب جديد من معلمك."
+        },
+        "updated": {
+          "title": "تحديث على واجب",
+          "body": "{assignmentTitle} — قام معلمك بتحديث تفاصيل هذا الواجب."
+        },
+        "due_soon": {
+          "title": "واجب قارب موعده",
+          "body": "{assignmentTitle} مستحق {daysUntilDue, plural, =0 {اليوم} =1 {غدًا} other {خلال # أيام}}."
+        }
+      },
+      "submission": {
+        "created": {
+          "title": "تسليم جديد",
+          "body": "استلمت تسليمًا جديدًا لواجب \"{assignmentTitle}\"."
+        },
+        "graded": {
+          "title": "تم تصحيح واجبك",
+          "body": "{assignmentTitle} — الدرجة: {score}/{totalPoints}"
+        }
+      },
+      "exam": {
+        "reminder": {
+          "title": "امتحان قادم",
+          "body": "{examTitle} ({subjectName}) {daysUntil, plural, =0 {اليوم} =1 {غدًا} other {خلال # أيام}}."
+        }
+      },
+      "achievement": {
+        "unlocked": {
+          "title": "إنجاز جديد",
+          "body": "لقد فتحت إنجاز \"{achievementTitle}\"."
+        }
+      },
+      "goal": {
+        "completed": {
+          "title": "تم تحقيق الهدف",
+          "body": "لقد حققت هدفك في وقت الدراسة."
+        }
+      }
+    },
+    "groups": {
+      "lessons": "الدروس",
+      "homework": "الواجبات",
+      "classes": "الحصص",
+      "digests": "الملخصات",
+      "assignments": "واجبات التدريس",
+      "submissions": "التسليمات",
+      "exams": "الاختبارات",
+      "gamification": "التحفيز"
+    },
+    "admin": {
+      "title": "إعدادات الإشعارات",
+      "subtitle": "تحكم في أنواع الإشعارات الفعالة، والقنوات التي تستخدمها، والمدة قبل إرسال التذكيرات المجدولة.",
+      "scheduledBadge": "مجدول",
+      "channels": {
+        "in_app": "داخل التطبيق",
+        "email": "البريد الإلكتروني",
+        "push": "إشعار فوري"
+      },
+      "offsetMinutesLabel": "الدقائق قبل الموعد",
+      "save": "حفظ",
+      "saving": "جارٍ الحفظ...",
+      "genericError": "حدث خطأ ما. حاول مرة أخرى.",
+      "loadError": "تعذّر تحميل إعدادات الإشعارات. حاول إعادة تحميل الصفحة."
     }
   },
   "settings": {

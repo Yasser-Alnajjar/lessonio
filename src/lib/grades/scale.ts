@@ -19,10 +19,14 @@ export function parseGradeScale(value: Json | null): GradeScaleEntry[] {
     .map((entry) => ({
       letter: typeof entry.letter === "string" ? entry.letter : "",
       minPercent: typeof entry.minPercent === "number" ? entry.minPercent : NaN,
-      gradePoints: typeof entry.gradePoints === "number" ? entry.gradePoints : NaN,
+      gradePoints:
+        typeof entry.gradePoints === "number" ? entry.gradePoints : NaN,
     }))
     .filter(
-      (entry) => entry.letter.length > 0 && !Number.isNaN(entry.minPercent) && !Number.isNaN(entry.gradePoints),
+      (entry) =>
+        entry.letter.length > 0 &&
+        !Number.isNaN(entry.minPercent) &&
+        !Number.isNaN(entry.gradePoints),
     );
 
   return entries.length > 0 ? entries : DEFAULT_GRADE_SCALE;
@@ -48,11 +52,15 @@ export function weightedGpa(
   scale: GradeScaleEntry[],
 ): number | null {
   const graded = subjects.filter(
-    (subject): subject is { average: number; creditHours: number } => subject.average !== null,
+    (subject): subject is { average: number; creditHours: number } =>
+      subject.average !== null,
   );
   if (graded.length === 0) return null;
 
-  const totalCredits = graded.reduce((sum, subject) => sum + subject.creditHours, 0);
+  const totalCredits = graded.reduce(
+    (sum, subject) => sum + subject.creditHours,
+    0,
+  );
   if (totalCredits === 0) return null;
 
   const totalPoints = graded.reduce((sum, subject) => {

@@ -23,7 +23,9 @@ import useTranslate from "@/hooks/useTranslate";
 import { useRouter } from "@/i18n/navigation";
 import type { SearchResultItem, SearchResultKind } from "@/lib/types/search";
 
-function groupByKind(data: SearchResultItem[]): Map<SearchResultKind, SearchResultItem[]> {
+function groupByKind(
+  data: SearchResultItem[],
+): Map<SearchResultKind, SearchResultItem[]> {
   const groups = new Map<SearchResultKind, SearchResultItem[]>();
   for (const item of data) {
     const existing = groups.get(item.kind) ?? [];
@@ -35,7 +37,8 @@ function groupByKind(data: SearchResultItem[]): Map<SearchResultKind, SearchResu
 
 /** navigator.platform/userAgent never changes after mount — a no-op subscribe is correct here. */
 const subscribeNever = () => () => {};
-const getIsMacSnapshot = () => /mac/i.test(navigator.platform || navigator.userAgent);
+const getIsMacSnapshot = () =>
+  /mac/i.test(navigator.platform || navigator.userAgent);
 const getIsMacServerSnapshot = () => false;
 
 export function GlobalSearch() {
@@ -147,39 +150,47 @@ export function GlobalSearch() {
             {trimmedQuery.length === 0 ? (
               <CommandEmpty>{t("palette.prompt")}</CommandEmpty>
             ) : !isFetching && results.length === 0 ? (
-              <CommandEmpty>{t("palette.empty", { query: trimmedQuery })}</CommandEmpty>
+              <CommandEmpty>
+                {t("palette.empty", { query: trimmedQuery })}
+              </CommandEmpty>
             ) : (
-              SEARCH_RESULT_GROUP_ORDER.filter((kind) => groups.has(kind)).map((kind) => {
-                const Icon = SEARCH_RESULT_ICONS[kind];
-                return (
-                  <CommandGroup key={kind} heading={t(`groups.${kind}`)}>
-                    {groups.get(kind)!.map((item) => (
-                      <CommandItem
-                        key={`${item.kind}-${item.id}`}
-                        value={`${item.kind}-${item.id}`}
-                        onSelect={() => goTo(item.path)}
-                      >
-                        <Icon />
-                        <span className="flex min-w-0 flex-col">
-                          <span className="truncate">{item.title}</span>
-                          {item.subtitle && (
-                            <span className="truncate text-xs text-muted-foreground">
-                              {item.subtitle}
-                            </span>
-                          )}
-                        </span>
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                );
-              })
+              SEARCH_RESULT_GROUP_ORDER.filter((kind) => groups.has(kind)).map(
+                (kind) => {
+                  const Icon = SEARCH_RESULT_ICONS[kind];
+                  return (
+                    <CommandGroup key={kind} heading={t(`groups.${kind}`)}>
+                      {groups.get(kind)!.map((item) => (
+                        <CommandItem
+                          key={`${item.kind}-${item.id}`}
+                          value={`${item.kind}-${item.id}`}
+                          onSelect={() => goTo(item.path)}
+                        >
+                          <Icon />
+                          <span className="flex min-w-0 flex-col">
+                            <span className="truncate">{item.title}</span>
+                            {item.subtitle && (
+                              <span className="truncate text-xs text-muted-foreground">
+                                {item.subtitle}
+                              </span>
+                            )}
+                          </span>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  );
+                },
+              )
             )}
 
             {trimmedQuery.length > 0 && (
               <CommandGroup>
                 <CommandItem
                   value="view-all-results"
-                  onSelect={() => goTo(`/search/results?q=${encodeURIComponent(trimmedQuery)}`)}
+                  onSelect={() =>
+                    goTo(
+                      `/search/results?q=${encodeURIComponent(trimmedQuery)}`,
+                    )
+                  }
                 >
                   <SearchIcon />
                   {t("palette.viewAll", { query: trimmedQuery })}

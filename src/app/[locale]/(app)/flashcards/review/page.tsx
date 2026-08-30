@@ -6,7 +6,9 @@ interface FlashcardsReviewPageProps {
   searchParams: Promise<{ subjectId?: string; lessonId?: string }>;
 }
 
-export default function FlashcardsReviewPage({ searchParams }: FlashcardsReviewPageProps) {
+export default function FlashcardsReviewPage({
+  searchParams,
+}: FlashcardsReviewPageProps) {
   return (
     <Suspense fallback={<PageLoader />}>
       <Flashcards.FlashcardsReview searchParams={searchParams} />

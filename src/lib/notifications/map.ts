@@ -7,8 +7,11 @@ export interface BackendNotification {
   type: string;
   title: string;
   body: string;
+  data: Record<string, unknown> | null;
+  entityType: string | null;
+  entityId: string | null;
   readAt: string | null;
-  linkPath: string;
+  linkPath: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -25,10 +28,13 @@ export function mapNotificationRow(row: BackendNotification): Notification {
     // The backend column is a plain `text` with a CHECK constraint, so narrow
     // it back to the union rather than asserting — an unrecognized value
     // (e.g. a type added by a migration this client doesn't know yet)
-    // degrades to a daily reminder instead of breaking the icon lookup.
-    type: isNotificationType(row.type) ? row.type : "daily_reminder",
+    // degrades to the daily digest instead of breaking the icon lookup.
+    type: isNotificationType(row.type) ? row.type : "digest.daily",
     title: row.title,
     body: row.body,
+    data: row.data ?? {},
+    entityType: row.entityType,
+    entityId: row.entityId,
     readAt: row.readAt,
     linkPath: row.linkPath,
     createdAt: row.createdAt,

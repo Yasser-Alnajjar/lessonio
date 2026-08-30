@@ -17,7 +17,8 @@ export function createExamSchema(t: Translator) {
       score: z.number().min(0, t("errors.scoreInvalid")).optional(),
     })
     .refine(
-      (values) => values.score === undefined || values.score <= values.totalScore,
+      (values) =>
+        values.score === undefined || values.score <= values.totalScore,
       { message: t("errors.scoreExceedsTotal"), path: ["score"] },
     );
 }

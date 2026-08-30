@@ -35,7 +35,9 @@ export interface CreateFlashcardInput {
   back: string;
 }
 
-export type UpdateFlashcardInput = Partial<Pick<CreateFlashcardInput, "front" | "back">>;
+export type UpdateFlashcardInput = Partial<
+  Pick<CreateFlashcardInput, "front" | "back">
+>;
 
 export type { FlashcardGrade };
 

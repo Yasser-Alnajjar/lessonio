@@ -15,9 +15,14 @@ import { revalidatePath } from "next/cache";
 import { axios } from "@/lib/client";
 import { getApiErrorMessage } from "@/lib/client/errors";
 import type { MutationResult } from "@/lib/types/common";
-import type { CreateSubjectInput, UpdateSubjectInput } from "@/lib/types/subject";
+import type {
+  CreateSubjectInput,
+  UpdateSubjectInput,
+} from "@/lib/types/subject";
 
-export async function createSubject(input: CreateSubjectInput): Promise<MutationResult> {
+export async function createSubject(
+  input: CreateSubjectInput,
+): Promise<MutationResult> {
   try {
     // CreateSubjectInput already matches SUBJ-003's body 1:1.
     await axios.post("/api/v1/subjects", input);

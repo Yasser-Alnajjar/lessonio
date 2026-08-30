@@ -26,7 +26,11 @@ export function StatisticCard({
   const hasValue = stat.value !== null && !Number.isNaN(stat.value);
 
   return (
-    <Card data-slot="statistic-card" className={cn("gap-2", className)} {...props}>
+    <Card
+      data-slot="statistic-card"
+      className={cn("gap-2", className)}
+      {...props}
+    >
       <CardContent className="flex items-start justify-between gap-3 pt-6">
         <div className="flex flex-col gap-1">
           <span className="text-xs text-muted-foreground">{stat.label}</span>
@@ -61,7 +65,11 @@ export function StatisticCard({
 
 function TrendIndicator({ trend }: { trend: StatisticTrend }) {
   const Icon =
-    trend.value > 0 ? TrendingUpIcon : trend.value < 0 ? TrendingDownIcon : MinusIcon;
+    trend.value > 0
+      ? TrendingUpIcon
+      : trend.value < 0
+        ? TrendingDownIcon
+        : MinusIcon;
   const tone =
     trend.value > 0
       ? "text-success"
@@ -70,10 +78,15 @@ function TrendIndicator({ trend }: { trend: StatisticTrend }) {
         : "text-muted-foreground";
 
   return (
-    <span className={cn("inline-flex items-center gap-1 text-xs font-medium", tone)}>
+    <span
+      className={cn("inline-flex items-center gap-1 text-xs font-medium", tone)}
+    >
       <Icon className="size-3.5" />
       {trend.value > 0 ? "+" : ""}
-      {trend.value}%{trend.label && <span className="text-muted-foreground">{trend.label}</span>}
+      {trend.value}%
+      {trend.label && (
+        <span className="text-muted-foreground">{trend.label}</span>
+      )}
     </span>
   );
 }
@@ -83,7 +96,11 @@ export function StatisticCardSkeleton({
   ...props
 }: React.ComponentProps<"div">) {
   return (
-    <Card data-slot="statistic-card-skeleton" className={cn("gap-2", className)} {...props}>
+    <Card
+      data-slot="statistic-card-skeleton"
+      className={cn("gap-2", className)}
+      {...props}
+    >
       <CardContent className="flex items-start justify-between gap-3 pt-6">
         <div className="flex flex-col gap-2">
           <Skeleton className="h-3 w-16" />

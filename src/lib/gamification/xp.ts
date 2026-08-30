@@ -32,7 +32,10 @@ export function computeXp(counts: XpCounts): number {
 }
 
 /** level = floor(sqrt(xp / base)) + 1, so the threshold for level L is (L-1)^2 * base. */
-export function computeLevel(xp: number): { level: number; xpToNextLevel: number } {
+export function computeLevel(xp: number): {
+  level: number;
+  xpToNextLevel: number;
+} {
   const level = Math.floor(Math.sqrt(xp / XP_LEVEL_BASE)) + 1;
   const nextLevelThreshold = level * level * XP_LEVEL_BASE;
   return { level, xpToNextLevel: nextLevelThreshold - xp };

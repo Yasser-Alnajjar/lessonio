@@ -1,6 +1,13 @@
 "use client";
 
-import { Archive, ArchiveRestore, Copy, MoreVertical, Pencil, Trash2 } from "lucide-react";
+import {
+  Archive,
+  ArchiveRestore,
+  Copy,
+  MoreVertical,
+  Pencil,
+  Trash2,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";

@@ -36,7 +36,11 @@ function toIsoDate(date: Date): string {
 }
 
 /** Applies one graded review to the card's SM-2 state, returning the new state and next due date. */
-export function applySm2(state: Sm2State, grade: FlashcardGrade, today: Date = new Date()): Sm2Result {
+export function applySm2(
+  state: Sm2State,
+  grade: FlashcardGrade,
+  today: Date = new Date(),
+): Sm2Result {
   const quality = GRADE_TO_QUALITY[grade];
 
   let repetitions: number;

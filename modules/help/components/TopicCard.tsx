@@ -9,7 +9,12 @@ export interface TopicCardProps {
   summary: string;
 }
 
-export function TopicCard({ href, icon: Icon, title, summary }: TopicCardProps) {
+export function TopicCard({
+  href,
+  icon: Icon,
+  title,
+  summary,
+}: TopicCardProps) {
   return (
     <Link
       href={href}

@@ -204,11 +204,7 @@ export const RegisterForm = () => {
                   </p>
                 )}
 
-                <Button
-                  type="submit"
-                  disabled={isPending}
-                  className="mt-2"
-                >
+                <Button type="submit" disabled={isPending} className="mt-2">
                   {isPending ? <LessonioSpinner /> : <UserPlus />}
                   {isPending ? t("submitting") : t("submit")}
                 </Button>

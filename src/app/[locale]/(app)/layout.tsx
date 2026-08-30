@@ -1,8 +1,8 @@
-import { getLocale, getTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
+import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 
 import { Actions } from "@/actions";
-import { redirect } from "@/i18n/navigation";
 import { AppSidebar } from "@/components/shared/app-sidebar";
 import { GlobalSearch } from "@/components/shared/global-search";
 import { NotificationBell } from "@/components/shared/notification-bell";
@@ -29,13 +29,19 @@ export const metadata: Metadata = {
  * from every route not in `PUBLIC_SEGMENTS`, but this checks again in case
  * the client navigated here via the App Router cache rather than a fresh
  * request through the middleware.
+ *
+ * `!user` here can mean a stale NextAuth cookie (backend `/auth/me` says
+ * the user is gone, but the JWT session itself is still valid) as well as
+ * a genuinely signed-out request, so this must route through
+ * `/api/auth/session-invalid` — a plain `redirect` to `/auth/login` would
+ * leave the cookie in place and get bounced right back by `guard.ts`. See
+ * that route's comment for the full loop it avoids.
  */
 export default async function AppLayout({ children }: AppLayoutProps) {
   const { data: user } = await Actions.Auth.getSession();
 
   if (!user) {
-    const locale = await getLocale();
-    redirect({ href: "/auth/login", locale });
+    redirect("/api/auth/session-invalid");
     return null;
   }
 
@@ -54,7 +60,7 @@ export default async function AppLayout({ children }: AppLayoutProps) {
           <GlobalSearch />
           <NotificationBell
             browserNotificationsEnabled={
-              settings?.notificationPreferences.enabledInBrowser ?? true
+              settings?.notificationPreferences.channels.in_app ?? true
             }
           />
         </header>

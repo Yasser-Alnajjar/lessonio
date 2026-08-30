@@ -16,14 +16,18 @@ export const SettingsAppearanceView = () => {
         <SettingsNav />
 
         <div>
-          <h1 className="text-foreground text-xl font-semibold">{t("title")}</h1>
+          <h1 className="text-foreground text-xl font-semibold">
+            {t("title")}
+          </h1>
           <p className="text-muted-foreground text-sm">{t("subtitle")}</p>
         </div>
 
         <section className="flex items-start justify-between gap-4">
           <div className="flex flex-col gap-0.5">
             <h2 className="text-sm font-semibold">{t("themeTitle")}</h2>
-            <p className="text-muted-foreground text-sm">{t("themeDescription")}</p>
+            <p className="text-muted-foreground text-sm">
+              {t("themeDescription")}
+            </p>
           </div>
           <ThemeToggle />
         </section>
@@ -33,7 +37,9 @@ export const SettingsAppearanceView = () => {
         <section className="flex items-start justify-between gap-4">
           <div className="flex flex-col gap-0.5">
             <h2 className="text-sm font-semibold">{t("languageTitle")}</h2>
-            <p className="text-muted-foreground text-sm">{t("languageDescription")}</p>
+            <p className="text-muted-foreground text-sm">
+              {t("languageDescription")}
+            </p>
           </div>
           <LanguageSwitch />
         </section>

@@ -42,7 +42,10 @@ export function HeatMapChart({ data }: HeatMapChartProps) {
       emptyState={{ title: tCommon("noDataYet"), description: t("empty") }}
       height={180}
     >
-      <div className="flex h-full items-center gap-1 overflow-x-auto py-2" style={{ height: 180 }}>
+      <div
+        className="flex h-full items-center gap-1 overflow-x-auto py-2"
+        style={{ height: 180 }}
+      >
         {weeks.map((week, weekIndex) => (
           <div key={weekIndex} className="flex flex-col gap-1">
             {week.map((cell, dayIndex) =>
@@ -56,7 +59,10 @@ export function HeatMapChart({ data }: HeatMapChartProps) {
                   )}
                 />
               ) : (
-                <div key={dayIndex} className="size-3.5 rounded-sm bg-transparent" />
+                <div
+                  key={dayIndex}
+                  className="size-3.5 rounded-sm bg-transparent"
+                />
               ),
             )}
           </div>

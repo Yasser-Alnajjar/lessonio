@@ -80,7 +80,12 @@ export const HELP_TOPICS: HelpTopic[] = [
     type: "overview",
     section: "gettingStarted",
     icon: Compass,
-    relatedTopics: ["subjects", "classes", "class-occurrences", "study-sessions"],
+    relatedTopics: [
+      "subjects",
+      "classes",
+      "class-occurrences",
+      "study-sessions",
+    ],
   },
   {
     slug: "first-steps",
@@ -123,7 +128,13 @@ export const HELP_TOPICS: HelpTopic[] = [
     icon: NotebookText,
     relatedFeatureHref: "/lessons/list",
     statusGroups: ["studyStatus", "reviewStatus", "homeworkStatus"],
-    relatedTopics: ["subjects", "class-occurrences", "homework", "exams", "flashcards"],
+    relatedTopics: [
+      "subjects",
+      "class-occurrences",
+      "homework",
+      "exams",
+      "flashcards",
+    ],
   },
   {
     slug: "study-sessions",

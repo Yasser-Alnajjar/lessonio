@@ -156,11 +156,7 @@ export const ResetPasswordForm = () => {
                 </p>
               )}
 
-              <Button
-                type="submit"
-                disabled={isPending}
-                className="mt-2"
-              >
+              <Button type="submit" disabled={isPending} className="mt-2">
                 {isPending ? <LessonioSpinner /> : <KeyRound />}
                 {isPending ? t("submitting") : t("submit")}
               </Button>

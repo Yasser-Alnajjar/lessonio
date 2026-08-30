@@ -17,7 +17,10 @@ import { revalidatePath } from "next/cache";
 
 import { axios } from "@/lib/client";
 import { getApiErrorMessage } from "@/lib/client/errors";
-import { mapNotificationRow, type BackendNotification } from "@/lib/notifications/map";
+import {
+  mapNotificationRow,
+  type BackendNotification,
+} from "@/lib/notifications/map";
 import type { ActionResult, MutationResult } from "@/lib/types/common";
 import type { Notification } from "@/lib/types/notification";
 
@@ -28,13 +31,13 @@ export interface RecentNotifications {
 
 /**
  * Polled by the notification bell — returns the latest few plus the badge
- * count. The backend's `/notifications/recent` endpoint has a write side
- * effect: it runs the on-demand notification generator before reading, which
- * is what makes new notifications appear between cron sweeps. That's a
- * deliberate backend decision (documented in API_CONTRACT.md §7.21), not
- * something this action needs to trigger separately.
+ * count. A plain read: notification rows come from the event-driven
+ * backend pipeline (a domain event, or a scheduled job drained by cron),
+ * never from this endpoint.
  */
-export async function getRecentNotifications(): Promise<ActionResult<RecentNotifications>> {
+export async function getRecentNotifications(): Promise<
+  ActionResult<RecentNotifications>
+> {
   try {
     const { data } = await axios.get<{
       data: { items: BackendNotification[]; unreadCount: number };
@@ -46,12 +49,14 @@ export async function getRecentNotifications(): Promise<ActionResult<RecentNotif
       },
       error: null,
     };
-  } catch {
-    return { data: null, error: null };
+  } catch (error) {
+    return { data: null, error: getApiErrorMessage(error) };
   }
 }
 
-export async function markNotificationAsRead(id: string): Promise<MutationResult> {
+export async function markNotificationAsRead(
+  id: string,
+): Promise<MutationResult> {
   try {
     await axios.post(`/api/v1/notifications/${id}/read`);
   } catch (error) {
@@ -78,7 +83,9 @@ export async function markAllNotificationsAsRead(): Promise<MutationResult> {
  * notification and the recipient address are resolved server-side from the
  * session — this action never accepts or forwards a recipient.
  */
-export async function sendNotificationToEmail(id: string): Promise<MutationResult> {
+export async function sendNotificationToEmail(
+  id: string,
+): Promise<MutationResult> {
   try {
     await axios.post(`/api/v1/notifications/${id}/email`);
   } catch (error) {

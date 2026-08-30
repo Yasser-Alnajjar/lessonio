@@ -1,8 +1,18 @@
-import { BookOpen, FileText, GraduationCap, NotebookText, Tag, type LucideIcon } from "lucide-react";
+import {
+  BookOpen,
+  FileText,
+  GraduationCap,
+  NotebookText,
+  Tag,
+  type LucideIcon,
+} from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
-import type { SearchResultItem as SearchResultItemType, SearchResultKind } from "@/lib/types/search";
+import type {
+  SearchResultItem as SearchResultItemType,
+  SearchResultKind,
+} from "@/lib/types/search";
 
 export const SEARCH_RESULT_ICONS: Record<SearchResultKind, LucideIcon> = {
   subject: BookOpen,
@@ -27,7 +37,11 @@ export interface SearchResultItemProps {
   className?: string;
 }
 
-export function SearchResultItem({ item, onSelect, className }: SearchResultItemProps) {
+export function SearchResultItem({
+  item,
+  onSelect,
+  className,
+}: SearchResultItemProps) {
   const Icon = SEARCH_RESULT_ICONS[item.kind];
 
   return (
@@ -43,9 +57,13 @@ export function SearchResultItem({ item, onSelect, className }: SearchResultItem
         <Icon className="size-4" />
       </span>
       <span className="flex min-w-0 flex-col">
-        <span className="truncate font-medium text-foreground">{item.title}</span>
+        <span className="truncate font-medium text-foreground">
+          {item.title}
+        </span>
         {item.subtitle && (
-          <span className="truncate text-xs text-muted-foreground">{item.subtitle}</span>
+          <span className="truncate text-xs text-muted-foreground">
+            {item.subtitle}
+          </span>
         )}
       </span>
     </Link>

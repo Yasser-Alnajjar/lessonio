@@ -16,9 +16,12 @@ import { getApiErrorMessage } from "@/lib/client/errors";
 import type { MutationResult } from "@/lib/types/common";
 import type { CreateExamInput, UpdateExamInput } from "@/lib/types/exam";
 
-export async function createExam(input: CreateExamInput): Promise<MutationResult> {
+export async function createExam(
+  input: CreateExamInput,
+): Promise<MutationResult> {
   const session = await auth();
-  if (!session?.user?.id) return { success: false, error: "You must be signed in." };
+  if (!session?.user?.id)
+    return { success: false, error: "You must be signed in." };
 
   try {
     // subjectId is derived server-side from the lesson (EXAM-002) — never sent by the client.
@@ -37,9 +40,13 @@ export async function createExam(input: CreateExamInput): Promise<MutationResult
   return { success: true, error: null };
 }
 
-export async function updateExam(id: string, input: UpdateExamInput): Promise<MutationResult> {
+export async function updateExam(
+  id: string,
+  input: UpdateExamInput,
+): Promise<MutationResult> {
   const session = await auth();
-  if (!session?.user?.id) return { success: false, error: "You must be signed in." };
+  if (!session?.user?.id)
+    return { success: false, error: "You must be signed in." };
 
   const patch: Record<string, unknown> = {};
   if (input.lessonId !== undefined) patch.lessonId = input.lessonId;
@@ -69,9 +76,13 @@ export async function updateExam(id: string, input: UpdateExamInput): Promise<Mu
  * "record score" control. Mirrors the Supabase code's own split between a
  * full-row update and a score-only update.
  */
-export async function updateExamScore(id: string, score: number): Promise<MutationResult> {
+export async function updateExamScore(
+  id: string,
+  score: number,
+): Promise<MutationResult> {
   const session = await auth();
-  if (!session?.user?.id) return { success: false, error: "You must be signed in." };
+  if (!session?.user?.id)
+    return { success: false, error: "You must be signed in." };
 
   try {
     await axios.patch(`/api/v1/exams/${id}/score`, { score });
@@ -85,7 +96,8 @@ export async function updateExamScore(id: string, score: number): Promise<Mutati
 
 export async function deleteExam(id: string): Promise<MutationResult> {
   const session = await auth();
-  if (!session?.user?.id) return { success: false, error: "You must be signed in." };
+  if (!session?.user?.id)
+    return { success: false, error: "You must be signed in." };
 
   try {
     await axios.delete(`/api/v1/exams/${id}`);

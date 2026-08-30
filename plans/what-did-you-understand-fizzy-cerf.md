@@ -2,17 +2,17 @@
 
 ## Context
 
-**What you asked for.** Customers should be able to upload their own `.docx` Word file and have it become the *sole* source of truth for the exported report: which sections appear, in what order, where each piece of data lands, how it's grouped, and every aspect of formatting. The app's job shrinks to: read the DOCX → find placeholders → resolve them against report data → expand loops → inject chart images → hand back a `.docx`. No predefined headings, tables, or ordering may be injected.
+**What you asked for.** Customers should be able to upload their own `.docx` Word file and have it become the _sole_ source of truth for the exported report: which sections appear, in what order, where each piece of data lands, how it's grouped, and every aspect of formatting. The app's job shrinks to: read the DOCX → find placeholders → resolve them against report data → expand loops → inject chart images → hand back a `.docx`. No predefined headings, tables, or ordering may be injected.
 
 **What I found that changes the shape of the work.**
 
 1. **The feature does not exist on `main`.** Everything the original brief referred to as "existing" (`generate-docx-from-template.ts`, `template-data.ts`, `embed-chart-images.ts`, `TemplateUploadField.tsx`, the `templateFile` option, `docxtemplater`/`pizzip`) lives only on the unmerged branch `docx/template` (single commit `92333cf`). You've said not to use anything from it. So this is a **greenfield build on `main`**, not a swap of a rendering engine. Constraints from the brief like "don't modify `template-data.ts`" and "keep the existing `TemplateRenderError`" are moot — those files don't exist here; I'm authoring them fresh. `docxtemplater` and `pizzip` are not in `main`'s `package.json` at all, so there is nothing to remove.
 
-2. **Grouping on `main` is destructive.** `groupItems()` ([normalize-report-data.ts:282](src/lib/report-generation/normalize-report-data.ts:282)) collapses N items into **one merged item per group** — comma-joining field values, dropping the grouped-on field, synthesizing an `instances` count. Renderers never see groups at all. Your requirement that *the template* define grouping therefore cannot reuse that function. The custom-template path will request ungrouped data and do **non-destructive** grouping in its own data layer, where a group keeps its real `items[]`.
+2. **Grouping on `main` is destructive.** `groupItems()` ([normalize-report-data.ts:282](src/lib/report-generation/normalize-report-data.ts:282)) collapses N items into **one merged item per group** — comma-joining field values, dropping the grouped-on field, synthesizing an `instances` count. Renderers never see groups at all. Your requirement that _the template_ define grouping therefore cannot reuse that function. The custom-template path will request ungrouped data and do **non-destructive** grouping in its own data layer, where a group keeps its real `items[]`.
 
 3. **`groupBy` and `fields` never leave the browser.** [report.ts:15](src/lib/actions/project/report.ts:15) sends only `sections.map(s => s.id)`. So the template path can pass a different `IReportOptions` into `normalizeReportData` with zero backend impact.
 
-4. **Good news on tooling.** `jszip@3.10.1` is already a dependency (used by the parser dialogs) — **no new package is needed**. LibreOffice 26.2 is installed at `/Applications/LibreOffice.app/Contents/MacOS/soffice` (just not on `PATH`), so real visual validation *is* possible. `bun test` works with no config.
+4. **Good news on tooling.** `jszip@3.10.1` is already a dependency (used by the parser dialogs) — **no new package is needed**. LibreOffice 26.2 is installed at `/Applications/LibreOffice.app/Contents/MacOS/soffice` (just not on `PATH`), so real visual validation _is_ possible. `bun test` works with no config.
 
 **Outcome.** A generic, data-driven DOCX templating engine under `src/lib/report-generation/docx/template/`, plus the UI to upload a template. The existing programmatic export path (`generate-docx.ts` and everything under `docx/sections/`) is not touched — default exports keep behaving exactly as they do today, checkboxes and all.
 
@@ -32,9 +32,21 @@ Verified: **Bun 1.3.3 has no `DOMParser` or `XMLSerializer`**. Using the DOM wou
 The tree keeps each element's **verbatim attribute source**:
 
 ```ts
-interface XmlElement { type: "element"; name: string; attrsRaw: string; selfClosing: boolean; children: XmlNode[] }
-interface XmlText { type: "text"; raw: string }   // still escaped, as authored
-interface XmlRaw  { type: "raw";  raw: string }   // <?xml?>, comments, CDATA
+interface XmlElement {
+  type: "element";
+  name: string;
+  attrsRaw: string;
+  selfClosing: boolean;
+  children: XmlNode[];
+}
+interface XmlText {
+  type: "text";
+  raw: string;
+} // still escaped, as authored
+interface XmlRaw {
+  type: "raw";
+  raw: string;
+} // <?xml?>, comments, CDATA
 ```
 
 This makes `serializeXml(parseXml(x)) === x` byte-for-byte, which is the single most important property: regions we don't deliberately touch come out bit-identical, so Word never sees surprise normalization of `mc:AlternateContent`, `mc:Ignorable`, namespace declarations, or attribute quoting.
@@ -53,7 +65,7 @@ Critically: **no run is ever created, moved, deleted, or re-parented.** Only `w:
 
 Block-structured, recursive, clone-then-render — never global string replacement. Three shapes:
 
-- **Inline** — open and close in one paragraph; the region's rendered text is concatenated per item into that paragraph. (Documented limitation: multi-run formatting *inside* an inline loop collapses to the opening run's; block loops preserve everything.)
+- **Inline** — open and close in one paragraph; the region's rendered text is concatenated per item into that paragraph. (Documented limitation: multi-run formatting _inside_ an inline loop collapses to the opening run's; block loops preserve everything.)
 - **Standalone markers** — `{#tag}` alone in its paragraph; that paragraph is dropped, body is the blocks between.
 - **Mixed markers** — marker shares its paragraph with content; the paragraph joins the repeated body with the tag substring spliced out.
 
@@ -71,7 +83,7 @@ Nested `w:tbl` is **not** descended into for depth accounting; it's handled by t
 
 ### Chart images
 
-The engine stays image-agnostic. The data builder sets `chart_image` to a sentinel `"img:<key>"`, which flows through the normal scalar path (landing in the run the user styled, e.g. centered). `` is illegal in XML 1.0 and is stripped from all *data* values, so collision is impossible.
+The engine stays image-agnostic. The data builder sets `chart_image` to a sentinel `"img:<key>"`, which flows through the normal scalar path (landing in the run the user styled, e.g. centered). `` is illegal in XML 1.0 and is stripped from all _data_ values, so collision is impossible.
 
 A post-render pass then, per marker: writes `word/media/ff-chart-N.png` (prefixed + existence-checked so it can't collide with the template's own media), allocates an `rId` by scanning **all** existing ids into a Set (covers non-numeric ids like `rIdLogo`), ensures a single case-insensitive `<Default Extension="png">` in `[Content_Types].xml`, ensures `xmlns:r`/`xmlns:wp` on the part root, reads the PNG's IHDR for intrinsic size and clamps to the page's text width from `w:sectPr`, then replaces the marker run with up to three runs (before-text / `<w:drawing>` / after-text), each carrying a clone of the original `w:rPr`.
 
@@ -80,10 +92,18 @@ A post-render pass then, per marker: writes `word/media/ff-chart-N.png` (prefixe
 `SectionView` is **an array with non-enumerable properties**, so `Array.isArray()` is true (`{#violations}` iterates items directly) while `{violations.count}` also resolves:
 
 ```ts
-type SectionView = ItemView[] & { id; title; count; is_empty; items; by_severity; by_status; /* …28 lazy… */ }
+type SectionView = ItemView[] & {
+  id;
+  title;
+  count;
+  is_empty;
+  items;
+  by_severity;
+  by_status /* …28 lazy… */;
+};
 ```
 
-For each of the 7 sections, 28 getters (`REPORT_FIELD_KEYS` ∪ `title`) are defined as `by_<key>` on the view *and* as root aliases `<section>_by_<key>`, both delegating to one memo. That's 392 `defineProperty` calls at build time and **zero grouping computed until a template actually reads one**. Both syntaxes you chose hit the same memo, so using both costs one computation. `Object.defineProperty` over `Proxy` — the key space is finite and known, and a proxy would complicate `in`, `Symbol.iterator`, and debugging for no gain.
+For each of the 7 sections, 28 getters (`REPORT_FIELD_KEYS` ∪ `title`) are defined as `by_<key>` on the view _and_ as root aliases `<section>_by_<key>`, both delegating to one memo. That's 392 `defineProperty` calls at build time and **zero grouping computed until a template actually reads one**. Both syntaxes you chose hit the same memo, so using both costs one computation. `Object.defineProperty` over `Proxy` — the key space is finite and known, and a proxy would complicate `in`, `Symbol.iterator`, and debugging for no gain.
 
 Groups are non-destructive: `{ key, value, label, count, severity?, items[] }` with **the original items, unmerged** — the exact opposite of `groupItems()`.
 
@@ -91,22 +111,22 @@ Groups are non-destructive: `{ key, value, label, count, severity?, items[] }` w
 
 New, under `src/lib/report-generation/docx/template/`:
 
-| File | Responsibility |
-|---|---|
-| `xml/parse-xml.ts` | tokenizer, node tree, verbatim serializer, attr helpers, escaping |
-| `paragraph-text.ts` | run-fragmentation: logical text ⇄ slot map, edit application, `<w:br>` expansion |
-| `tags.ts` | tag grammar scanner (liberal: `{ }`, `{"json":1}`, `{{` stay literal) |
-| `scope.ts` | scope chain, dotted paths, stringify, truthiness |
-| `render-blocks.ts` | paragraph/nested/inverted loop engine |
-| `render-table.ts` | row-loop detection + expansion |
-| `dedupe-ids.ts` | post-clone uniqueness (bookmarks, `docPr`, `paraId`) |
-| `docx-package.ts` | jszip open/save, part enumeration, rels + content-types helpers |
-| `embed-images.ts` | sentinel → `<w:drawing>`, media/rels/content-types, EMU sizing |
-| `render-part.ts` / `render-docx-template.ts` | orchestration; engine entry (DOM-free) |
-| `build-template-data.ts` | `IReportData` → tag object, lazy group accessors |
-| `chart-images.ts` | `IReportChart[]` → image map (browser-only; keeps engine testable) |
-| `errors.ts` | `TemplateRenderError` + error-code → i18n key map |
-| `index.ts` | `renderReportFromTemplate({ template, report, labels, options })` |
+| File                                         | Responsibility                                                                   |
+| -------------------------------------------- | -------------------------------------------------------------------------------- |
+| `xml/parse-xml.ts`                           | tokenizer, node tree, verbatim serializer, attr helpers, escaping                |
+| `paragraph-text.ts`                          | run-fragmentation: logical text ⇄ slot map, edit application, `<w:br>` expansion |
+| `tags.ts`                                    | tag grammar scanner (liberal: `{ }`, `{"json":1}`, `{{` stay literal)            |
+| `scope.ts`                                   | scope chain, dotted paths, stringify, truthiness                                 |
+| `render-blocks.ts`                           | paragraph/nested/inverted loop engine                                            |
+| `render-table.ts`                            | row-loop detection + expansion                                                   |
+| `dedupe-ids.ts`                              | post-clone uniqueness (bookmarks, `docPr`, `paraId`)                             |
+| `docx-package.ts`                            | jszip open/save, part enumeration, rels + content-types helpers                  |
+| `embed-images.ts`                            | sentinel → `<w:drawing>`, media/rels/content-types, EMU sizing                   |
+| `render-part.ts` / `render-docx-template.ts` | orchestration; engine entry (DOM-free)                                           |
+| `build-template-data.ts`                     | `IReportData` → tag object, lazy group accessors                                 |
+| `chart-images.ts`                            | `IReportChart[]` → image map (browser-only; keeps engine testable)               |
+| `errors.ts`                                  | `TemplateRenderError` + error-code → i18n key map                                |
+| `index.ts`                                   | `renderReportFromTemplate({ template, report, labels, options })`                |
 
 Modified:
 
@@ -122,14 +142,14 @@ Tests under `template/__tests__/` run with `bun test` (works with no config; the
 
 Build order, each phase gated on the previous:
 
-0. **Fixtures** — throwaway `build-fixtures.ts` using the already-installed `docx` package: scalars, a placeholder deliberately split across three runs *with different `rPr`*, paragraph loop, nested loop, row loop, multi-row loop, header/footer, chart marker, bookmarks-in-loop, plus one genuinely Word-authored file.
-1. **XML core** — `serializeXml(parseXml(x)) === x` byte-for-byte on every fixture *and* the Word-authored file. Nothing proceeds until this holds.
+0. **Fixtures** — throwaway `build-fixtures.ts` using the already-installed `docx` package: scalars, a placeholder deliberately split across three runs _with different `rPr`_, paragraph loop, nested loop, row loop, multi-row loop, header/footer, chart marker, bookmarks-in-loop, plus one genuinely Word-authored file.
+1. **XML core** — `serializeXml(parseXml(x)) === x` byte-for-byte on every fixture _and_ the Word-authored file. Nothing proceeds until this holds.
 2. **Paragraph text** — offsets map correctly on the fragmented fixture; surviving `<w:rPr>` equals the first run's bytes exactly; escaping; `xml:space`.
 3. **Tags + scope** — pure functions, including the liberal-brace cases.
 4. **Block loops** — standalone vs mixed markers, nesting, empty arrays, inverted, multiple loops, scalars resolving up the chain.
 5. **Table loops** — all three branches; `w:tcPr` of clone compared to original; the illegal straddle asserts a throw.
 6. **Data builder** — laziness proven (grouping not invoked unless read); `violations_by_severity` and `violations.by_severity` return the same memoized reference; `sum(group.count) === items.length`.
-7. **Images** — rId allocation against a fixture with `rId1..rId8` *and* `rIdLogo`; exactly one png `Default`; unique non-zero `docPr` ids.
+7. **Images** — rId allocation against a fixture with `rId1..rId8` _and_ `rIdLogo`; exactly one png `Default`; unique non-zero `docPr` ids.
 8. **End-to-end** — render → re-open output with jszip → assert `word/document.xml`, `word/_rels/document.xml.rels`, `[Content_Types].xml` present and well-formed; no leftover `{tag}`/`{#loop}`/`{/loop}`; loop counts correct; every `r:embed` resolves to a relationship resolving to an existing media part. Plus an **identity test**: a template with no tags must render to a byte-identical `document.xml`.
 9. **Visual** — convert outputs to PDF headlessly via `/Applications/LibreOffice.app/Contents/MacOS/soffice --headless --convert-to pdf` and inspect the pages: paragraphs in customer-defined positions, repeated rows correct, formatting preserved, charts present and unbroken.
 10. **In-app** — run the dev server, export with a real uploaded template, confirm the default (non-template) export is unchanged.

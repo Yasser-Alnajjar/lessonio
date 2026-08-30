@@ -12,7 +12,12 @@ interface ProgressCardProps {
   xpToNextLevel: number;
 }
 
-export function ProgressCard({ percent, level, xp, xpToNextLevel }: ProgressCardProps) {
+export function ProgressCard({
+  percent,
+  level,
+  xp,
+  xpToNextLevel,
+}: ProgressCardProps) {
   const t = useTranslate("dashboard.progress");
 
   return (

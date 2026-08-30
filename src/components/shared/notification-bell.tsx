@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 import { Bell } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
@@ -22,6 +28,10 @@ import {
 import { NotificationIcon } from "@/components/ui-system/notification-icon";
 import { useBrowserNotifications } from "@/hooks/use-browser-notifications";
 import { Link, useRouter } from "@/i18n/navigation";
+import {
+  renderNotificationBody,
+  renderNotificationTitle,
+} from "@/lib/notifications/render";
 import { cn } from "@/lib/utils";
 import type { ActionResult } from "@/lib/types/common";
 import type { Notification } from "@/lib/types/notification";
@@ -40,6 +50,7 @@ export function NotificationBell({
   browserNotificationsEnabled,
 }: NotificationBellProps) {
   const t = useTranslations("notifications.bell");
+  const tContent = useTranslations("notifications");
   const locale = useLocale();
   const isArabic = locale === "ar";
   const router = useRouter();
@@ -67,6 +78,8 @@ export function NotificationBell({
 
   const items = data?.data?.items ?? [];
   const unreadCount = data?.data?.unreadCount ?? 0;
+  const isLoading = data === null;
+  const hasError = data !== null && data.data === null;
 
   const markRead = (id: string) => {
     markNotificationAsRead(id).then(refresh);
@@ -100,13 +113,14 @@ export function NotificationBell({
     for (const item of unread) {
       showNotification({
         id: item.id,
-        title: item.title,
-        body: item.body,
+        title: renderNotificationTitle(tContent, item),
+        body: renderNotificationBody(tContent, item),
         onClick: () => router.push(item.linkPath ?? "/notifications/center"),
       });
     }
   }, [
     data,
+    tContent,
     browserNotificationsEnabled,
     permission,
     showNotification,
@@ -182,7 +196,18 @@ export function NotificationBell({
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
 
-        {items.length === 0 ? (
+        {isLoading ? (
+          <p className="text-muted-foreground px-2 py-6 text-center text-sm">
+            {t("loading")}
+          </p>
+        ) : hasError ? (
+          <p
+            role="alert"
+            className="text-destructive px-2 py-6 text-center text-sm"
+          >
+            {t("loadError")}
+          </p>
+        ) : items.length === 0 ? (
           <p className="text-muted-foreground px-2 py-6 text-center text-sm">
             {t("empty")}
           </p>
@@ -218,11 +243,11 @@ export function NotificationBell({
                               : "font-medium",
                           )}
                         >
-                          {notification.title}
+                          {renderNotificationTitle(tContent, notification)}
                         </span>
 
                         <span className="line-clamp-2 text-xs text-muted-foreground">
-                          {notification.body}
+                          {renderNotificationBody(tContent, notification)}
                         </span>
                       </span>
                     </DropdownMenuItem>

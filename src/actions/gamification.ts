@@ -5,7 +5,11 @@ import { axios } from "@/lib/client";
 import type { ActionResult } from "@/lib/types/common";
 import type { Achievement } from "@/lib/types/achievement";
 import type { Goal } from "@/lib/types/goal";
-import { deleteGoal, setCurrentGoal, updateGoal } from "./gamification.mutations";
+import {
+  deleteGoal,
+  setCurrentGoal,
+  updateGoal,
+} from "./gamification.mutations";
 
 /** Real Laravel reads — achievement writes happen server-side automatically on every read, goal writes go through gamification.mutations.ts. */
 export const gamificationActions = {

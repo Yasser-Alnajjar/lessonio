@@ -68,9 +68,7 @@ export function JoinCodePanel({
           disabled={isPending}
           aria-label={t("rotate")}
         >
-          <RefreshCw
-            className={cn("size-4", isPending && "animate-spin")}
-          />
+          <RefreshCw className={cn("size-4", isPending && "animate-spin")} />
         </Button>
       </div>
       <p className="text-xs text-muted-foreground">{t("hint")}</p>

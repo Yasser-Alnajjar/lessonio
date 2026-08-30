@@ -21,6 +21,8 @@ export const ACCEPTED_ATTACHMENT_MIME_TYPES = Object.keys(ATTACHMENT_MIME_KIND);
 /** Matches the bucket's `file_size_limit` (50 MB). */
 export const MAX_ATTACHMENT_SIZE_BYTES = 50 * 1024 * 1024;
 
-export function attachmentKindForMimeType(mimeType: string): AttachmentKind | null {
+export function attachmentKindForMimeType(
+  mimeType: string,
+): AttachmentKind | null {
   return ATTACHMENT_MIME_KIND[mimeType] ?? null;
 }

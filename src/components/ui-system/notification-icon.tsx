@@ -5,7 +5,10 @@ import {
   CalendarClock,
   CheckCircle2,
   ClipboardList,
+  FileEdit,
   RotateCcw,
+  Target,
+  Trophy,
   Users,
 } from "lucide-react";
 
@@ -17,32 +20,56 @@ const TYPE_META: Record<
   NotificationType,
   { icon: typeof BellRing; className: string }
 > = {
-  upcoming_lesson: {
+  "lesson.upcoming": {
     icon: CalendarClock,
     className: "bg-sky-500/10 text-sky-600 dark:text-sky-400",
   },
-  homework_due: {
-    icon: ClipboardList,
-    className: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
-  },
-  daily_reminder: {
-    icon: BellRing,
-    className: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
-  },
-  upcoming_class: {
-    icon: Users,
-    className: "bg-rose-500/10 text-rose-600 dark:text-rose-400",
-  },
-  review_reminder: {
+  "lesson.review_due": {
     icon: RotateCcw,
     className: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
   },
-  assignment_assigned: {
+  "homework.due_soon": {
+    icon: ClipboardList,
+    className: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+  },
+  "class.reminder": {
+    icon: Users,
+    className: "bg-rose-500/10 text-rose-600 dark:text-rose-400",
+  },
+  "digest.daily": {
+    icon: BellRing,
+    className: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
+  },
+  "assignment.published": {
     icon: ClipboardList,
     className: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400",
   },
-  assignment_graded: {
+  "assignment.updated": {
+    icon: FileEdit,
+    className: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400",
+  },
+  "assignment.due_soon": {
+    icon: ClipboardList,
+    className: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+  },
+  "submission.created": {
+    icon: ClipboardList,
+    className: "bg-sky-500/10 text-sky-600 dark:text-sky-400",
+  },
+  "submission.graded": {
     icon: CheckCircle2,
+    className: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+  },
+  "exam.reminder": {
+    icon: CalendarClock,
+    className: "bg-rose-500/10 text-rose-600 dark:text-rose-400",
+  },
+  "achievement.unlocked": {
+    icon: Trophy,
+    className: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+  },
+  "goal.completed": {
+    icon: Target,
     className: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
   },
 };

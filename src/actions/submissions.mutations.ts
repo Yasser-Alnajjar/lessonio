@@ -32,9 +32,12 @@ export async function submitAssignment(
   if ("error" in auth) return { success: false, error: auth.error };
 
   try {
-    await axios.put(`/api/v1/classroom/assignments/${assignmentId}/submission`, {
-      content: input.content,
-    });
+    await axios.put(
+      `/api/v1/classroom/assignments/${assignmentId}/submission`,
+      {
+        content: input.content,
+      },
+    );
   } catch (error) {
     return { success: false, error: getApiErrorMessage(error) };
   }

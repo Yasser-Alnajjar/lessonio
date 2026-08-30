@@ -49,7 +49,8 @@
     "teachingClasses": "Classes",
     "teachingAssignments": "Assignments",
     "classroomClasses": "My Classes",
-    "classroomAssignments": "Assignments"
+    "classroomAssignments": "Assignments",
+    "adminNotificationSettings": "Notification settings"
   },
   "landing": {
     "meta": {
@@ -1284,13 +1285,37 @@
   },
   "notifications": {
     "types": {
-      "upcoming_lesson": "Upcoming lesson",
-      "homework_due": "Homework due",
-      "daily_reminder": "Daily reminder",
-      "upcoming_class": "Upcoming class",
-      "review_reminder": "Review reminder",
-      "assignment_assigned": "New assignment",
-      "assignment_graded": "Assignment graded"
+      "lesson": {
+        "upcoming": "Upcoming lesson",
+        "review_due": "Review reminder"
+      },
+      "homework": {
+        "due_soon": "Homework due"
+      },
+      "class": {
+        "reminder": "Upcoming class"
+      },
+      "digest": {
+        "daily": "Daily reminder"
+      },
+      "assignment": {
+        "published": "New assignment",
+        "updated": "Assignment updated",
+        "due_soon": "Assignment due soon"
+      },
+      "submission": {
+        "created": "New submission",
+        "graded": "Assignment graded"
+      },
+      "exam": {
+        "reminder": "Upcoming exam"
+      },
+      "achievement": {
+        "unlocked": "Achievement unlocked"
+      },
+      "goal": {
+        "completed": "Goal completed"
+      }
     },
     "bell": {
       "label": "Notifications",
@@ -1303,7 +1328,9 @@
       "viewAll": "View all",
       "enable": "Turn on browser notifications",
       "enabled": "Browser notifications are on",
-      "blocked": "Browser notifications are blocked in your browser settings."
+      "blocked": "Browser notifications are blocked in your browser settings.",
+      "loading": "Loading notifications...",
+      "loadError": "We couldn't load notifications."
     },
     "center": {
       "title": "Notifications",
@@ -1324,7 +1351,8 @@
       "emptyDescription": "Reminders about lessons, homework, and reviews will show up here.",
       "emptyUnreadTitle": "Nothing unread",
       "emptyUnreadDescription": "You've read everything. Switch to All to see past notifications.",
-      "genericError": "Something went wrong. Please try again."
+      "genericError": "Something went wrong. Please try again.",
+      "loadError": "We couldn't load your notifications. Try reloading the page."
     },
     "preferences": {
       "title": "Notification preferences",
@@ -1344,7 +1372,106 @@
       "saving": "Saving...",
       "saved": "Preferences saved.",
       "genericError": "Something went wrong. Please try again.",
-      "missingSettings": "We couldn't load your settings. Try reloading the page."
+      "missingSettings": "We couldn't load your settings. Try reloading the page.",
+      "channelInApp": "In-app",
+      "channelEmail": "Email"
+    },
+    "content": {
+      "lesson": {
+        "upcoming": {
+          "title": "{isToday, select, true {Lesson today} other {Lesson tomorrow}}",
+          "body": "{lessonTitle} ({subjectName})."
+        },
+        "review_due": {
+          "title": "Time to review",
+          "body": "You haven't reviewed \"{lessonTitle}\" ({subjectName}) yet."
+        }
+      },
+      "homework": {
+        "due_soon": {
+          "title": "{daysUntilDue, plural, =0 {Homework due today} other {Homework due soon}}",
+          "body": "{homeworkTitle} ({subjectName}) is due {daysUntilDue, plural, =0 {today} =1 {tomorrow} other {in # days}}."
+        }
+      },
+      "class": {
+        "reminder": {
+          "title": "Upcoming class",
+          "body": "{subjectName} starts {minutesUntil, plural, =0 {now} =1 {in one minute} other {in # minutes}}."
+        }
+      },
+      "digest": {
+        "daily": {
+          "title": "Today at a glance",
+          "body": "{lessonCount, plural, =0 {No lessons} =1 {One lesson} other {# lessons}} and {dueCount, plural, =0 {no homework due} =1 {one homework due} other {# homework due}} today."
+        }
+      },
+      "assignment": {
+        "published": {
+          "title": "New assignment",
+          "body": "{assignmentTitle} — your teacher assigned a new one."
+        },
+        "updated": {
+          "title": "Assignment updated",
+          "body": "{assignmentTitle} — your teacher updated the details of this assignment."
+        },
+        "due_soon": {
+          "title": "Assignment due soon",
+          "body": "{assignmentTitle} is due {daysUntilDue, plural, =0 {today} =1 {tomorrow} other {in # days}}."
+        }
+      },
+      "submission": {
+        "created": {
+          "title": "New submission",
+          "body": "You received a new submission for \"{assignmentTitle}\"."
+        },
+        "graded": {
+          "title": "Assignment graded",
+          "body": "{assignmentTitle} — score: {score}/{totalPoints}."
+        }
+      },
+      "exam": {
+        "reminder": {
+          "title": "Upcoming exam",
+          "body": "{examTitle} ({subjectName}) {daysUntil, plural, =0 {today} =1 {tomorrow} other {in # days}}."
+        }
+      },
+      "achievement": {
+        "unlocked": {
+          "title": "Achievement unlocked",
+          "body": "You unlocked \"{achievementTitle}\"."
+        }
+      },
+      "goal": {
+        "completed": {
+          "title": "Goal completed",
+          "body": "You hit your {period} study time goal."
+        }
+      }
+    },
+    "groups": {
+      "lessons": "Lessons",
+      "homework": "Homework",
+      "classes": "Classes",
+      "digests": "Digests",
+      "assignments": "Assignments",
+      "submissions": "Submissions",
+      "exams": "Exams",
+      "gamification": "Gamification"
+    },
+    "admin": {
+      "title": "Notification settings",
+      "subtitle": "Control which notification types are active, which channels they use, and how far ahead scheduled reminders fire.",
+      "scheduledBadge": "Scheduled",
+      "channels": {
+        "in_app": "In-app",
+        "email": "Email",
+        "push": "Push"
+      },
+      "offsetMinutesLabel": "Minutes before",
+      "save": "Save",
+      "saving": "Saving...",
+      "genericError": "Something went wrong. Please try again.",
+      "loadError": "We couldn't load notification settings. Try reloading the page."
     }
   },
   "settings": {

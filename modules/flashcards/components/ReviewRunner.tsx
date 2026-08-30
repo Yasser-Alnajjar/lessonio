@@ -31,9 +31,7 @@ export function ReviewRunner({ cards, backHref }: ReviewRunnerProps) {
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [reviewedCount, setReviewedCount] = useState(0);
-  const [pendingGrade, setPendingGrade] = useState<FlashcardGrade | null>(
-    null,
-  );
+  const [pendingGrade, setPendingGrade] = useState<FlashcardGrade | null>(null);
   const [isPending, startTransition] = useTransition();
 
   if (cards.length === 0) {

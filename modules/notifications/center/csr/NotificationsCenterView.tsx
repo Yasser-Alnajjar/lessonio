@@ -16,11 +16,16 @@ import { EmptyState } from "@/components/ui-system/empty-state";
 import { NotificationIcon } from "@/components/ui-system/notification-icon";
 import useTranslate from "@/hooks/useTranslate";
 import { Link, useRouter } from "@/i18n/navigation";
+import {
+  renderNotificationBody,
+  renderNotificationTitle,
+} from "@/lib/notifications/render";
 import { cn } from "@/lib/utils";
 import type { Notification } from "@/lib/types/notification";
 
 interface NotificationsCenterViewProps {
   data: Notification[];
+  loadError?: boolean;
 }
 
 type Tab = "all" | "unread";
@@ -55,6 +60,7 @@ function groupByDay(
 
 export const NotificationsCenterView = ({
   data,
+  loadError = false,
 }: NotificationsCenterViewProps) => {
   const t = useTranslate("notifications");
   const locale = useLocale();
@@ -169,6 +175,12 @@ export const NotificationsCenterView = ({
         </p>
       )}
 
+      {loadError && (
+        <p role="alert" className="text-destructive text-sm">
+          {t("center.loadError")}
+        </p>
+      )}
+
       {groups.length === 0 ? (
         <EmptyState
           variant={data.length === 0 ? "no-data" : "no-results"}
@@ -216,7 +228,7 @@ export const NotificationsCenterView = ({
                               isUnread ? "font-semibold" : "font-medium",
                             )}
                           >
-                            {notification.title}
+                            {renderNotificationTitle(t, notification)}
                           </span>
                           <Badge variant="outline" className="font-normal">
                             {t(`types.${notification.type}`)}
@@ -228,7 +240,7 @@ export const NotificationsCenterView = ({
                           )}
                         </span>
                         <span className="text-muted-foreground text-sm">
-                          {notification.body}
+                          {renderNotificationBody(t, notification)}
                         </span>
                         <span className="text-muted-foreground/70 text-xs">
                           {format.dateTime(new Date(notification.createdAt), {

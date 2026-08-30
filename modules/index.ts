@@ -19,3 +19,4 @@ export * as Settings from "./settings";
 export * as Help from "./help";
 export * as Teaching from "./teaching";
 export * as Classroom from "./classroom";
+export * as Admin from "./admin";

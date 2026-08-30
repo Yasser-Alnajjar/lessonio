@@ -1,7 +1,11 @@
 import "server-only";
 
 import { axios } from "@/lib/client";
-import { mapNotificationRow, type BackendNotification } from "@/lib/notifications/map";
+import { getApiErrorMessage } from "@/lib/client/errors";
+import {
+  mapNotificationRow,
+  type BackendNotification,
+} from "@/lib/notifications/map";
 import type { ActionResult } from "@/lib/types/common";
 import type { Notification } from "@/lib/types/notification";
 import {
@@ -15,19 +19,15 @@ import {
 export const notificationsActions = {
   async getAll(): Promise<ActionResult<Notification[]>> {
     try {
-      const { data } = await axios.get<{ data: BackendNotification[] }>("/api/v1/notifications");
+      const { data } = await axios.get<{ data: BackendNotification[] }>(
+        "/api/v1/notifications",
+      );
       return { data: data.data.map(mapNotificationRow), error: null };
-    } catch {
-      return { data: null, error: null };
-    }
-  },
-
-  async getUnreadCount(): Promise<ActionResult<number>> {
-    try {
-      const { data } = await axios.get<{ data: number }>("/api/v1/notifications/unread-count");
-      return { data: data.data, error: null };
-    } catch {
-      return { data: 0, error: null };
+    } catch (error) {
+      // Distinguish "empty" from "backend/network failure" — a caller that
+      // inspects `.error` needs this to render a real error state instead
+      // of silently looking identical to "you're all caught up".
+      return { data: null, error: getApiErrorMessage(error) };
     }
   },
 

@@ -16,7 +16,10 @@ export interface FlashcardActionsMenuProps {
   onDelete: () => void;
 }
 
-export function FlashcardActionsMenu({ onEdit, onDelete }: FlashcardActionsMenuProps) {
+export function FlashcardActionsMenu({
+  onEdit,
+  onDelete,
+}: FlashcardActionsMenuProps) {
   const t = useTranslations("flashcards.card");
 
   return (

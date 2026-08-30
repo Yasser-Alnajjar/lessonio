@@ -14,11 +14,17 @@ import { auth } from "@auth";
 import { axios } from "@/lib/client";
 import { getApiErrorMessage } from "@/lib/client/errors";
 import type { MutationResult } from "@/lib/types/common";
-import type { CreateHomeworkInput, UpdateHomeworkInput } from "@/lib/types/homework";
+import type {
+  CreateHomeworkInput,
+  UpdateHomeworkInput,
+} from "@/lib/types/homework";
 
-export async function createHomework(input: CreateHomeworkInput): Promise<MutationResult> {
+export async function createHomework(
+  input: CreateHomeworkInput,
+): Promise<MutationResult> {
   const session = await auth();
-  if (!session?.user?.id) return { success: false, error: "You must be signed in." };
+  if (!session?.user?.id)
+    return { success: false, error: "You must be signed in." };
 
   try {
     // subjectId is derived server-side from the lesson (HW-002) — never sent by the client.
@@ -40,7 +46,8 @@ export async function updateHomework(
   input: UpdateHomeworkInput,
 ): Promise<MutationResult> {
   const session = await auth();
-  if (!session?.user?.id) return { success: false, error: "You must be signed in." };
+  if (!session?.user?.id)
+    return { success: false, error: "You must be signed in." };
 
   const patch: Record<string, unknown> = {};
   if (input.lessonId !== undefined) patch.lessonId = input.lessonId;
@@ -68,7 +75,8 @@ export async function toggleHomeworkCompleted(
   completed: boolean,
 ): Promise<MutationResult> {
   const session = await auth();
-  if (!session?.user?.id) return { success: false, error: "You must be signed in." };
+  if (!session?.user?.id)
+    return { success: false, error: "You must be signed in." };
 
   try {
     // HW-004 — sets, not toggles: the caller supplies the target value.
@@ -83,7 +91,8 @@ export async function toggleHomeworkCompleted(
 
 export async function deleteHomework(id: string): Promise<MutationResult> {
   const session = await auth();
-  if (!session?.user?.id) return { success: false, error: "You must be signed in." };
+  if (!session?.user?.id)
+    return { success: false, error: "You must be signed in." };
 
   try {
     await axios.delete(`/api/v1/homework/${id}`);

@@ -21,9 +21,14 @@ import type { MutationResult } from "@/lib/types/common";
  * only `lessons.date`; it lives in the calendar domain because it backs
  * month-view drag-and-drop, but it writes the `lessons` table.
  */
-export async function rescheduleLesson(lessonId: string, newDate: string): Promise<MutationResult> {
+export async function rescheduleLesson(
+  lessonId: string,
+  newDate: string,
+): Promise<MutationResult> {
   try {
-    await axios.patch(`/api/v1/lessons/${lessonId}/reschedule`, { date: newDate });
+    await axios.patch(`/api/v1/lessons/${lessonId}/reschedule`, {
+      date: newDate,
+    });
   } catch (error) {
     return { success: false, error: getApiErrorMessage(error) };
   }

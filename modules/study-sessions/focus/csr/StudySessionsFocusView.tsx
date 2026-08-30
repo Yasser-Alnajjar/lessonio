@@ -5,7 +5,10 @@ import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import useTranslate from "@/hooks/useTranslate";
 import type { LessonWithRelations } from "@/lib/types/lesson";
-import type { StudySessionSummary, StudySessionWithRelations } from "@/lib/types/study-session";
+import type {
+  StudySessionSummary,
+  StudySessionWithRelations,
+} from "@/lib/types/study-session";
 import type { Subject } from "@/lib/types/subject";
 import { FocusTimer } from "../../components/FocusTimer";
 
@@ -35,7 +38,9 @@ export const StudySessionsFocusView = ({
     <div className="flex flex-col gap-6 p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold text-foreground">{t("title")}</h1>
+          <h1 className="text-xl font-semibold text-foreground">
+            {t("title")}
+          </h1>
           <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
         </div>
         <Button asChild variant="outline">
@@ -49,16 +54,35 @@ export const StudySessionsFocusView = ({
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatisticCard
-          stat={{ key: "today", label: t("stats.today"), value: safeSummary.totalMinutesToday, suffix: "m" }}
+          stat={{
+            key: "today",
+            label: t("stats.today"),
+            value: safeSummary.totalMinutesToday,
+            suffix: "m",
+          }}
         />
         <StatisticCard
-          stat={{ key: "week", label: t("stats.week"), value: safeSummary.totalMinutesThisWeek, suffix: "m" }}
+          stat={{
+            key: "week",
+            label: t("stats.week"),
+            value: safeSummary.totalMinutesThisWeek,
+            suffix: "m",
+          }}
         />
         <StatisticCard
-          stat={{ key: "sessions", label: t("stats.sessions"), value: safeSummary.sessionsThisWeek }}
+          stat={{
+            key: "sessions",
+            label: t("stats.sessions"),
+            value: safeSummary.sessionsThisWeek,
+          }}
         />
         <StatisticCard
-          stat={{ key: "average", label: t("stats.average"), value: safeSummary.averageSessionMinutes, suffix: "m" }}
+          stat={{
+            key: "average",
+            label: t("stats.average"),
+            value: safeSummary.averageSessionMinutes,
+            suffix: "m",
+          }}
         />
       </div>
     </div>

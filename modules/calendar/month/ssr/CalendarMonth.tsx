@@ -16,5 +16,12 @@ export const CalendarMonth = async ({ searchParams }: CalendarMonthProps) => {
     Actions.Subjects.getAll(),
   ]);
 
-  return <CalendarMonthView data={data} subjects={subjects ?? []} year={year} month={month} />;
+  return (
+    <CalendarMonthView
+      data={data}
+      subjects={subjects ?? []}
+      year={year}
+      month={month}
+    />
+  );
 };

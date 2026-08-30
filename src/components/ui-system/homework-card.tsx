@@ -29,7 +29,8 @@ export function HomeworkCard({
   const [isPending, startTransition] = useTransition();
 
   const isOverdue =
-    !homework.completed && isBefore(parseISO(homework.deadline), startOfDay(new Date()));
+    !homework.completed &&
+    isBefore(parseISO(homework.deadline), startOfDay(new Date()));
 
   const handleToggle = (checked: boolean) => {
     startTransition(async () => {
@@ -77,7 +78,9 @@ export function HomeworkCard({
             </h3>
           </div>
         </div>
-        {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
+        {actions && (
+          <div className="flex shrink-0 items-center gap-2">{actions}</div>
+        )}
       </CardHeader>
       <CardContent className="flex flex-col gap-1.5 text-xs text-muted-foreground">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
@@ -101,9 +104,16 @@ export function HomeworkCard({
   );
 }
 
-export function HomeworkCardSkeleton({ className, ...props }: React.ComponentProps<"div">) {
+export function HomeworkCardSkeleton({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
   return (
-    <Card data-slot="homework-card-skeleton" className={cn("h-full gap-3", className)} {...props}>
+    <Card
+      data-slot="homework-card-skeleton"
+      className={cn("h-full gap-3", className)}
+      {...props}
+    >
       <CardHeader className="flex-row items-start gap-3 space-y-0">
         <Skeleton className="mt-0.5 size-4 shrink-0 rounded-[4px]" />
         <div className="flex min-w-0 flex-1 flex-col gap-2">

@@ -30,4 +30,10 @@ export interface AuditFields {
 export type UUID = string;
 
 /** Generic JSON value — used for loosely-typed jsonb-shaped API fields. */
-export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[];

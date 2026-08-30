@@ -13,7 +13,10 @@ interface FlashcardsReviewViewProps {
   backHref: string;
 }
 
-export const FlashcardsReviewView = ({ cards, backHref }: FlashcardsReviewViewProps) => {
+export const FlashcardsReviewView = ({
+  cards,
+  backHref,
+}: FlashcardsReviewViewProps) => {
   const t = useTranslations("flashcards.review");
 
   return (

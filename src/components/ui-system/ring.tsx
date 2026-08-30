@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
 
-export interface RingProps extends Omit<React.ComponentProps<"div">, "children"> {
+export interface RingProps
+  extends Omit<React.ComponentProps<"div">, "children"> {
   /** Percentage complete. Values outside 0-100 are clamped for the arc but still shown in the label. */
   value: number;
   size?: "sm" | "default" | "lg";
@@ -80,7 +81,11 @@ export function Ring({
             <span
               className={cn(
                 "font-medium text-foreground tabular-nums",
-                size === "sm" ? "text-[0.65rem]" : size === "lg" ? "text-lg" : "text-sm",
+                size === "sm"
+                  ? "text-[0.65rem]"
+                  : size === "lg"
+                    ? "text-lg"
+                    : "text-sm",
               )}
             >
               {Math.round(value)}%

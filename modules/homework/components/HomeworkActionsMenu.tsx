@@ -16,7 +16,10 @@ export interface HomeworkActionsMenuProps {
   onDelete: () => void;
 }
 
-export function HomeworkActionsMenu({ onEdit, onDelete }: HomeworkActionsMenuProps) {
+export function HomeworkActionsMenu({
+  onEdit,
+  onDelete,
+}: HomeworkActionsMenuProps) {
   const t = useTranslations("homework.card");
 
   return (

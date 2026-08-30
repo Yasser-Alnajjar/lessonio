@@ -57,11 +57,17 @@ export const HelpGlossaryView = () => {
       ) : (
         <div className="flex flex-col divide-y divide-border">
           {terms.map((term) => (
-            <div key={term} id={term} className="flex flex-col gap-2 py-5 first:pt-0">
+            <div
+              key={term}
+              id={term}
+              className="flex flex-col gap-2 py-5 first:pt-0"
+            >
               <h2 className="text-base font-semibold">
                 {t(`glossary.terms.${term}.name`)}
               </h2>
-              <p className="text-balance">{t(`glossary.terms.${term}.explanation`)}</p>
+              <p className="text-balance">
+                {t(`glossary.terms.${term}.explanation`)}
+              </p>
               <p className="text-muted-foreground text-sm text-balance">
                 {t(`glossary.terms.${term}.example`)}
               </p>

@@ -43,9 +43,7 @@ interface FormItemContextValue {
   id: string;
 }
 
-const FormItemContext = React.createContext<FormItemContextValue | null>(
-  null,
-);
+const FormItemContext = React.createContext<FormItemContextValue | null>(null);
 
 function useFormField() {
   const fieldContext = React.useContext(FormFieldContext);
@@ -80,7 +78,11 @@ const FormItem = React.forwardRef<
   const id = React.useId();
   return (
     <FormItemContext.Provider value={{ id }}>
-      <div ref={ref} className={cn("flex flex-col gap-2", className)} {...props} />
+      <div
+        ref={ref}
+        className={cn("flex flex-col gap-2", className)}
+        {...props}
+      />
     </FormItemContext.Provider>
   );
 });

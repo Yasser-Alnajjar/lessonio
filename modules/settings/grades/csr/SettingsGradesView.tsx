@@ -19,20 +19,30 @@ interface SettingsGradesViewProps {
 function isValidScale(scale: GradeScaleEntry[]): boolean {
   return scale.every((entry, index) => {
     const inRange =
-      entry.minPercent >= 0 && entry.minPercent <= 100 && entry.gradePoints >= 0 && entry.gradePoints <= 4.3;
+      entry.minPercent >= 0 &&
+      entry.minPercent <= 100 &&
+      entry.gradePoints >= 0 &&
+      entry.gradePoints <= 4.3;
     if (!inRange) return false;
     const previous = scale[index - 1];
     return index === 0 || !previous || entry.minPercent < previous.minPercent;
   });
 }
 
-export const SettingsGradesView = ({ scale: initialScale }: SettingsGradesViewProps) => {
+export const SettingsGradesView = ({
+  scale: initialScale,
+}: SettingsGradesViewProps) => {
   const t = useTranslate("settings.grades");
   const tHelp = useTranslate("help");
   const router = useRouter();
 
-  const [scale, setScale] = useState<GradeScaleEntry[]>(initialScale ?? DEFAULT_GRADE_SCALE);
-  const [status, setStatus] = useState<{ kind: "saved" | "error"; message: string } | null>(null);
+  const [scale, setScale] = useState<GradeScaleEntry[]>(
+    initialScale ?? DEFAULT_GRADE_SCALE,
+  );
+  const [status, setStatus] = useState<{
+    kind: "saved" | "error";
+    message: string;
+  } | null>(null);
 
   const [isPending, startTransition] = useTransition();
 
@@ -44,7 +54,10 @@ export const SettingsGradesView = ({ scale: initialScale }: SettingsGradesViewPr
           setStatus({ kind: "saved", message: t("saved") });
           router.refresh();
         } else {
-          setStatus({ kind: "error", message: result.error ?? t("genericError") });
+          setStatus({
+            kind: "error",
+            message: result.error ?? t("genericError"),
+          });
         }
       } catch {
         setStatus({ kind: "error", message: t("genericError") });
@@ -54,7 +67,9 @@ export const SettingsGradesView = ({ scale: initialScale }: SettingsGradesViewPr
 
   const updateEntry = (index: number, patch: Partial<GradeScaleEntry>) => {
     setStatus(null);
-    setScale((prev) => prev.map((entry, i) => (i === index ? { ...entry, ...patch } : entry)));
+    setScale((prev) =>
+      prev.map((entry, i) => (i === index ? { ...entry, ...patch } : entry)),
+    );
   };
 
   const valid = isValidScale(scale);
@@ -65,13 +80,18 @@ export const SettingsGradesView = ({ scale: initialScale }: SettingsGradesViewPr
         <SettingsNav />
 
         <div>
-          <h1 className="text-xl font-semibold text-foreground">{t("title")}</h1>
+          <h1 className="text-xl font-semibold text-foreground">
+            {t("title")}
+          </h1>
           <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
         </div>
 
         <Callout variant="note" title={tHelp("topics.grades.title")}>
           <p>{tHelp("topics.grades.whatIsIt")}</p>
-          <Link href="/help/detail/grades" className="mt-1 inline-block font-medium">
+          <Link
+            href="/help/detail/grades"
+            className="mt-1 inline-block font-medium"
+          >
             {tHelp("ui.learnMore")}
           </Link>
         </Callout>
@@ -86,8 +106,13 @@ export const SettingsGradesView = ({ scale: initialScale }: SettingsGradesViewPr
           {scale.map((entry, index) => {
             const isFloor = index === scale.length - 1;
             return (
-              <div key={entry.letter} className="grid grid-cols-[3rem_1fr_1fr] items-center gap-3">
-                <span className="text-sm font-semibold text-foreground">{entry.letter}</span>
+              <div
+                key={entry.letter}
+                className="grid grid-cols-[3rem_1fr_1fr] items-center gap-3"
+              >
+                <span className="text-sm font-semibold text-foreground">
+                  {entry.letter}
+                </span>
                 <div className="flex flex-col gap-1">
                   <Label htmlFor={`min-${entry.letter}`} className="sr-only">
                     {t("minPercentHeader")} {entry.letter}
@@ -99,7 +124,11 @@ export const SettingsGradesView = ({ scale: initialScale }: SettingsGradesViewPr
                     max={100}
                     disabled={isFloor}
                     value={entry.minPercent}
-                    onChange={(event) => updateEntry(index, { minPercent: event.target.valueAsNumber })}
+                    onChange={(event) =>
+                      updateEntry(index, {
+                        minPercent: event.target.valueAsNumber,
+                      })
+                    }
                   />
                 </div>
                 <div className="flex flex-col gap-1">
@@ -113,7 +142,11 @@ export const SettingsGradesView = ({ scale: initialScale }: SettingsGradesViewPr
                     max={4.3}
                     step={0.1}
                     value={entry.gradePoints}
-                    onChange={(event) => updateEntry(index, { gradePoints: event.target.valueAsNumber })}
+                    onChange={(event) =>
+                      updateEntry(index, {
+                        gradePoints: event.target.valueAsNumber,
+                      })
+                    }
                   />
                 </div>
               </div>
@@ -132,7 +165,12 @@ export const SettingsGradesView = ({ scale: initialScale }: SettingsGradesViewPr
             {isPending ? t("saving") : t("save")}
           </Button>
           {status && (
-            <p role="status" className={status.kind === "error" ? "text-sm text-destructive" : "text-sm"}>
+            <p
+              role="status"
+              className={
+                status.kind === "error" ? "text-sm text-destructive" : "text-sm"
+              }
+            >
               {status.message}
             </p>
           )}

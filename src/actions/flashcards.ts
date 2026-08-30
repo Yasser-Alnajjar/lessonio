@@ -3,7 +3,10 @@ import "server-only";
 import { auth } from "@auth";
 import { axios } from "@/lib/client";
 import type { ActionResult } from "@/lib/types/common";
-import type { FlashcardDeckSummary, FlashcardWithRelations } from "@/lib/types/flashcard";
+import type {
+  FlashcardDeckSummary,
+  FlashcardWithRelations,
+} from "@/lib/types/flashcard";
 import {
   createFlashcard,
   deleteFlashcard,
@@ -14,7 +17,9 @@ import {
 /** SSR-facing surface for `Actions.Flashcards.*`. Mutations re-export the real Server Actions. */
 export const flashcardsActions = {
   /** `GET /api/v1/lessons/{lessonId}/flashcards` (FLASH-001, soft-empty — API_CONTRACT.md §3.5). */
-  async getByLesson(lessonId: string): Promise<ActionResult<FlashcardWithRelations[]>> {
+  async getByLesson(
+    lessonId: string,
+  ): Promise<ActionResult<FlashcardWithRelations[]>> {
     const session = await auth();
     if (!session?.user?.id) return { data: [], error: null };
 
@@ -59,7 +64,9 @@ export const flashcardsActions = {
     try {
       const { data } = await axios.get<{ data: FlashcardWithRelations[] }>(
         "/api/v1/flashcards/due",
-        { params: { subjectId: params?.subjectId, lessonId: params?.lessonId } },
+        {
+          params: { subjectId: params?.subjectId, lessonId: params?.lessonId },
+        },
       );
       return { data: data.data, error: null };
     } catch {

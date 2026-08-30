@@ -23,7 +23,10 @@ export function StatusExplainerCard({
       <h3 className="text-sm font-semibold">{groupLabel}</h3>
       <div className="flex flex-col divide-y divide-border">
         {values.map((status) => (
-          <div key={status.value} className="flex flex-col gap-2 py-4 first:pt-0 last:pb-0">
+          <div
+            key={status.value}
+            className="flex flex-col gap-2 py-4 first:pt-0 last:pb-0"
+          >
             <Badge variant="outline" className="w-fit">
               {status.label}
             </Badge>

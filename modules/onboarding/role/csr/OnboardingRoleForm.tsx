@@ -16,7 +16,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useRouter } from "@/i18n/navigation";
-import type { AppRole } from "@/lib/types/user";
+import type { SelectableAppRole } from "@/lib/types/user";
 
 /**
  * The OAuth path: `signInWithOAuth` has no form, so `profiles.role` lands
@@ -27,7 +27,7 @@ import type { AppRole } from "@/lib/types/user";
 export const OnboardingRoleForm = () => {
   const t = useTranslations("onboarding.role");
   const router = useRouter();
-  const [role, setRole] = useState<AppRole>("student");
+  const [role, setRole] = useState<SelectableAppRole>("student");
   const [error, setError] = useState<string | null>(null);
 
   const [isPending, startTransition] = useTransition();
@@ -65,11 +65,7 @@ export const OnboardingRoleForm = () => {
           </p>
         )}
 
-        <Button
-          onClick={handleSubmit}
-          disabled={isPending}
-          className="mt-2"
-        >
+        <Button onClick={handleSubmit} disabled={isPending} className="mt-2">
           {isPending ? <LessonioSpinner /> : <ArrowRight />}
           {isPending ? t("submitting") : t("submit")}
         </Button>

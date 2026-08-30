@@ -21,13 +21,13 @@ through the new admin UIs (which also validates the editors) rather than hand-se
 
 ### The empty indices
 
-| Index | Docs | Feeds | Authoring UI today |
-|---|---|---|---|
-| `home_content` | **0** | Portal home `/` | **None** |
-| `publications` | **0** | `/cybersecurity-publications` | **None** |
-| `justifications` | **0** | `/violations-justifications` | **None** |
-| `training_progress` | **0** | Training completion | **None** |
-| `assets` | **0** | (unused) | **None** |
+| Index               | Docs  | Feeds                         | Authoring UI today |
+| ------------------- | ----- | ----------------------------- | ------------------ |
+| `home_content`      | **0** | Portal home `/`               | **None**           |
+| `publications`      | **0** | `/cybersecurity-publications` | **None**           |
+| `justifications`    | **0** | `/violations-justifications`  | **None**           |
+| `training_progress` | **0** | Training completion           | **None**           |
+| `assets`            | **0** | (unused)                      | **None**           |
 
 The only frontend reference to home content or publications anywhere is the read-only GET
 in [action.ts](src/lib/actions/main/action.ts). Every demo to date required hand-seeding ES.
@@ -85,7 +85,7 @@ Justification Review, plus minimal Asset Ownership.
 **Employee (new pages):** My Security Score (becomes the home), My Device Posture,
 My Certificates.
 
-> **Dependency flagged:** *My Device Posture* is impossible without a device→employee
+> **Dependency flagged:** _My Device Posture_ is impossible without a device→employee
 > mapping — the endpoint documents have no owner field. Asset Ownership wasn't picked as
 > an admin priority, so I've folded a **minimal** version into Phase 2 (assign a device to
 > an employee, nothing more). Without it, My Device cannot be built.

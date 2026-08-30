@@ -27,7 +27,10 @@ interface FormState {
 
 function currentPeriodStart(period: GoalPeriod): string {
   const today = new Date();
-  const start = period === "weekly" ? startOfWeek(today, { weekStartsOn: 1 }) : startOfMonth(today);
+  const start =
+    period === "weekly"
+      ? startOfWeek(today, { weekStartsOn: 1 })
+      : startOfMonth(today);
   return format(start, "yyyy-MM-dd");
 }
 
@@ -70,10 +73,17 @@ export const GamificationGoalsView = ({ data }: GamificationGoalsViewProps) => {
           <CardContent className="flex flex-col items-center gap-3 py-8 text-center">
             <Target className="size-8 text-muted-foreground" />
             <div>
-              <p className="text-sm font-medium text-foreground">{periodLabel}</p>
-              <p className="text-xs text-muted-foreground">{t("noGoalDescription")}</p>
+              <p className="text-sm font-medium text-foreground">
+                {periodLabel}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {t("noGoalDescription")}
+              </p>
             </div>
-            <Button size="sm" onClick={() => setFormState({ open: true, goal: null, period })}>
+            <Button
+              size="sm"
+              onClick={() => setFormState({ open: true, goal: null, period })}
+            >
               <Plus />
               {t("setGoal")}
             </Button>
@@ -83,7 +93,9 @@ export const GamificationGoalsView = ({ data }: GamificationGoalsViewProps) => {
     }
 
     const percent =
-      goal.targetMinutes > 0 ? Math.round((goal.achievedMinutes / goal.targetMinutes) * 100) : 0;
+      goal.targetMinutes > 0
+        ? Math.round((goal.achievedMinutes / goal.targetMinutes) * 100)
+        : 0;
 
     return (
       <Card key={period} data-slot="goal-card">
@@ -92,7 +104,10 @@ export const GamificationGoalsView = ({ data }: GamificationGoalsViewProps) => {
           <div className="flex flex-col gap-1">
             <span className="text-xs text-muted-foreground">{periodLabel}</span>
             <span className="text-sm font-medium text-foreground">
-              {t("achievedOfTarget", { achieved: goal.achievedMinutes, target: goal.targetMinutes })}
+              {t("achievedOfTarget", {
+                achieved: goal.achievedMinutes,
+                target: goal.targetMinutes,
+              })}
             </span>
             <Button
               variant="link"
@@ -116,7 +131,9 @@ export const GamificationGoalsView = ({ data }: GamificationGoalsViewProps) => {
       </div>
 
       <div>
-        <h2 className="mb-3 text-sm font-medium text-muted-foreground">{t("currentPeriod")}</h2>
+        <h2 className="mb-3 text-sm font-medium text-muted-foreground">
+          {t("currentPeriod")}
+        </h2>
         <div className="grid gap-4 sm:grid-cols-2">
           {renderCurrentCard("weekly")}
           {renderCurrentCard("monthly")}
@@ -124,9 +141,15 @@ export const GamificationGoalsView = ({ data }: GamificationGoalsViewProps) => {
       </div>
 
       <div>
-        <h2 className="mb-3 text-sm font-medium text-muted-foreground">{t("pastGoals")}</h2>
+        <h2 className="mb-3 text-sm font-medium text-muted-foreground">
+          {t("pastGoals")}
+        </h2>
         {pastGoals.length === 0 ? (
-          <EmptyState variant="no-data" title={t("noPastGoals")} className="min-h-32" />
+          <EmptyState
+            variant="no-data"
+            title={t("noPastGoals")}
+            className="min-h-32"
+          />
         ) : (
           <div className="flex flex-col gap-2">
             {pastGoals.map((goal) => (
@@ -136,7 +159,9 @@ export const GamificationGoalsView = ({ data }: GamificationGoalsViewProps) => {
               >
                 <div className="flex items-center gap-3">
                   <Badge variant="secondary">{t(goal.period)}</Badge>
-                  <span className="text-sm text-muted-foreground">{goal.periodStart}</span>
+                  <span className="text-sm text-muted-foreground">
+                    {goal.periodStart}
+                  </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="text-sm text-foreground">
@@ -145,7 +170,11 @@ export const GamificationGoalsView = ({ data }: GamificationGoalsViewProps) => {
                       target: goal.targetMinutes,
                     })}
                   </span>
-                  <Button variant="ghost" size="sm" onClick={() => setDeleteTarget(goal)}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setDeleteTarget(goal)}
+                  >
                     {t("deleteAction")}
                   </Button>
                 </div>

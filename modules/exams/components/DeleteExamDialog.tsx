@@ -13,7 +13,12 @@ export interface DeleteExamDialogProps {
   onDeleted?: () => void;
 }
 
-export function DeleteExamDialog({ open, onOpenChange, exam, onDeleted }: DeleteExamDialogProps) {
+export function DeleteExamDialog({
+  open,
+  onOpenChange,
+  exam,
+  onDeleted,
+}: DeleteExamDialogProps) {
   const t = useTranslations("exams.delete");
 
   if (!exam) return null;

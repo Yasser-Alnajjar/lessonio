@@ -15,7 +15,9 @@ interface GradesOverviewViewProps {
 export const GradesOverviewView = ({ data }: GradesOverviewViewProps) => {
   const t = useTranslate("grades.overview");
 
-  const gradedSubjects = data.subjects.filter((subject) => subject.average !== null);
+  const gradedSubjects = data.subjects.filter(
+    (subject) => subject.average !== null,
+  );
 
   return (
     <div className="flex flex-col gap-6 p-4">
@@ -34,13 +36,20 @@ export const GradesOverviewView = ({ data }: GradesOverviewViewProps) => {
           }}
         />
         <StatisticCard
-          stat={{ key: "subjectsGraded", label: t("stats.subjectsGraded"), value: gradedSubjects.length }}
+          stat={{
+            key: "subjectsGraded",
+            label: t("stats.subjectsGraded"),
+            value: gradedSubjects.length,
+          }}
         />
         <StatisticCard
           stat={{
             key: "examsScored",
             label: t("stats.examsScored"),
-            value: data.subjects.reduce((sum, subject) => sum + subject.examCount, 0),
+            value: data.subjects.reduce(
+              (sum, subject) => sum + subject.examCount,
+              0,
+            ),
           }}
         />
       </div>
@@ -48,7 +57,10 @@ export const GradesOverviewView = ({ data }: GradesOverviewViewProps) => {
       <GradeTrendChart data={data.trend} />
 
       {data.subjects.length === 0 ? (
-        <EmptyState title={t("emptyTitle")} description={t("emptyDescription")} />
+        <EmptyState
+          title={t("emptyTitle")}
+          description={t("emptyDescription")}
+        />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {data.subjects.map((subject) => (
@@ -73,11 +85,16 @@ export const GradesOverviewView = ({ data }: GradesOverviewViewProps) => {
                     <Badge variant="secondary">{subject.letter}</Badge>
                   </div>
                 ) : (
-                  <span className="text-sm text-muted-foreground">{t("noScoredExams")}</span>
+                  <span className="text-sm text-muted-foreground">
+                    {t("noScoredExams")}
+                  </span>
                 )}
 
                 <p className="text-xs text-muted-foreground">
-                  {t("cardMeta", { credits: subject.creditHours, exams: subject.examCount })}
+                  {t("cardMeta", {
+                    credits: subject.creditHours,
+                    exams: subject.examCount,
+                  })}
                 </p>
               </CardContent>
             </Card>

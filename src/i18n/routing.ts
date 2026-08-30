@@ -20,4 +20,8 @@ export const routing = defineRouting({
   locales,
   defaultLocale,
   localePrefix: "as-needed",
+  // Otherwise a browser sending `Accept-Language: en` gets redirected to
+  // `/en` on first visit despite `defaultLocale` being "ar" — negotiation
+  // only kicks in once `NEXT_LOCALE` is set (e.g. via `LanguageSwitch`).
+  localeDetection: false,
 });

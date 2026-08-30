@@ -33,7 +33,13 @@ export const attachmentsActions = {
       );
       return { data: data.data, error: null };
     } catch (error) {
-      return { data: null, error: getApiErrorMessage(error, "This share link is invalid or has expired.") };
+      return {
+        data: null,
+        error: getApiErrorMessage(
+          error,
+          "This share link is invalid or has expired.",
+        ),
+      };
     }
   },
 

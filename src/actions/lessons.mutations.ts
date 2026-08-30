@@ -22,7 +22,9 @@ import { getApiErrorMessage } from "@/lib/client/errors";
 import type { MutationResult } from "@/lib/types/common";
 import type { CreateLessonInput, UpdateLessonInput } from "@/lib/types/lesson";
 
-export async function createLesson(input: CreateLessonInput): Promise<MutationResult> {
+export async function createLesson(
+  input: CreateLessonInput,
+): Promise<MutationResult> {
   try {
     // CreateLessonInput already matches LESSON-003's body 1:1, tagIds included.
     await axios.post("/api/v1/lessons", input);

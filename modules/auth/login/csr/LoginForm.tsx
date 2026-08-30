@@ -131,11 +131,7 @@ export const LoginForm = () => {
               </p>
             )}
 
-            <Button
-              type="submit"
-              disabled={isPending}
-              className="mt-2"
-            >
+            <Button type="submit" disabled={isPending} className="mt-2">
               {isPending ? <LessonioSpinner /> : <LogIn />}
               {isPending ? t("submitting") : t("submit")}
             </Button>

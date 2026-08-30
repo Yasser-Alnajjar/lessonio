@@ -65,6 +65,7 @@ export function privatePageMetadata(
 }
 
 type PrivateScreen =
+  | "adminNotificationSettings"
   | "calendarMonth"
   | "classesList"
   | "classroomAssignments"
@@ -104,6 +105,10 @@ const privateScreenCopy: Record<
   Record<PrivateScreen, { title: string; description: string }>
 > = {
   en: {
+    adminNotificationSettings: {
+      title: "Notification settings",
+      description: "Manage system-wide notification policies.",
+    },
     calendarMonth: {
       title: "Calendar",
       description: "Your private study calendar.",
@@ -220,6 +225,10 @@ const privateScreenCopy: Record<
     },
   },
   ar: {
+    adminNotificationSettings: {
+      title: "إعدادات الإشعارات",
+      description: "أدر سياسات الإشعارات على مستوى النظام.",
+    },
     calendarMonth: { title: "التقويم", description: "تقويم دراستك الخاص." },
     classesList: { title: "الحصص", description: "جدول حصصك الخاص." },
     classroomAssignments: {

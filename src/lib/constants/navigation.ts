@@ -14,6 +14,7 @@ import {
   Percent,
   Presentation,
   Settings,
+  ShieldCheck,
   Target,
   Timer,
   Trophy,
@@ -32,6 +33,7 @@ export interface NavItem {
 
 const STUDENT_ONLY: readonly AppRole[] = ["student"];
 const TEACHER_ONLY: readonly AppRole[] = ["teacher"];
+const ADMIN_ONLY: readonly AppRole[] = ["admin"];
 
 /**
  * Single source of truth for the primary application navigation, shared by
@@ -143,6 +145,12 @@ export const NAV_ITEMS = [
     roles: STUDENT_ONLY,
   },
   {
+    href: "/admin/notification-settings",
+    key: "adminNotificationSettings",
+    icon: ShieldCheck,
+    roles: ADMIN_ONLY,
+  },
+  {
     href: "/notifications/center",
     key: "notifications",
     icon: Bell,
@@ -166,6 +174,7 @@ export const NAV_ITEMS = [
 export const ROLE_HOME: Record<AppRole, string> = {
   student: "/dashboard/overview",
   teacher: "/teaching/classes",
+  admin: "/admin/notification-settings",
 };
 
 const ALL_NAV_HREFS = NAV_ITEMS.map((item) => item.href);

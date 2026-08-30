@@ -4,7 +4,12 @@ import { auth } from "@auth";
 import { axios } from "@/lib/client";
 import type { ActionResult } from "@/lib/types/common";
 import type { ExamWithRelations } from "@/lib/types/exam";
-import { createExam, deleteExam, updateExam, updateExamScore } from "./exams.mutations";
+import {
+  createExam,
+  deleteExam,
+  updateExam,
+  updateExamScore,
+} from "./exams.mutations";
 
 /** SSR-facing surface for `Actions.Exams.*`. Mutations re-export the real Server Actions. */
 export const examsActions = {
@@ -19,7 +24,9 @@ export const examsActions = {
     if (!session?.user?.id) return { data: [], error: null };
 
     try {
-      const { data } = await axios.get<{ data: ExamWithRelations[] }>("/api/v1/exams");
+      const { data } = await axios.get<{ data: ExamWithRelations[] }>(
+        "/api/v1/exams",
+      );
       return { data: data.data, error: null };
     } catch {
       return { data: [], error: null };

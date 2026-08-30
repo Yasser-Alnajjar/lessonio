@@ -2,7 +2,10 @@ import "server-only";
 
 import { axios } from "@/lib/client";
 import type { ActionResult } from "@/lib/types/common";
-import type { MySubmission, SubmissionQueueEntry } from "@/lib/types/submission";
+import type {
+  MySubmission,
+  SubmissionQueueEntry,
+} from "@/lib/types/submission";
 import { gradeSubmission, submitAssignment } from "./submissions.mutations";
 
 /**

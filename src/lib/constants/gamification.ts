@@ -1,4 +1,11 @@
-import { Award, CheckCircle, Clock, Flame, Sparkles, type LucideIcon } from "lucide-react";
+import {
+  Award,
+  CheckCircle,
+  Clock,
+  Flame,
+  Sparkles,
+  type LucideIcon,
+} from "lucide-react";
 
 /** XP awarded per unit of real activity. Tunable — no derived value depends on the exact numbers. */
 export const XP_PER_COMPLETED_LESSON = 10;

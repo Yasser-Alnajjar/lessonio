@@ -24,7 +24,9 @@ export const FlashcardsDeckView = ({ decks }: FlashcardsDeckViewProps) => {
     <div className="flex flex-col gap-6 p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold text-foreground">{t("title")}</h1>
+          <h1 className="text-xl font-semibold text-foreground">
+            {t("title")}
+          </h1>
           <p className="text-sm text-muted-foreground">
             {t("subtitle", { total: totalCards, due: totalDue })}
           </p>
@@ -63,7 +65,9 @@ export const FlashcardsDeckView = ({ decks }: FlashcardsDeckViewProps) => {
                   <span className="text-2xl font-semibold tabular-nums text-foreground">
                     {deck.totalCards}
                   </span>
-                  <span className="text-xs text-muted-foreground">{t("cardsLabel")}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {t("cardsLabel")}
+                  </span>
                   {deck.dueCount > 0 && (
                     <Badge variant="secondary" className="ms-auto">
                       {t("dueCount", { count: deck.dueCount })}
@@ -71,13 +75,28 @@ export const FlashcardsDeckView = ({ decks }: FlashcardsDeckViewProps) => {
                   )}
                 </div>
                 {deck.dueCount > 0 ? (
-                  <Button asChild variant="outline" size="sm" className="w-full">
-                    <Link href={{ pathname: "/flashcards/review", query: { subjectId: deck.subjectId } }}>
+                  <Button
+                    asChild
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                  >
+                    <Link
+                      href={{
+                        pathname: "/flashcards/review",
+                        query: { subjectId: deck.subjectId },
+                      }}
+                    >
                       {t("review")}
                     </Link>
                   </Button>
                 ) : (
-                  <Button variant="outline" size="sm" disabled className="w-full">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled
+                    className="w-full"
+                  >
                     {t("review")}
                   </Button>
                 )}

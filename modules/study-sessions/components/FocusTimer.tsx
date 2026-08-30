@@ -202,11 +202,7 @@ export function FocusTimer({ running, subjects, lessons }: FocusTimerProps) {
               </SelectContent>
             </Select>
 
-            <Button
-              onClick={handleStart}
-              disabled={pending}
-              className="gap-2"
-            >
+            <Button onClick={handleStart} disabled={pending} className="gap-2">
               {isStarting ? (
                 <LessonioSpinner className="size-4" />
               ) : (

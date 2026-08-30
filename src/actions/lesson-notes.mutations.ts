@@ -25,7 +25,9 @@ export type CreateNoteResult =
   | { success: false; error: string; note: null };
 
 /** `lessonId` addresses the route (`POST lessons/{lessonId}/notes`, NOTE-002) and is not part of the body. */
-export async function createNote(input: CreateLessonNoteInput): Promise<CreateNoteResult> {
+export async function createNote(
+  input: CreateLessonNoteInput,
+): Promise<CreateNoteResult> {
   try {
     const { data } = await axios.post<{ data: LessonNote }>(
       `/api/v1/lessons/${input.lessonId}/notes`,

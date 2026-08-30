@@ -16,7 +16,9 @@ interface SearchResultsViewProps {
   query: string;
 }
 
-function groupByKind(data: SearchResultItemType[]): Map<SearchResultKind, SearchResultItemType[]> {
+function groupByKind(
+  data: SearchResultItemType[],
+): Map<SearchResultKind, SearchResultItemType[]> {
   const groups = new Map<SearchResultKind, SearchResultItemType[]>();
   for (const item of data) {
     const existing = groups.get(item.kind) ?? [];
@@ -34,9 +36,13 @@ export const SearchResultsView = ({ data, query }: SearchResultsViewProps) => {
   return (
     <div className="flex flex-col gap-6 p-4">
       <div>
-        <h1 className="text-xl font-semibold text-foreground">{t("results.title")}</h1>
+        <h1 className="text-xl font-semibold text-foreground">
+          {t("results.title")}
+        </h1>
         <p className="text-sm text-muted-foreground">
-          {trimmedQuery ? t("results.subtitle", { query: trimmedQuery }) : t("results.promptDescription")}
+          {trimmedQuery
+            ? t("results.subtitle", { query: trimmedQuery })
+            : t("results.promptDescription")}
         </p>
       </div>
 
@@ -54,18 +60,23 @@ export const SearchResultsView = ({ data, query }: SearchResultsViewProps) => {
         />
       ) : (
         <div className="flex flex-col gap-6">
-          {SEARCH_RESULT_GROUP_ORDER.filter((kind) => groups.has(kind)).map((kind) => (
-            <div key={kind} className="flex flex-col gap-1">
-              <h2 className="px-3 text-sm font-medium text-muted-foreground">
-                {t(`groups.${kind}`)}
-              </h2>
-              <div className="flex flex-col gap-0.5">
-                {groups.get(kind)!.map((item) => (
-                  <SearchResultItem key={`${item.kind}-${item.id}`} item={item} />
-                ))}
+          {SEARCH_RESULT_GROUP_ORDER.filter((kind) => groups.has(kind)).map(
+            (kind) => (
+              <div key={kind} className="flex flex-col gap-1">
+                <h2 className="px-3 text-sm font-medium text-muted-foreground">
+                  {t(`groups.${kind}`)}
+                </h2>
+                <div className="flex flex-col gap-0.5">
+                  {groups.get(kind)!.map((item) => (
+                    <SearchResultItem
+                      key={`${item.kind}-${item.id}`}
+                      item={item}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            ),
+          )}
         </div>
       )}
     </div>

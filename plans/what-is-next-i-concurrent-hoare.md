@@ -12,18 +12,18 @@ high-value additions the existing data model is already half-prepared for.
 and `start()`/`stop()` return `"Not implemented until Phase 10."` The history page renders
 `FeaturePlaceholder`. Meanwhile four other domains query the `study_sessions` table for real:
 
-| Consumer | Line |
-|---|---|
-| Statistics — weekly study time | [`statistics.ts:70`](src/actions/statistics.ts:70) |
-| Dashboard — weekly summary | [`dashboard.ts:217`](src/actions/dashboard.ts:217), [`:292`](src/actions/dashboard.ts:292) |
-| Gamification — XP per study hour | [`gamification.ts:77`](src/actions/gamification.ts:77) |
-| Subject detail — per-subject study time | [`subjects.ts:107`](src/actions/subjects.ts:107) |
+| Consumer                                | Line                                                                                       |
+| --------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Statistics — weekly study time          | [`statistics.ts:70`](src/actions/statistics.ts:70)                                         |
+| Dashboard — weekly summary              | [`dashboard.ts:217`](src/actions/dashboard.ts:217), [`:292`](src/actions/dashboard.ts:292) |
+| Gamification — XP per study hour        | [`gamification.ts:77`](src/actions/gamification.ts:77)                                     |
+| Subject detail — per-subject study time | [`subjects.ts:107`](src/actions/subjects.ts:107)                                           |
 
 Nothing anywhere writes to that table, so every study-time chart, the weekly summary, and the
 `XP_PER_STUDY_HOUR` term in [`xp.ts`](src/lib/gamification/xp.ts) are permanently zero. The DB is
 ready and waiting — the migration even ships a partial index
-`idx_study_sessions_running ... where ended_at is null` commented *"Fast lookup for 'is there a
-session currently running' (Start/Stop timer UI)"*, and `duration_minutes` is a **generated stored
+`idx_study_sessions_running ... where ended_at is null` commented _"Fast lookup for 'is there a
+session currently running' (Start/Stop timer UI)"_, and `duration_minutes` is a **generated stored
 column**, so the actions only need `insert` + `update ended_at`.
 
 Outcome: close the gap first (Phase 19), then add flashcards, grades/GPA, and a calendar feed.
@@ -90,7 +90,7 @@ src/app/[locale]/(app)/study-sessions/focus/page.tsx   # Suspense + PageLoader o
   is reachable in one click.
 - **Nav** — add `{ href: "/study-sessions/focus", key: "studySessions", icon: Timer }` to
   `NAV_ITEMS` in [`navigation.ts`](src/lib/constants/navigation.ts). Note `isActivePath` handles
-  two entries per domain by comparing the *second* segment, so `focus` and `history` will highlight
+  two entries per domain by comparing the _second_ segment, so `focus` and `history` will highlight
   independently — no change needed there.
 - **i18n** — `messages/en.json` and `messages/ar.json` have **no `studySessions` namespace yet**;
   add it to both (every other domain has one). RTL must be checked.

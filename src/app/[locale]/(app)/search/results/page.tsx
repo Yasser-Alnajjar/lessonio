@@ -6,7 +6,9 @@ interface SearchResultsPageProps {
   searchParams: Promise<{ q?: string }>;
 }
 
-export default function SearchResultsPage({ searchParams }: SearchResultsPageProps) {
+export default function SearchResultsPage({
+  searchParams,
+}: SearchResultsPageProps) {
   return (
     <Suspense fallback={<PageLoader />}>
       <Search.SearchResults searchParams={searchParams} />

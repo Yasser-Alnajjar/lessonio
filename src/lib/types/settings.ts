@@ -5,24 +5,39 @@ import type { NotificationType } from "./notification";
 export const THEME_MODES = ["light", "dark", "system"] as const;
 export type ThemeMode = (typeof THEME_MODES)[number];
 
+export interface NotificationChannelPreferences {
+  in_app: boolean;
+  email: boolean;
+  push: boolean;
+}
+
+export interface NotificationTypePreference {
+  in_app: boolean;
+  email: boolean;
+}
+
 export interface NotificationPreferences {
-  enabledInBrowser: boolean;
-  enabledInEmail: boolean;
-  types: Record<NotificationType, boolean>;
+  channels: NotificationChannelPreferences;
+  types: Record<NotificationType, NotificationTypePreference>;
 }
 
 /** Mirrors the `settings.notification_preferences` jsonb column default. */
 export const DEFAULT_NOTIFICATION_PREFERENCES: NotificationPreferences = {
-  enabledInBrowser: true,
-  enabledInEmail: false,
+  channels: { in_app: true, email: false, push: false },
   types: {
-    upcoming_lesson: true,
-    homework_due: true,
-    daily_reminder: true,
-    upcoming_class: true,
-    review_reminder: true,
-    assignment_assigned: true,
-    assignment_graded: true,
+    "lesson.upcoming": { in_app: true, email: false },
+    "lesson.review_due": { in_app: true, email: false },
+    "homework.due_soon": { in_app: true, email: false },
+    "class.reminder": { in_app: true, email: false },
+    "digest.daily": { in_app: true, email: false },
+    "assignment.published": { in_app: true, email: false },
+    "assignment.updated": { in_app: true, email: false },
+    "assignment.due_soon": { in_app: true, email: false },
+    "submission.created": { in_app: true, email: false },
+    "submission.graded": { in_app: true, email: false },
+    "exam.reminder": { in_app: true, email: false },
+    "achievement.unlocked": { in_app: true, email: false },
+    "goal.completed": { in_app: true, email: false },
   },
 };
 

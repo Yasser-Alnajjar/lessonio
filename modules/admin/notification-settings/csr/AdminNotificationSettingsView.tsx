@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import useTranslate from "@/hooks/useTranslate";
 import { useRouter } from "@/i18n/navigation";
 import type { NotificationPolicyEntry } from "@/lib/types/notification-policy";
+import { AdminNav } from "../../components/AdminNav";
 
 interface AdminNotificationSettingsViewProps {
   data: NotificationPolicyEntry[];
@@ -155,7 +156,9 @@ export const AdminNotificationSettingsView = ({
   const groups = groupByGroup(data);
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 p-4">
+      <AdminNav />
+
       <div>
         <h1 className="text-foreground text-xl font-semibold">{t("title")}</h1>
         <p className="text-muted-foreground text-sm">{t("subtitle")}</p>

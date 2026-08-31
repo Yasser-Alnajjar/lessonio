@@ -28,7 +28,9 @@ function renderContent(
   fallback: string,
 ): string {
   if (Object.keys(data).length === 0) return fallback;
-  return t.has(key) ? t(key, data as Record<string, string | number>) : fallback;
+  return t.has(key)
+    ? t(key, data as Record<string, string | number>)
+    : fallback;
 }
 
 export function renderNotificationTitle(

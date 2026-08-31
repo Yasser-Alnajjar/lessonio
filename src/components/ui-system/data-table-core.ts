@@ -54,6 +54,23 @@ export interface DataTableRowAction<TData> {
   isHidden?: (row: TData) => boolean;
 }
 
+/**
+ * Opts a `DataTable` into server-side pagination: `data` is treated as
+ * exactly one page already fetched from the server, and the client
+ * paginator is neutralized so it renders as a single client page.
+ * `onPageChange` is expected to be wrapped in `useTransition` by the
+ * caller — see the plan's per-view wiring snippet.
+ */
+export interface DataTableServerPagination {
+  page: number;
+  lastPage: number;
+  isPending?: boolean;
+  onPageChange: (page: number) => void;
+  perPage: number;
+  onPerPageChange: (perPage: number) => void;
+  perPageOptions?: number[];
+}
+
 export interface DataTableProps<TData extends DataTableRowData> {
   columns: DataTableColumnDef<TData>[];
   data: TData[];
@@ -68,4 +85,6 @@ export interface DataTableProps<TData extends DataTableRowData> {
   onRowSelectionChange?: (selectedIds: string[]) => void;
   pageSize?: number;
   className?: string;
+  /** When present, `data` is one server-fetched page and the footer paginates via `onPageChange` instead of client-side. */
+  serverPagination?: DataTableServerPagination;
 }

@@ -10,7 +10,14 @@ import {
   ChevronRightIcon,
   MoreHorizontal,
 } from "lucide-react";
-
+import { useTranslations } from "next-intl";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableHeader,
@@ -28,6 +35,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+} from "@/components/ui/pagination";
 import { cn } from "@/lib/utils";
 import { EmptyState } from "@/components/ui-system/empty-state";
 import {
@@ -50,7 +63,9 @@ export function DataTable<TData extends DataTableRowData>({
   onRowSelectionChange,
   pageSize = 10,
   className,
+  serverPagination,
 }: DataTableProps<TData>) {
+  const t = useTranslations("common.table");
   const fullColumns = React.useMemo<DataTableColumnDef<TData>[]>(() => {
     const selectionColumn: DisplayColumnDef<typeof dataTableFeatures, TData> = {
       id: "select",
@@ -122,7 +137,14 @@ export function DataTable<TData extends DataTableRowData>({
     columns: fullColumns,
     data: data.length > 0 ? data : (EMPTY_DATA as TData[]),
     getRowId,
-    initialState: { pagination: { pageIndex: 0, pageSize } },
+    // A server page is already exactly the rows to show — one client "page"
+    // of that same size, so the client paginator never re-slices it.
+    initialState: {
+      pagination: {
+        pageIndex: 0,
+        pageSize: serverPagination ? Math.max(data.length, 1) : pageSize,
+      },
+    },
   });
 
   React.useEffect(() => {
@@ -137,7 +159,10 @@ export function DataTable<TData extends DataTableRowData>({
     );
   }
 
-  if (data.length === 0) {
+  // An out-of-range server page (e.g. a filter shrank the result set) still
+  // has a Prev button to recover with — only an actually-empty result set
+  // (no server pagination, or genuinely on page 1) shows the empty state.
+  if (data.length === 0 && (!serverPagination || serverPagination.page === 1)) {
     return <EmptyState {...emptyState} className={className} />;
   }
 
@@ -195,32 +220,124 @@ export function DataTable<TData extends DataTableRowData>({
         </Table>
       </div>
 
-      <div className="flex items-center justify-between gap-4">
-        <p className="text-xs text-muted-foreground">
-          Page {table.state.pagination.pageIndex + 1} of{" "}
-          {Math.max(1, table.getPageCount())}
-        </p>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <ChevronLeftIcon className="size-4 rtl:rotate-180" />
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-            <ChevronRightIcon className="size-4 rtl:rotate-180" />
-          </Button>
+      {serverPagination ? (
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">
+              {t("rowsPerPage")}
+            </span>
+
+            <Select
+              value={String(serverPagination.perPage)}
+              onValueChange={(value) => {
+                serverPagination.onPerPageChange(Number(value));
+              }}
+              disabled={serverPagination.isPending}
+            >
+              <SelectTrigger className="h-8 w-[80px]">
+                <SelectValue />
+              </SelectTrigger>
+
+              <SelectContent>
+                {(serverPagination.perPageOptions ?? [10, 25, 50, 100]).map(
+                  (option) => (
+                    <SelectItem key={option} value={String(option)}>
+                      {option}
+                    </SelectItem>
+                  ),
+                )}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <p className="text-xs text-muted-foreground">
+            {t("pageOf", {
+              page: serverPagination.page,
+              total: Math.max(1, serverPagination.lastPage),
+            })}
+          </p>
+
+          <Pagination className="mx-0 w-auto">
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationLink
+                  href="#"
+                  size="default"
+                  aria-disabled={
+                    serverPagination.page <= 1 || serverPagination.isPending
+                  }
+                  className={cn(
+                    "gap-1 px-2.5",
+                    (serverPagination.page <= 1 ||
+                      serverPagination.isPending) &&
+                      "pointer-events-none opacity-50",
+                  )}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    serverPagination.onPageChange(serverPagination.page - 1);
+                  }}
+                >
+                  <ChevronLeftIcon className="size-4 rtl:rotate-180" />
+                  <span className="hidden sm:block">{t("previous")}</span>
+                </PaginationLink>
+              </PaginationItem>
+
+              <PaginationItem>
+                <PaginationLink
+                  href="#"
+                  size="default"
+                  aria-disabled={
+                    serverPagination.page >= serverPagination.lastPage ||
+                    serverPagination.isPending
+                  }
+                  className={cn(
+                    "gap-1 px-2.5",
+                    (serverPagination.page >= serverPagination.lastPage ||
+                      serverPagination.isPending) &&
+                      "pointer-events-none opacity-50",
+                  )}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    serverPagination.onPageChange(serverPagination.page + 1);
+                  }}
+                >
+                  <span className="hidden sm:block">{t("next")}</span>
+                  <ChevronRightIcon className="size-4 rtl:rotate-180" />
+                </PaginationLink>
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
         </div>
-      </div>
+      ) : (
+        <div className="flex items-center justify-between gap-4">
+          <p className="text-xs text-muted-foreground">
+            {t("pageOf", {
+              page: table.state.pagination.pageIndex + 1,
+              total: Math.max(1, table.getPageCount()),
+            })}
+          </p>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
+              <ChevronLeftIcon className="size-4 rtl:rotate-180" />
+              {t("previous")}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+            >
+              {t("next")}
+              <ChevronRightIcon className="size-4 rtl:rotate-180" />
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

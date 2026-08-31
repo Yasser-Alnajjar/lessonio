@@ -66,6 +66,11 @@ export function privatePageMetadata(
 
 type PrivateScreen =
   | "adminNotificationSettings"
+  | "adminOverview"
+  | "adminUsers"
+  | "adminTeacherClasses"
+  | "adminAssignments"
+  | "adminNotificationJobs"
   | "calendarMonth"
   | "classesList"
   | "classroomAssignments"
@@ -108,6 +113,26 @@ const privateScreenCopy: Record<
     adminNotificationSettings: {
       title: "Notification settings",
       description: "Manage system-wide notification policies.",
+    },
+    adminOverview: {
+      title: "Admin overview",
+      description: "A snapshot of accounts, content, and notification jobs.",
+    },
+    adminUsers: {
+      title: "Users",
+      description: "Every account across the product.",
+    },
+    adminTeacherClasses: {
+      title: "Teacher classes",
+      description: "Classes created by every teacher.",
+    },
+    adminAssignments: {
+      title: "Assignments",
+      description: "Assignments across every teacher's classes.",
+    },
+    adminNotificationJobs: {
+      title: "Notification jobs",
+      description: "Every scheduled and sent notification job.",
     },
     calendarMonth: {
       title: "Calendar",
@@ -228,6 +253,26 @@ const privateScreenCopy: Record<
     adminNotificationSettings: {
       title: "إعدادات الإشعارات",
       description: "أدر سياسات الإشعارات على مستوى النظام.",
+    },
+    adminOverview: {
+      title: "نظرة عامة على الإدارة",
+      description: "لمحة عن الحسابات والمحتوى ومهام الإشعارات.",
+    },
+    adminUsers: {
+      title: "المستخدمون",
+      description: "كل الحسابات في المنتج.",
+    },
+    adminTeacherClasses: {
+      title: "حصص المعلمين",
+      description: "الحصص التي أنشأها كل معلم.",
+    },
+    adminAssignments: {
+      title: "الواجبات",
+      description: "الواجبات عبر حصص كل المعلمين.",
+    },
+    adminNotificationJobs: {
+      title: "مهام الإشعارات",
+      description: "كل مهمة إشعار مجدولة أو مُرسَلة.",
     },
     calendarMonth: { title: "التقويم", description: "تقويم دراستك الخاص." },
     classesList: { title: "الحصص", description: "جدول حصصك الخاص." },

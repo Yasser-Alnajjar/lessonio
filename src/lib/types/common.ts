@@ -15,11 +15,18 @@ export interface MutationResult {
   error: string | null;
 }
 
+/** The camelCase `meta` envelope every admin list endpoint returns. */
+export interface PaginationMeta {
+  page: number;
+  perPage: number;
+  total: number;
+  lastPage: number;
+  hasMore: boolean;
+}
+
 export interface PaginatedResult<T> {
   data: T[];
-  total: number;
-  page: number;
-  pageSize: number;
+  meta: PaginationMeta;
 }
 
 export interface AuditFields {

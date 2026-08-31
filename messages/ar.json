@@ -18,7 +18,13 @@
     "error": "حدث خطأ ما",
     "retry": "إعادة المحاولة",
     "back": "رجوع",
-    "noDataYet": "لا توجد بيانات بعد"
+    "noDataYet": "لا توجد بيانات بعد",
+    "table": {
+      "previous": "السابق",
+      "next": "التالي",
+      "pageOf": "صفحة {page} من {total}",
+      "rowsPerPage": "عدد الصفوف"
+    }
   },
   "offline": {
     "banner": "أنت غير متصل بالإنترنت. سيتم مزامنة التغييرات تلقائيًا عند عودة الاتصال.",
@@ -50,7 +56,7 @@
     "teachingAssignments": "الواجبات المسندة",
     "classroomClasses": "حصصي",
     "classroomAssignments": "مهام الحصص",
-    "adminNotificationSettings": "إعدادات الإشعارات"
+    "admin": "الإدارة"
   },
   "landing": {
     "meta": {
@@ -2415,6 +2421,185 @@
       "downloadError": "تعذّر تنزيل هذا الملف. حاول مرة أخرى.",
       "invalidTitle": "الرابط غير متاح",
       "invalidDescription": "رابط المشاركة هذا غير صالح أو انتهت صلاحيته."
+    }
+  },
+  "admin": {
+    "nav": {
+      "label": "التنقل الإداري",
+      "overview": "نظرة عامة",
+      "users": "المستخدمون",
+      "classes": "الحصص",
+      "assignments": "الواجبات",
+      "jobs": "مهام الإشعارات",
+      "notificationSettings": "إعدادات الإشعارات"
+    },
+    "overview": {
+      "title": "نظرة عامة على الإدارة",
+      "subtitle": "لمحة عن الحسابات والمحتوى وحالة مسار الإشعارات.",
+      "users": {
+        "title": "المستخدمون",
+        "total": "إجمالي المستخدمين",
+        "students": "الطلاب",
+        "teachers": "المعلمون",
+        "admins": "المشرفون",
+        "unassigned": "بدون دور",
+        "newLast7Days": "جدد خلال 7 أيام"
+      },
+      "content": {
+        "title": "المحتوى",
+        "teacherClasses": "حصص المعلمين",
+        "archivedTeacherClasses": "الحصص المؤرشفة",
+        "assignments": "الواجبات",
+        "publishedAssignments": "الواجبات المنشورة",
+        "submissions": "التسليمات",
+        "lessons": "الدروس",
+        "subjects": "المواد"
+      },
+      "engagement": {
+        "title": "التفاعل",
+        "runningStudySessions": "جلسات مذاكرة جارية",
+        "studyMinutesLast7Days": "دقائق المذاكرة (آخر 7 أيام)"
+      },
+      "notificationJobs": {
+        "title": "مهام الإشعارات",
+        "pending": "قيد الانتظار",
+        "processing": "قيد المعالجة",
+        "sent": "مُرسَلة",
+        "failed": "فشلت",
+        "cancelled": "ملغاة",
+        "oldestPending": "أقدم مهمة قيد الانتظار"
+      },
+      "signupTrend": {
+        "title": "التسجيلات (آخر 14 يومًا)"
+      },
+      "loadError": "تعذّر تحميل النظرة العامة. حاول إعادة تحميل الصفحة."
+    },
+    "users": {
+      "title": "المستخدمون",
+      "subtitle": "كل الحسابات في المنتج، بغض النظر عمّن أنشأها.",
+      "searchPlaceholder": "ابحث بالاسم أو البريد الإلكتروني",
+      "roleFilterAll": "كل الأدوار",
+      "table": {
+        "name": "الاسم",
+        "email": "البريد الإلكتروني",
+        "role": "الدور",
+        "joined": "تاريخ الانضمام",
+        "changeRole": "تغيير الدور"
+      },
+      "emptyTitle": "لا يوجد مستخدمون",
+      "emptyDescription": "جرّب بحثًا أو تصفية مختلفة.",
+      "detail": {
+        "backToUsers": "العودة إلى المستخدمين",
+        "notFound": "المستخدم غير موجود.",
+        "memberSince": "عضو منذ",
+        "timezone": "المنطقة الزمنية",
+        "counts": {
+          "title": "المحتوى المملوك",
+          "lessons": "الدروس",
+          "subjects": "المواد",
+          "studySessions": "جلسات المذاكرة",
+          "teacherClasses": "حصص التدريس",
+          "assignments": "الواجبات"
+        }
+      },
+      "changeRoleDialog": {
+        "title": "تغيير الدور",
+        "description": "انقل {name} إلى دور مختلف. يسري هذا التغيير فورًا على الخادم.",
+        "roleLabel": "الدور",
+        "sessionWarning": "يجب على المستخدم تسجيل الدخول من جديد ليسري هذا بالكامل — تظل جلسته الحالية بالدور القديم حتى ذلك الحين.",
+        "submit": "تغيير الدور",
+        "submitting": "جارٍ التغيير...",
+        "cancel": "إلغاء",
+        "errors": {
+          "roleRequired": "اختر دورًا."
+        }
+      }
+    },
+    "classes": {
+      "title": "حصص المعلمين",
+      "subtitle": "الحصص التي أنشأها كل معلم، وليس حصصك فقط.",
+      "searchPlaceholder": "ابحث باسم الحصة",
+      "archivedFilter": {
+        "all": "كل الحصص",
+        "active": "النشطة فقط",
+        "archived": "المؤرشفة فقط"
+      },
+      "table": {
+        "name": "الحصة",
+        "teacher": "المعلم",
+        "students": "الطلاب",
+        "status": "الحالة",
+        "archive": "أرشفة",
+        "unarchive": "إلغاء الأرشفة"
+      },
+      "statusArchived": "مؤرشفة",
+      "statusActive": "نشطة",
+      "emptyTitle": "لا توجد حصص",
+      "emptyDescription": "جرّب بحثًا أو تصفية مختلفة.",
+      "archiveDialog": {
+        "title": "أرشفة الحصة",
+        "description": "سيتم أرشفة \"{name}\" وإخفاؤها من الاستخدام النشط. لن يؤدي هذا إلى حذف قائمة الطلاب أو السجل.",
+        "confirm": "أرشفة"
+      },
+      "unarchiveDialog": {
+        "title": "إلغاء أرشفة الحصة",
+        "description": "ستعود \"{name}\" نشطة من جديد.",
+        "confirm": "إلغاء الأرشفة"
+      }
+    },
+    "assignments": {
+      "title": "الواجبات",
+      "subtitle": "الواجبات عبر حصص كل المعلمين، بما في ذلك المسودات.",
+      "searchPlaceholder": "ابحث بالعنوان",
+      "statusFilterAll": "كل الحالات",
+      "statusDraft": "مسودة",
+      "statusPublished": "منشور",
+      "table": {
+        "title": "الواجب",
+        "class": "الحصة",
+        "teacher": "المعلم",
+        "status": "الحالة",
+        "dueAt": "الاستحقاق",
+        "unpublish": "إلغاء النشر"
+      },
+      "emptyTitle": "لا توجد واجبات",
+      "emptyDescription": "جرّب بحثًا أو تصفية مختلفة.",
+      "unpublishDialog": {
+        "title": "إلغاء نشر الواجب",
+        "description": "سيعود \"{title}\" إلى مسودة وستُلغى تذكيراته المعلّقة قبل الاستحقاق. تبقى التسليمات كما هي.",
+        "confirm": "إلغاء النشر"
+      }
+    },
+    "jobs": {
+      "title": "مهام الإشعارات",
+      "subtitle": "كل مهمة إشعار مجدولة أو مُرسَلة في المسار.",
+      "statusFilterAll": "كل الحالات",
+      "eventTypeFilterAll": "كل أنواع الأحداث",
+      "stats": {
+        "pending": "قيد الانتظار",
+        "processing": "قيد المعالجة",
+        "sent": "مُرسَلة",
+        "failed": "فشلت",
+        "cancelled": "ملغاة",
+        "oldestPending": "أقدم مهمة قيد الانتظار"
+      },
+      "table": {
+        "eventType": "الحدث",
+        "recipient": "المستلم",
+        "status": "الحالة",
+        "scheduledAt": "موعد الجدولة",
+        "attempts": "المحاولات"
+      },
+      "emptyTitle": "لا توجد مهام إشعارات",
+      "emptyDescription": "جرّب تصفية مختلفة."
+    },
+    "roles": {
+      "student": "طالب",
+      "teacher": "معلم",
+      "admin": "مشرف"
+    },
+    "actions": {
+      "view": "عرض"
     }
   }
 }

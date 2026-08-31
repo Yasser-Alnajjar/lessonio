@@ -145,8 +145,8 @@ export const NAV_ITEMS = [
     roles: STUDENT_ONLY,
   },
   {
-    href: "/admin/notification-settings",
-    key: "adminNotificationSettings",
+    href: "/admin/overview",
+    key: "admin",
     icon: ShieldCheck,
     roles: ADMIN_ONLY,
   },
@@ -174,7 +174,7 @@ export const NAV_ITEMS = [
 export const ROLE_HOME: Record<AppRole, string> = {
   student: "/dashboard/overview",
   teacher: "/teaching/classes",
-  admin: "/admin/notification-settings",
+  admin: "/admin/overview",
 };
 
 const ALL_NAV_HREFS = NAV_ITEMS.map((item) => item.href);

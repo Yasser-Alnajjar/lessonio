@@ -18,7 +18,13 @@
     "error": "Something went wrong",
     "retry": "Retry",
     "back": "Back",
-    "noDataYet": "No data yet"
+    "noDataYet": "No data yet",
+    "table": {
+      "previous": "Previous",
+      "next": "Next",
+      "pageOf": "Page {page} of {total}",
+      "rowsPerPage": "Rows per page"
+    }
   },
   "offline": {
     "banner": "You're offline. Changes will sync automatically once you're back online.",
@@ -50,7 +56,7 @@
     "teachingAssignments": "Assignments",
     "classroomClasses": "My Classes",
     "classroomAssignments": "Assignments",
-    "adminNotificationSettings": "Notification settings"
+    "admin": "Admin"
   },
   "landing": {
     "meta": {
@@ -2415,6 +2421,185 @@
       "downloadError": "Couldn't download this file. Try again.",
       "invalidTitle": "Link unavailable",
       "invalidDescription": "This share link is invalid or has expired."
+    }
+  },
+  "admin": {
+    "nav": {
+      "label": "Admin navigation",
+      "overview": "Overview",
+      "users": "Users",
+      "classes": "Classes",
+      "assignments": "Assignments",
+      "jobs": "Notification jobs",
+      "notificationSettings": "Notification settings"
+    },
+    "overview": {
+      "title": "Admin overview",
+      "subtitle": "A snapshot of accounts, content, and the notification pipeline.",
+      "users": {
+        "title": "Users",
+        "total": "Total users",
+        "students": "Students",
+        "teachers": "Teachers",
+        "admins": "Admins",
+        "unassigned": "Unassigned role",
+        "newLast7Days": "New in last 7 days"
+      },
+      "content": {
+        "title": "Content",
+        "teacherClasses": "Teacher classes",
+        "archivedTeacherClasses": "Archived classes",
+        "assignments": "Assignments",
+        "publishedAssignments": "Published assignments",
+        "submissions": "Submissions",
+        "lessons": "Lessons",
+        "subjects": "Subjects"
+      },
+      "engagement": {
+        "title": "Engagement",
+        "runningStudySessions": "Study sessions in progress",
+        "studyMinutesLast7Days": "Study minutes (last 7 days)"
+      },
+      "notificationJobs": {
+        "title": "Notification jobs",
+        "pending": "Pending",
+        "processing": "Processing",
+        "sent": "Sent",
+        "failed": "Failed",
+        "cancelled": "Cancelled",
+        "oldestPending": "Oldest pending job"
+      },
+      "signupTrend": {
+        "title": "Signups (last 14 days)"
+      },
+      "loadError": "We couldn't load the overview. Try reloading the page."
+    },
+    "users": {
+      "title": "Users",
+      "subtitle": "Every account across the product, regardless of who created it.",
+      "searchPlaceholder": "Search by name or email",
+      "roleFilterAll": "All roles",
+      "table": {
+        "name": "Name",
+        "email": "Email",
+        "role": "Role",
+        "joined": "Joined",
+        "changeRole": "Change role"
+      },
+      "emptyTitle": "No users found",
+      "emptyDescription": "Try a different search or filter.",
+      "detail": {
+        "backToUsers": "Back to users",
+        "notFound": "User not found.",
+        "memberSince": "Member since",
+        "timezone": "Timezone",
+        "counts": {
+          "title": "Content owned",
+          "lessons": "Lessons",
+          "subjects": "Subjects",
+          "studySessions": "Study sessions",
+          "teacherClasses": "Teacher classes",
+          "assignments": "Assignments"
+        }
+      },
+      "changeRoleDialog": {
+        "title": "Change role",
+        "description": "Move {name} to a different role. This takes effect immediately on the backend.",
+        "roleLabel": "Role",
+        "sessionWarning": "The user must sign in again for this to take full effect — their current session keeps its old role until then.",
+        "submit": "Change role",
+        "submitting": "Changing...",
+        "cancel": "Cancel",
+        "errors": {
+          "roleRequired": "Choose a role."
+        }
+      }
+    },
+    "classes": {
+      "title": "Teacher classes",
+      "subtitle": "Classes created by every teacher, not just your own.",
+      "searchPlaceholder": "Search by class name",
+      "archivedFilter": {
+        "all": "All classes",
+        "active": "Active only",
+        "archived": "Archived only"
+      },
+      "table": {
+        "name": "Class",
+        "teacher": "Teacher",
+        "students": "Students",
+        "status": "Status",
+        "archive": "Archive",
+        "unarchive": "Unarchive"
+      },
+      "statusArchived": "Archived",
+      "statusActive": "Active",
+      "emptyTitle": "No classes found",
+      "emptyDescription": "Try a different search or filter.",
+      "archiveDialog": {
+        "title": "Archive class",
+        "description": "\"{name}\" will be archived and hidden from active use. This does not delete its roster or history.",
+        "confirm": "Archive"
+      },
+      "unarchiveDialog": {
+        "title": "Unarchive class",
+        "description": "\"{name}\" will become active again.",
+        "confirm": "Unarchive"
+      }
+    },
+    "assignments": {
+      "title": "Assignments",
+      "subtitle": "Assignments across every teacher's classes, including drafts.",
+      "searchPlaceholder": "Search by title",
+      "statusFilterAll": "All statuses",
+      "statusDraft": "Draft",
+      "statusPublished": "Published",
+      "table": {
+        "title": "Assignment",
+        "class": "Class",
+        "teacher": "Teacher",
+        "status": "Status",
+        "dueAt": "Due",
+        "unpublish": "Unpublish"
+      },
+      "emptyTitle": "No assignments found",
+      "emptyDescription": "Try a different search or filter.",
+      "unpublishDialog": {
+        "title": "Unpublish assignment",
+        "description": "\"{title}\" will return to draft and its pending due-soon reminders will be cancelled. Submissions are kept.",
+        "confirm": "Unpublish"
+      }
+    },
+    "jobs": {
+      "title": "Notification jobs",
+      "subtitle": "Every scheduled and sent notification job in the pipeline.",
+      "statusFilterAll": "All statuses",
+      "eventTypeFilterAll": "All event types",
+      "stats": {
+        "pending": "Pending",
+        "processing": "Processing",
+        "sent": "Sent",
+        "failed": "Failed",
+        "cancelled": "Cancelled",
+        "oldestPending": "Oldest pending"
+      },
+      "table": {
+        "eventType": "Event",
+        "recipient": "Recipient",
+        "status": "Status",
+        "scheduledAt": "Scheduled for",
+        "attempts": "Attempts"
+      },
+      "emptyTitle": "No notification jobs found",
+      "emptyDescription": "Try a different filter."
+    },
+    "roles": {
+      "student": "Student",
+      "teacher": "Teacher",
+      "admin": "Admin"
+    },
+    "actions": {
+      "view": "View"
     }
   }
 }

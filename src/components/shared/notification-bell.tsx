@@ -64,7 +64,8 @@ export function NotificationBell({
 
   const refresh = useCallback(() => {
     getRecentNotifications().then(setData);
-  }, []);
+    router.refresh();
+  }, [router]);
 
   useEffect(() => {
     refresh();
@@ -195,67 +196,68 @@ export function NotificationBell({
           )}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <div className="max-h-[70vh] overflow-y-auto">
+          {isLoading ? (
+            <p className="text-muted-foreground px-2 py-6 text-center text-sm">
+              {t("loading")}
+            </p>
+          ) : hasError ? (
+            <p
+              role="alert"
+              className="text-destructive px-2 py-6 text-center text-sm"
+            >
+              {t("loadError")}
+            </p>
+          ) : items.length === 0 ? (
+            <p className="text-muted-foreground px-2 py-6 text-center text-sm">
+              {t("empty")}
+            </p>
+          ) : (
+            sections.map(
+              ({ label, items: sectionItems }) =>
+                sectionItems.length > 0 && (
+                  <React.Fragment key={label}>
+                    <DropdownMenuLabel dir={isArabic ? "rtl" : "ltr"}>
+                      {label}
+                    </DropdownMenuLabel>
 
-        {isLoading ? (
-          <p className="text-muted-foreground px-2 py-6 text-center text-sm">
-            {t("loading")}
-          </p>
-        ) : hasError ? (
-          <p
-            role="alert"
-            className="text-destructive px-2 py-6 text-center text-sm"
-          >
-            {t("loadError")}
-          </p>
-        ) : items.length === 0 ? (
-          <p className="text-muted-foreground px-2 py-6 text-center text-sm">
-            {t("empty")}
-          </p>
-        ) : (
-          sections.map(
-            ({ label, items: sectionItems }) =>
-              sectionItems.length > 0 && (
-                <React.Fragment key={label}>
-                  <DropdownMenuLabel dir={isArabic ? "rtl" : "ltr"}>
-                    {label}
-                  </DropdownMenuLabel>
+                    {sectionItems.map((notification) => (
+                      <DropdownMenuItem
+                        key={notification.id}
+                        dir={isArabic ? "rtl" : "ltr"}
+                        onSelect={() => handleSelect(notification)}
+                        className={cn(
+                          "cursor-pointer items-start gap-2.5 py-2",
+                          notification.readAt === null
+                            ? "bg-accent/40"
+                            : "bg-card focus:bg-card opacity-80",
+                        )}
+                      >
+                        <NotificationIcon type={notification.type} />
 
-                  {sectionItems.map((notification) => (
-                    <DropdownMenuItem
-                      key={notification.id}
-                      dir={isArabic ? "rtl" : "ltr"}
-                      onSelect={() => handleSelect(notification)}
-                      className={cn(
-                        "cursor-pointer items-start gap-2.5 py-2",
-                        notification.readAt === null
-                          ? "bg-accent/40"
-                          : "bg-card focus:bg-card opacity-80",
-                      )}
-                    >
-                      <NotificationIcon type={notification.type} />
+                        <span className="flex min-w-0 flex-col gap-0.5">
+                          <span
+                            className={cn(
+                              "truncate text-sm",
+                              notification.readAt === null
+                                ? "font-bold"
+                                : "font-medium",
+                            )}
+                          >
+                            {renderNotificationTitle(tContent, notification)}
+                          </span>
 
-                      <span className="flex min-w-0 flex-col gap-0.5">
-                        <span
-                          className={cn(
-                            "truncate text-sm",
-                            notification.readAt === null
-                              ? "font-bold"
-                              : "font-medium",
-                          )}
-                        >
-                          {renderNotificationTitle(tContent, notification)}
+                          <span className="line-clamp-2 text-xs text-muted-foreground">
+                            {renderNotificationBody(tContent, notification)}
+                          </span>
                         </span>
-
-                        <span className="line-clamp-2 text-xs text-muted-foreground">
-                          {renderNotificationBody(tContent, notification)}
-                        </span>
-                      </span>
-                    </DropdownMenuItem>
-                  ))}
-                </React.Fragment>
-              ),
-          )
-        )}
+                      </DropdownMenuItem>
+                    ))}
+                  </React.Fragment>
+                ),
+            )
+          )}
+        </div>
 
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
